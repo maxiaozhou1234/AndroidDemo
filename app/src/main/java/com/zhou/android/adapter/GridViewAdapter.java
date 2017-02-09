@@ -62,7 +62,7 @@ public class GridViewAdapter extends BaseAdapter {
         GridViewItem item = list.get(position);
         String simpleName = "";
         try {
-            simpleName = Class.forName(item.targetClass).getSimpleName();
+            simpleName = item.clz == null ? Class.forName(item.targetClass).getSimpleName() : item.clz.getSimpleName();
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }

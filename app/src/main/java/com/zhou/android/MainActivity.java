@@ -26,7 +26,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         gridView = (GridView) findViewById(R.id.gridView);
         final List<GridViewItem> list = new ArrayList<>();
-        list.add(new GridViewItem(SurfaceActivity.class.getName(), "界面绘制"));
+        list.add(new GridViewItem(SurfaceActivity.class, "界面绘制"));
         list.add(new GridViewItem("Test", "测试"));
         list.add(new GridViewItem("Apple", "苹果"));
         list.add(new GridViewItem("Banana", "香蕉"));
@@ -39,7 +39,7 @@ public class MainActivity extends AppCompatActivity {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 GridViewItem item = list.get(position);
                 try {
-                    startActivity(new Intent(MainActivity.this, Class.forName(item.targetClass)));
+                    startActivity(new Intent(MainActivity.this, item.clz));
                 } catch (Exception e) {
                     e.printStackTrace();
                     Toast.makeText(MainActivity.this, String.format("start %s failed", TextUtils.isEmpty(item.zhName) ? item.targetClass : item.zhName), Toast.LENGTH_SHORT).show();
