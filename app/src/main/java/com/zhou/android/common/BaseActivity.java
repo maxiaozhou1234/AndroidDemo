@@ -9,15 +9,15 @@ import android.view.MenuItem;
  * Created by ZhOu on 2017/2/9.
  */
 
-public class BaseActivity extends AppCompatActivity {
+public abstract class BaseActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView();
-        getSupportActionBar().setTitle(getClass().getSimpleName());
+        getSupportActionBar().setTitle(getClass().getSimpleName().replace("Activity", ""));
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        initView();
+        init();
         addListener();
     }
 
@@ -29,17 +29,12 @@ public class BaseActivity extends AppCompatActivity {
         } else
             return super.onOptionsItemSelected(item);
     }
-    
-    public void back(){
+
+    public void back() {
         finish();
     }
 
-    protected void setContentView() {
-    }
-
-    protected void initView() {
-    }
-
-    protected void addListener() {
-    }
+    protected abstract void setContentView();
+    protected abstract void init();
+    protected abstract void addListener();
 }

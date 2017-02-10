@@ -9,6 +9,7 @@ import android.widget.AdapterView;
 import android.widget.GridView;
 import android.widget.Toast;
 
+import com.zhou.android.SysDemo.FingerPrintActivity;
 import com.zhou.android.UIDemo.SurfaceActivity;
 import com.zhou.android.adapter.GridViewAdapter;
 import com.zhou.android.item.GridViewItem;
@@ -27,6 +28,7 @@ public class MainActivity extends AppCompatActivity {
         gridView = (GridView) findViewById(R.id.gridView);
         final List<GridViewItem> list = new ArrayList<>();
         list.add(new GridViewItem(SurfaceActivity.class, "界面绘制"));
+        list.add(new GridViewItem(FingerPrintActivity.class, "指纹解锁"));
         list.add(new GridViewItem("Test", "测试"));
         list.add(new GridViewItem("Apple", "苹果"));
         list.add(new GridViewItem("Banana", "香蕉"));

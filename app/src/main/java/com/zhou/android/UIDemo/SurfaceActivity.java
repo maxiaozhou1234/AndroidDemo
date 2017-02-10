@@ -1,8 +1,5 @@
 package com.zhou.android.UIDemo;
 
-import android.os.Bundle;
-import android.support.annotation.Nullable;
-
 import com.zhou.android.R;
 import com.zhou.android.common.BaseActivity;
 
@@ -13,8 +10,17 @@ import com.zhou.android.common.BaseActivity;
 public class SurfaceActivity extends BaseActivity {
 
     @Override
-    protected void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+    protected void setContentView() {
         setContentView(R.layout.activity_surface);
+    }
+
+    @Override
+    protected void init() {
+
+    }
+
+    @Override
+    protected void addListener() {
+
     }
 }
