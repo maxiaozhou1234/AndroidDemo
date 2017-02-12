@@ -18,6 +18,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.Toast;
 
@@ -36,6 +37,8 @@ public class FingerPrintActivity extends BaseActivity {
 
     private final static int FINGERPRINT = 0x1001;
 
+    private EditText et_pay;
+
     private FingerprintManager fingerprintManager;
 
 //    private KeyguardManager keyguardManager;
@@ -47,6 +50,8 @@ public class FingerPrintActivity extends BaseActivity {
     private Dialog fingerDialog, keyDialog;
 
     private boolean fingerPrintIsUsable = true;
+
+    private FingerPrintCallback fingerPrintCallback = new FingerPrintCallback();
 
     private CancellationSignal cancellationSignal = new CancellationSignal();
 
@@ -72,6 +77,12 @@ public class FingerPrintActivity extends BaseActivity {
                 Log.d(TAG, "Your device unsupported FingerPrint!");
                 fingerPrintIsUsable = false;
             }
+            if (fingerPrintIsUsable && !fingerprintManager.hasEnrolledFingerprints()) {
+                Log.e(TAG, "Your device dose not have a fingerprint.");
+                fingerPrintIsUsable = false;
+
+            }
+
         } catch (Exception e) {
             e.printStackTrace();
             Log.d(TAG, "Use FingerPrint Api failed!");
@@ -102,6 +113,7 @@ public class FingerPrintActivity extends BaseActivity {
             }
         }
 
+        et_pay = (EditText) findViewById(R.id.et_pay);
         imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
         Log.d(TAG, "result:" + fingerPrintIsUsable);
     }
@@ -111,8 +123,9 @@ public class FingerPrintActivity extends BaseActivity {
     }
 
     public void onClick(View view) {
+        et_pay.clearFocus();
         if (fingerPrintIsUsable &&
-                ContextCompat.checkSelfPermission(this, Manifest.permission.USE_FINGERPRINT) != PackageManager.PERMISSION_GRANTED)
+                ContextCompat.checkSelfPermission(this, Manifest.permission.USE_FINGERPRINT) == PackageManager.PERMISSION_GRANTED)
             useFingerPrint();
         else useKeyboard();
     }
@@ -154,7 +167,7 @@ public class FingerPrintActivity extends BaseActivity {
         });
         fingerDialog.show();
 
-        fingerprintManager.authenticate(null, cancellationSignal, 0, new FingerPrintCallback(), handler);
+        fingerprintManager.authenticate(null, cancellationSignal, 0, fingerPrintCallback, handler);
 
     }
 
