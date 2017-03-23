@@ -1,4 +1,4 @@
-package com.zhou.android.SysDemo;
+package com.zhou.android.main;
 
 import android.Manifest;
 import android.app.AlertDialog;

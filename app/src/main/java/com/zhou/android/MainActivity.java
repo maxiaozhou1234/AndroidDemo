@@ -9,11 +9,13 @@ import android.widget.AdapterView;
 import android.widget.GridView;
 import android.widget.Toast;
 
-import com.zhou.android.SysDemo.FingerPrintActivity;
-import com.zhou.android.UIDemo.ScrollTestActivity;
-import com.zhou.android.UIDemo.SurfaceActivity;
 import com.zhou.android.adapter.GridViewAdapter;
 import com.zhou.android.item.GridViewItem;
+import com.zhou.android.main.FingerPrintActivity;
+import com.zhou.android.main.FloatBallActivity;
+import com.zhou.android.main.ForbidScreenshotActivity;
+import com.zhou.android.main.ScrollTestActivity;
+import com.zhou.android.main.SurfaceActivity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,6 +33,8 @@ public class MainActivity extends AppCompatActivity {
         list.add(new GridViewItem(SurfaceActivity.class, "界面绘制"));
         list.add(new GridViewItem(FingerPrintActivity.class, "指纹解锁"));
         list.add(new GridViewItem(ScrollTestActivity.class, "滑动测试"));
+        list.add(new GridViewItem(ForbidScreenshotActivity.class, "禁止截屏"));
+        list.add(new GridViewItem(FloatBallActivity.class, "悬浮球"));
         list.add(new GridViewItem("Test", "测试"));
         list.add(new GridViewItem("Apple", "苹果"));
         list.add(new GridViewItem("Banana", "香蕉"));

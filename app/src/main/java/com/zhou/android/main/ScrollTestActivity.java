@@ -1,4 +1,4 @@
-package com.zhou.android.UIDemo;
+package com.zhou.android.main;
 
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;

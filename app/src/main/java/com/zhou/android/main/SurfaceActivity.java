@@ -1,9 +1,10 @@
-package com.zhou.android.UIDemo;
+package com.zhou.android.main;
 
 import com.zhou.android.R;
 import com.zhou.android.common.BaseActivity;
 
 /**
+ * 
  * Created by ZhOu on 2017/2/8.
  */
 
