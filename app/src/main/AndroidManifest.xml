@@ -26,6 +26,10 @@
             android:name=".SysDemo.FingerPrintActivity"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustPan" />
+        <activity
+            android:name="com.zhou.android.UIDemo.ScrollTestActivity"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="adjustPan" />
     </application>
 
 </manifest>
