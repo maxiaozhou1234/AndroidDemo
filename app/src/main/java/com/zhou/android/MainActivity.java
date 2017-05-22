@@ -12,6 +12,7 @@ import android.widget.Toast;
 
 import com.zhou.android.adapter.GridViewAdapter;
 import com.zhou.android.item.GridViewItem;
+import com.zhou.android.main.BroadcastReceiverActivity;
 import com.zhou.android.main.FingerPrintActivity;
 import com.zhou.android.main.FloatBallActivity;
 import com.zhou.android.main.ForbidScreenshotActivity;
@@ -36,6 +37,7 @@ public class MainActivity extends AppCompatActivity {
         list.add(new GridViewItem(ScrollTestActivity.class, "滑动测试"));
         list.add(new GridViewItem(ForbidScreenshotActivity.class, "禁止截屏"));
         list.add(new GridViewItem(FloatBallActivity.class, "悬浮球"));
+        list.add(new GridViewItem(BroadcastReceiverActivity.class, "App广播"));
         list.add(new GridViewItem("Test", "测试"));
         list.add(new GridViewItem("Apple", "苹果"));
         list.add(new GridViewItem("Banana", "香蕉"));
@@ -50,7 +52,7 @@ public class MainActivity extends AppCompatActivity {
                 try {
                     startActivity(new Intent(MainActivity.this, item.clz));
                 } catch (Exception e) {
-                    e.printStackTrace();
+//                    e.printStackTrace();
                     Toast.makeText(MainActivity.this, String.format("start %s failed", TextUtils.isEmpty(item.zhName) ? item.targetClass : item.zhName), Toast.LENGTH_SHORT).show();
                 }
             }

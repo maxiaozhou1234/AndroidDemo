@@ -64,7 +64,7 @@ public class GridViewAdapter extends BaseAdapter {
         try {
             simpleName = item.clz == null ? Class.forName(item.targetClass).getSimpleName() : item.clz.getSimpleName();
         } catch (ClassNotFoundException e) {
-            e.printStackTrace();
+//            e.printStackTrace();
         }
         holder.ll_bg.setBackgroundColor(color[position % color.length]);
         holder.tv_name.setText(TextUtils.isEmpty(simpleName) ? item.targetClass.substring(0, 1).toUpperCase() : simpleName.substring(0, 1).toUpperCase());

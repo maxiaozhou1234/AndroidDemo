@@ -7,6 +7,8 @@
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.GET_TASKS" />
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
+    <uses-permission android:name="android.permission.WAKE_LOCK"/>
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
 
     <application
         android:name=".ZApplication"
@@ -28,9 +30,9 @@
                 <category android:name="android.intent.category.DEFAULT" />
 
                 <data
+                    android:host="www.zhou.com"
                     android:pathPrefix="/h5/open"
-                    android:scheme="zhou"
-                    android:host="www.zhou.com"/>
+                    android:scheme="zhou" />
             </intent-filter>
         </activity>
         <activity
@@ -48,16 +50,21 @@
         <activity
             android:name="com.zhou.android.main.ForbidScreenshotActivity"
             android:screenOrientation="portrait"
-            android:windowSoftInputMode="adjustPan">
-        </activity>
+            android:windowSoftInputMode="adjustPan" />
         <activity
             android:name="com.zhou.android.main.FloatBallActivity"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="adjustPan" />
+
+        <activity
+            android:name="com.zhou.android.main.BroadcastReceiverActivity"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustPan" />
 
         <service
             android:name="com.zhou.android.service.FloatBallService"
             android:exported="false" />
+
     </application>
 
 </manifest>
