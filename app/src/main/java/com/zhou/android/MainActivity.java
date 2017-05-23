@@ -13,6 +13,8 @@ import android.widget.Toast;
 import com.zhou.android.adapter.GridViewAdapter;
 import com.zhou.android.item.GridViewItem;
 import com.zhou.android.main.BroadcastReceiverActivity;
+import com.zhou.android.main.CallLogActivity;
+import com.zhou.android.main.ContactActivity;
 import com.zhou.android.main.FingerPrintActivity;
 import com.zhou.android.main.FloatBallActivity;
 import com.zhou.android.main.ForbidScreenshotActivity;
@@ -38,6 +40,8 @@ public class MainActivity extends AppCompatActivity {
         list.add(new GridViewItem(ForbidScreenshotActivity.class, "禁止截屏"));
         list.add(new GridViewItem(FloatBallActivity.class, "悬浮球"));
         list.add(new GridViewItem(BroadcastReceiverActivity.class, "App广播"));
+        list.add(new GridViewItem(ContactActivity.class, "通讯录"));
+        list.add(new GridViewItem(CallLogActivity.class, "通话记录"));
         list.add(new GridViewItem("Test", "测试"));
         list.add(new GridViewItem("Apple", "苹果"));
         list.add(new GridViewItem("Banana", "香蕉"));

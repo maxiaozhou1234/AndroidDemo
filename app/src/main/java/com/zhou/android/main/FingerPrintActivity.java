@@ -167,7 +167,11 @@ public class FingerPrintActivity extends BaseActivity {
         });
         fingerDialog.show();
 
-        fingerprintManager.authenticate(null, cancellationSignal, 0, fingerPrintCallback, handler);
+        try {
+            fingerprintManager.authenticate(null, cancellationSignal, 0, fingerPrintCallback, handler);
+        }catch (SecurityException e){
+            e.printStackTrace();
+        }
 
     }
 
