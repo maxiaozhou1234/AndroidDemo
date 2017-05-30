@@ -45,24 +45,4 @@ public class FloatView extends View {
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         setMeasuredDimension(size, size);
     }
-
-    @Override
-    public boolean onTouchEvent(MotionEvent event) {
-        if (MotionEvent.ACTION_DOWN == event.getAction()) {
-            if (onClickListener != null)
-                onClickListener.onViewClick(this);
-            return true;
-        } else
-            return super.onTouchEvent(event);
-    }
-
-    public interface OnClickListener {
-        void onViewClick(View v);
-    }
-
-    private OnClickListener onClickListener;
-
-    public void setOnClickListener(OnClickListener onClickListener) {
-        this.onClickListener = onClickListener;
-    }
 }

@@ -12,12 +12,27 @@
         android:src="@drawable/ic_viewgroup" />
 
     <Button
+        android:id="@+id/btn_screen"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
         android:layout_centerHorizontal="true"
         android:layout_marginBottom="4dp"
+        android:layout_marginLeft="10dp"
         android:onClick="onClick"
         android:text="@string/get_screen" />
+
+    <Button
+        android:id="@+id/btn_snap"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="4dp"
+        android:layout_marginRight="10dp"
+        android:onClick="onClick"
+        android:text="@string/get_snap_shot" />
 
 </RelativeLayout>

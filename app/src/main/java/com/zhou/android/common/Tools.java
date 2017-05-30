@@ -53,8 +53,13 @@ public class Tools {
 
     public static String[] getTopActivity(Context context) {
         ActivityManager am = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
-        String packageName = am.getRunningTasks(1).get(0).topActivity.getPackageName();
-        String activityName = am.getRunningTasks(1).get(0).topActivity.getClassName();
+        ActivityManager.RunningTaskInfo runningTaskInfo = am.getRunningTasks(1).get(0);
+        String packageName = runningTaskInfo.topActivity.getPackageName();
+        String activityName = runningTaskInfo.topActivity.getClassName();
         return new String[]{packageName, activityName};
+    }
+
+    public static float getDpi(Context context) {
+        return context.getResources().getDisplayMetrics().density;
     }
 }
