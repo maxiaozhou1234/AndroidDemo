@@ -22,7 +22,6 @@ public class BroadcastReceiverActivity extends BaseActivity {
     public final String TAG = "zhou";
     private TestReceiver testReceiver, testReceiver2;
     private MediaPlayer mp;
-    private boolean isStop = false;
     private String uri = "";
 
     @Override
@@ -77,13 +76,15 @@ public class BroadcastReceiverActivity extends BaseActivity {
             Log.d(TAG, "System send.");
         } else if (R.id.btn_start == id) {
             try {
+                if (mp != null && mp.isPlaying())
+                    return;
+
                 mp = new MediaPlayer();
                 mp.setDataSource(this, Uri.parse(uri));
                 mp.setAudioStreamType(AudioManager.STREAM_NOTIFICATION);
                 mp.setLooping(true);
                 mp.prepare();
                 mp.start();
-                isStop = false;
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -91,7 +92,7 @@ public class BroadcastReceiverActivity extends BaseActivity {
             if (mp != null) {
                 mp.stop();
                 mp.release();
-                isStop = true;
+                mp = null;
             }
         }
     }
