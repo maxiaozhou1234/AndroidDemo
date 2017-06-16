@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Set;
 
 /**
+ * Bluetooth 蓝牙主页列表测试用
  * Created by ZhOu on 2017/6/14.
  */
 
@@ -99,7 +100,7 @@ public class BluetoothMainActivity extends BaseActivity {
         super.onDestroy();
         unregisterReceiver(bluetoothReceiver);
         if (bluetoothChatService != null) {
-            bluetoothChatService.stop();
+            bluetoothChatService.initiativeStop();
             bluetoothChatService = null;
         }
     }
@@ -183,9 +184,17 @@ public class BluetoothMainActivity extends BaseActivity {
                 v = (String) o;
             else
                 v = new String((byte[]) o);
-//            if (msg.what == MessageType.MESSAGE_READ) {
-//                Toast.makeText(BluetoothMainActivity.this, v, Toast.LENGTH_SHORT).show();
-//            }
+            if (msg.what == MessageType.MESSAGE_READ) {
+                Toast.makeText(BluetoothMainActivity.this, v, Toast.LENGTH_SHORT).show();
+                if (v.equals(MessageType.MESSAGE_DISCONNECT_DEVICE)) {
+                    Log.d(TAG, "断开连接");
+                }
+            } else if (msg.what == MessageType.MESSAGE_WRITE) {
+                Toast.makeText(BluetoothMainActivity.this, v, Toast.LENGTH_SHORT).show();
+                if (v.equals(MessageType.MESSAGE_DISCONNECT_DEVICE)) {
+                    Log.d(TAG, "断开连接");
+                }
+            }
             Log.d(TAG, msg.what + " : " + v);
         }
     };

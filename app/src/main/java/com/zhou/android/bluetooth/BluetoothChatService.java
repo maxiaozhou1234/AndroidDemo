@@ -14,6 +14,7 @@ import java.io.OutputStream;
 import java.util.UUID;
 
 /**
+ * Bluetooth 蓝牙通信服务
  * Created by ZhOu on 2017/6/14.
  */
 
@@ -32,8 +33,6 @@ public class BluetoothChatService {
     private ConnectThread connectThread;
     private ConnectedThread connectedThread;
 
-    private BluetoothDevice remoteDevice;
-
     private int state = StateNone;
 
     public BluetoothChatService(Context context, Handler handler) {
@@ -50,7 +49,7 @@ public class BluetoothChatService {
             try {
                 bluetoothServerSocket = bluetoothAdapter.listenUsingRfcommWithServiceRecord("BluetoothChat", uuid);
             } catch (IOException e) {
-                e.printStackTrace();
+//                e.printStackTrace();
                 bluetoothServerSocket = null;
             }
         }
@@ -62,7 +61,7 @@ public class BluetoothChatService {
                 try {
                     bluetoothSocket = bluetoothServerSocket.accept();
                 } catch (IOException e) {
-                    e.printStackTrace();
+//                    e.printStackTrace();
                     break;
                 }
                 if (bluetoothSocket != null) {
@@ -106,7 +105,7 @@ public class BluetoothChatService {
             try {
                 tmp = device.createRfcommSocketToServiceRecord(uuid);
             } catch (IOException e) {
-                e.printStackTrace();
+//                e.printStackTrace();
                 tmp = null;
             }
             bluetoothSocket = tmp;
@@ -118,7 +117,7 @@ public class BluetoothChatService {
             try {
                 bluetoothSocket.connect();
             } catch (IOException e) {
-                e.printStackTrace();
+//                e.printStackTrace();
                 try {
                     bluetoothSocket.close();
                 } catch (IOException e1) {
@@ -140,7 +139,7 @@ public class BluetoothChatService {
             try {
                 bluetoothSocket.close();
             } catch (IOException e) {
-                e.printStackTrace();
+//                e.printStackTrace();
             }
         }
     }
@@ -157,7 +156,7 @@ public class BluetoothChatService {
                 inputStream = bluetoothSocket.getInputStream();
                 outputStream = bluetoothSocket.getOutputStream();
             } catch (IOException e) {
-                e.printStackTrace();
+//                e.printStackTrace();
             }
         }
 
@@ -165,26 +164,44 @@ public class BluetoothChatService {
         public void run() {
             byte[] buffer = new byte[1024];
             int len;
-
             while (true) {
+                if (inputStream == null)
+                    break;
                 try {
                     len = inputStream.read(buffer);
-                    handler.obtainMessage(MessageType.MESSAGE_READ, len, -1, buffer).sendToTarget();
+                    if (len != -1) {
+                        String v = new String(buffer, 0, len);
+                        handler.obtainMessage(MessageType.MESSAGE_READ, v).sendToTarget();
+                    }
                 } catch (IOException e) {
-                    e.printStackTrace();
+//                    e.printStackTrace();
                     connectionLost();
                     BluetoothChatService.this.start();
+                    break;
+                } catch (NullPointerException e) {
+//                    e.printStackTrace();
                     break;
                 }
             }
         }
 
         public void write(byte[] buffer) {
+            if (buffer == null) {
+                return;
+            }
             try {
                 outputStream.write(buffer);
                 handler.obtainMessage(MessageType.MESSAGE_WRITE, -1, -1, buffer).sendToTarget();
-            } catch (IOException e) {
-                e.printStackTrace();
+            } catch (Exception e) {
+//                e.printStackTrace();
+            }
+        }
+
+        public void disconnect() {
+            try {
+                outputStream.write(MessageType.MESSAGE_DISCONNECT_DEVICE.getBytes());
+            } catch (Exception e) {
+//                e.printStackTrace();
             }
         }
 
@@ -294,13 +311,32 @@ public class BluetoothChatService {
         setState(StateNone);
     }
 
+    /**
+     * 主动关闭，发送关闭消息通知对方
+     */
+    public void initiativeStop() {
+        disconnect();
+        stop();
+    }
+
     public void write(byte[] buffer) {
         ConnectedThread t;
         synchronized (BluetoothChatService.this) {
             if (state != StateConnected) return;
             t = connectedThread;
         }
-        t.write(buffer);
+        if (t != null)
+            t.write(buffer);
+    }
+
+    private void disconnect() {
+        ConnectedThread t;
+        synchronized (BluetoothChatService.this) {
+            if (state != StateConnected) return;
+            t = connectedThread;
+        }
+        if (t != null)
+            t.disconnect();
     }
 
     private void setState(int state) {

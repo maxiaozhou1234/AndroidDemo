@@ -2,4 +2,8 @@
     <string name="app_name">Android</string>
     <string name="get_screen">Get Screen</string>
     <string name="get_snap_shot">SnapShot</string>
+    <string name="bluetooth">蓝牙</string>
+    <string name="discoverable">开放可见</string>
+    <string name="match_devices">已配对设备</string>
+    <string name="use_devices">可用设备</string>
 </resources>

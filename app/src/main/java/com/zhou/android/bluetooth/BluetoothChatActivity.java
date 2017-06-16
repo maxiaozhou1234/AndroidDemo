@@ -19,7 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * 蓝牙聊天
+ * 蓝牙聊天 测试界面
  * <p>
  * Created by ZhOu on 2017/5/24.
  */
@@ -33,7 +33,7 @@ public class BluetoothChatActivity extends BaseActivity {
 
     @Override
     protected void setContentView() {
-        setContentView(R.layout.activity_bluetooth);
+        setContentView(R.layout.fragment_bluetooth_chat);
     }
 
     @Override

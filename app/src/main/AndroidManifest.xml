@@ -87,6 +87,11 @@
             android:name="com.zhou.android.bluetooth.BluetoothChatActivity"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustResize|stateAlwaysHidden" />
+        
+        <activity
+            android:name="com.zhou.android.bluetooth.BluetoothActivity"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="adjustResize|stateAlwaysHidden" />
 
         <service
             android:name="com.zhou.android.service.FloatBallService"
