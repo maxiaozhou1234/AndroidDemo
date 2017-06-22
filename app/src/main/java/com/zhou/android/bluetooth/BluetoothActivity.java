@@ -1,5 +1,7 @@
 package com.zhou.android.bluetooth;
 
+import android.app.Notification;
+import android.app.NotificationManager;
 import android.bluetooth.BluetoothDevice;
 import android.content.Context;
 import android.os.Bundle;
@@ -42,6 +44,8 @@ public class BluetoothActivity extends BaseActivity implements BluetoothListFrag
     private MenuItem bluetoothStatus;
     private InputMethodManager imm;
 
+    private NotificationManager notificationManager;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         this.savedInstanceState = savedInstanceState;
@@ -69,7 +73,7 @@ public class BluetoothActivity extends BaseActivity implements BluetoothListFrag
             transaction.add(R.id.fragment, listFragment, LIST_FRAGMENT);
             transaction.add(R.id.fragment, chatFragment, CHAT_FRAGMENT);
         }
-        transaction.setCustomAnimations(R.anim.slide_in_right, android.R.anim.slide_out_right);
+//        transaction.setCustomAnimations(R.anim.slide_in_right, android.R.anim.slide_out_right);
         transaction.hide(chatFragment).show(listFragment).commit();
         currentFragment = listFragment;
     }
@@ -168,8 +172,10 @@ public class BluetoothActivity extends BaseActivity implements BluetoothListFrag
                 } else {
                     if (currentFragment.getTag().equals(CHAT_FRAGMENT))
                         ((BluetoothChatFragment) currentFragment).pushMessage(message);
-                    else
+                    else {
+                        notification(mService.deviceName, message);
                         Log.d("zhou", message);
+                    }
                 }
             }
         }
@@ -212,5 +218,26 @@ public class BluetoothActivity extends BaseActivity implements BluetoothListFrag
             setSubtitle("");
         } else
             super.finish();
+    }
+
+    int messageId = 0;
+
+    private void notification(String name, String message) {
+        if (notificationManager == null)
+            notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        if (name == null)
+            name = "收到一条信息";
+        else
+            name += "发来信息";
+        Notification notification = new Notification.Builder(this)
+                .setContentTitle(name)
+                .setContentText(message)
+                .setAutoCancel(true)
+                .setSmallIcon(R.mipmap.ic_launcher)
+                .setDefaults(Notification.DEFAULT_SOUND)
+                .setTicker(message)
+                .build();
+        notificationManager.notify(messageId, notification);
+        messageId++;
     }
 }

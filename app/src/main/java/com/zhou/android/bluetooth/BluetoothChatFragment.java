@@ -41,6 +41,16 @@ public class BluetoothChatFragment extends Fragment {
     private CommonAdapter<ArrayMap<String, Object>> chatAdapter;
     private InputMethodManager imm;
 
+//    @Override
+//    public void onResume() {
+//        super.onResume();
+//        if (editText != null) {
+//            editText.setFocusable(true);
+//            editText.setFocusableInTouchMode(true);
+//            editText.requestFocus();
+//        }
+//    }
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {

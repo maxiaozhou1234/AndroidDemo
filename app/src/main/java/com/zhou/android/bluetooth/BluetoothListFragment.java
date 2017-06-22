@@ -247,6 +247,9 @@ public class BluetoothListFragment extends Fragment {
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (RequestBluetoothCode == requestCode) {
+            if (bluetoothAdapter.isDiscovering())
+                bluetoothAdapter.cancelDiscovery();
+            bluetoothAdapter.startDiscovery();
             sw_bluetooth.setChecked(-1 == resultCode);
             if (-1 != resultCode) {
                 Toast.makeText(getActivity(), "Open Bluetooth is failed,please open in Setting.",

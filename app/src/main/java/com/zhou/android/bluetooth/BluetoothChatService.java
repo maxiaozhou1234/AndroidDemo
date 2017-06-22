@@ -27,6 +27,8 @@ public class BluetoothChatService {
     public final static int StateConnecting = 2;
     public final static int StateConnected = 3;
 
+    public String deviceName = "";
+
     private final BluetoothAdapter bluetoothAdapter;
     private Handler handler;
     private AcceptThread acceptThread;
@@ -60,7 +62,7 @@ public class BluetoothChatService {
             while (state != StateConnected) {
                 try {
                     bluetoothSocket = bluetoothServerSocket.accept();
-                } catch (IOException e) {
+                } catch (Exception e) {
 //                    e.printStackTrace();
                     break;
                 }
@@ -88,7 +90,7 @@ public class BluetoothChatService {
         public void cancel() {
             try {
                 bluetoothServerSocket.close();
-            } catch (IOException e) {
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         }
@@ -138,7 +140,7 @@ public class BluetoothChatService {
         public void cancel() {
             try {
                 bluetoothSocket.close();
-            } catch (IOException e) {
+            } catch (Exception e) {
 //                e.printStackTrace();
             }
         }
@@ -275,7 +277,7 @@ public class BluetoothChatService {
         connectedThread = new ConnectedThread(bSocket);
         connectedThread.start();
 
-        handler.obtainMessage(MessageType.MESSAGE_DEVICE, bDevice.getName()).sendToTarget();
+        handler.obtainMessage(MessageType.MESSAGE_DEVICE, deviceName = bDevice.getName()).sendToTarget();
 
         setState(StateConnected);
     }
