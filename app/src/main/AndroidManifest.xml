@@ -24,7 +24,7 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".MainActivity">
+        <activity android:name=".kotlin.SimpleListKotlinActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -51,50 +51,48 @@
             android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustPan" />
         <activity
-            android:name="com.zhou.android.main.ScrollTestActivity"
+            android:name=".main.ScrollTestActivity"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustPan" />
         <activity
-            android:name="com.zhou.android.main.ForbidScreenshotActivity"
+            android:name=".main.ForbidScreenshotActivity"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustPan" />
         <activity
-            android:name="com.zhou.android.main.FloatBallActivity"
+            android:name=".main.FloatBallActivity"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustPan" />
-
         <activity
-            android:name="com.zhou.android.main.BroadcastReceiverActivity"
+            android:name=".main.BroadcastReceiverActivity"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustPan" />
-
         <activity
-            android:name="com.zhou.android.main.ContactActivity"
+            android:name=".main.ContactActivity"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustPan" />
-
         <activity
-            android:name="com.zhou.android.main.CallLogActivity"
+            android:name=".main.CallLogActivity"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustPan" />
-
         <activity
-            android:name="com.zhou.android.bluetooth.BluetoothMainActivity"
+            android:name=".bluetooth.BluetoothMainActivity"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustResize|stateAlwaysHidden" />
-
         <activity
-            android:name="com.zhou.android.bluetooth.BluetoothChatActivity"
+            android:name=".bluetooth.BluetoothChatActivity"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustResize|stateAlwaysHidden" />
-        
         <activity
-            android:name="com.zhou.android.bluetooth.BluetoothActivity"
+            android:name=".bluetooth.BluetoothActivity"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="adjustResize|stateAlwaysHidden" />
+        <activity
+            android:name=".MainActivity"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustResize|stateAlwaysHidden" />
 
         <service
-            android:name="com.zhou.android.service.FloatBallService"
+            android:name=".service.FloatBallService"
             android:exported="false" />
 
     </application>
