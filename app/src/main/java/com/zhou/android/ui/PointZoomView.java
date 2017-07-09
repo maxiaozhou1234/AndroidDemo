@@ -28,7 +28,7 @@ public class PointZoomView extends ImageView {
 
     private Matrix matrix = new Matrix();
 
-    private float imageWidth, imageHeight;
+    private float imageWidth = 0f, imageHeight = 0f;
     private float startY, endY;
 
     private Paint pointPaint;
@@ -93,12 +93,10 @@ public class PointZoomView extends ImageView {
         if (drawable != null) {
             imageWidth = drawable.getIntrinsicWidth();
             imageHeight = drawable.getIntrinsicHeight();
-            startY = (Tools.getScreenHeight(getContext()) - imageHeight) / 2
-                    + Tools.getStateHeight(getContext())
-                    + Tools.getDpi(getContext()) * 48;
-            endY = startY + imageHeight;
+//            startY = (viewHeight - imageHeight) / 2;
+//            endY = startY + imageHeight;
             Log.d("zhou", "w-h: " + imageWidth + "," + imageHeight);
-            Log.d("zhou", "start-: " + startY + "," + endY);
+//            Log.d("zhou", "start-: " + startY + "," + endY);
         }
     }
 
