@@ -20,6 +20,7 @@ import com.zhou.android.main.ContactActivity;
 import com.zhou.android.main.FingerPrintActivity;
 import com.zhou.android.main.FloatBallActivity;
 import com.zhou.android.main.ForbidScreenshotActivity;
+import com.zhou.android.main.PointZoomActivity;
 import com.zhou.android.main.ScrollTestActivity;
 import com.zhou.android.main.SurfaceActivity;
 
@@ -47,6 +48,7 @@ public class MainActivity extends AppCompatActivity {
 //        list.add(new GridViewItem(BluetoothMainActivity.class, "蓝牙通信"));
         list.add(new GridViewItem(BluetoothActivity.class, "蓝牙通信"));
         list.add(new GridViewItem(SimpleListKotlinActivity.class, "Kotlin"));
+        list.add(new GridViewItem(PointZoomActivity.class, "Point Zoom"));
         list.add(new GridViewItem("Test", "测试"));
         list.add(new GridViewItem("Apple", "苹果"));
         list.add(new GridViewItem("Banana", "香蕉"));

@@ -5,6 +5,8 @@ import android.content.Context;
 import android.util.DisplayMetrics;
 import android.view.WindowManager;
 
+import java.lang.reflect.Field;
+import java.util.Calendar;
 import java.util.List;
 
 /**
@@ -61,5 +63,20 @@ public class Tools {
 
     public static float getDpi(Context context) {
         return context.getResources().getDisplayMetrics().density;
+    }
+
+    public static int getStateHeight(Context context) {
+        int statusHeight;
+        try {
+            Class clazz = Class.forName("com.android.internal.R$dimen");
+            Object object = clazz.newInstance();
+            Field field = clazz.getField("status_bar_height");
+            int id = Integer.valueOf(field.get(object).toString());
+            statusHeight = context.getResources().getDimensionPixelSize(id);
+        } catch (Exception e) {
+            e.printStackTrace();
+            statusHeight = (int) (getDpi(context) * 25 + 0.5f);
+        }
+        return statusHeight;
     }
 }
