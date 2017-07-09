@@ -6,6 +6,22 @@ package com.zhou
  */
 fun main(args: Array<String>) {
     println(sum_1(4, 6))
+    var name = "zhou"
+    /**
+     * 等价与
+     * String a;
+     * int length = a!=null?a.length():-1
+     * -->
+     * var length = if(a!=null) a.length else -1
+     * 使用elvis操作符:
+     *      问号（?）判断表达式，如果a为null，表达式就会返回null
+     *      如果elvis操作符左侧为空，那么返回右侧，否则返回左侧的值
+     * var length = a?.length?:-1
+     */
+    var a: String? = null
+    var length = a?.length ?:-1
+    println(a?.length)
+    println("$length")
 }
 
 /**

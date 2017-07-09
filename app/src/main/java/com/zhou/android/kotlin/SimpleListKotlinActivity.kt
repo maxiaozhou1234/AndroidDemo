@@ -15,12 +15,9 @@ class SimpleListKotlinActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_kotin)
-        actionBar.title = "Kotlin"
-        actionBar.setDisplayHomeAsUpEnabled(true)
-        var button = findViewById(R.id.button) as Button
-        button.setOnClickListener { view ->
-            startActivity(Intent(this@SimpleListKotlinActivity, MainActivity::class.java))
-        }
+        val actionBar = supportActionBar
+        actionBar?.title = "Kotlin"
+        actionBar?.setDisplayHomeAsUpEnabled(true)
         var listView = findViewById(R.id.listView) as ListView
         var data: ArrayList<String> = ArrayList()
         for (i in 0..20) {
