@@ -1,13 +1,10 @@
 package com.zhou.android.kotlin
 
-import android.content.Intent
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.view.MenuItem
 import android.widget.ArrayAdapter
-import android.widget.Button
 import android.widget.ListView
-import com.zhou.android.MainActivity
 import com.zhou.android.R
 
 class SimpleListKotlinActivity : AppCompatActivity() {

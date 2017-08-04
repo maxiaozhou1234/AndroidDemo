@@ -91,9 +91,15 @@
             android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustResize|stateAlwaysHidden" />
 
-        <activity android:name=".main.PointZoomActivity"
+        <activity
+            android:name=".main.PointZoomActivity"
             android:screenOrientation="portrait"
-            android:windowSoftInputMode="adjustResize|stateAlwaysHidden"/>
+            android:windowSoftInputMode="adjustResize|stateAlwaysHidden" />
+        
+        <activity
+            android:name=".main.PhotoPickerActivity"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="adjustResize|stateAlwaysHidden" />
 
         <service
             android:name=".service.FloatBallService"
