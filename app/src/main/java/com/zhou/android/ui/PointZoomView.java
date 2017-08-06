@@ -4,7 +4,6 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
-import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.drawable.Drawable;
 import android.support.annotation.Nullable;
@@ -13,8 +12,6 @@ import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ImageView;
-
-import com.zhou.android.common.Tools;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,10 +23,10 @@ import java.util.List;
 
 public class PointZoomView extends ImageView {
 
-    private Matrix matrix = new Matrix();
-
     private float imageWidth = 0f, imageHeight = 0f;
-    private float startY, endY;
+    private float viewWidth = 0f, viewHeight = 0f;
+    private float startY = 0f, endY = 0f;
+    private float scale = 1f;//真实文件大小和控件的大小的比例
 
     private Paint pointPaint;
 
@@ -59,27 +56,23 @@ public class PointZoomView extends ImageView {
     }
 
     @Override
+    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+        viewWidth = MeasureSpec.getSize(widthMeasureSpec);
+        viewHeight = MeasureSpec.getSize(heightMeasureSpec);
+    }
+
+    @Override
     protected void onDraw(Canvas canvas) {
-
         super.onDraw(canvas);
-//        Drawable drawable = getDrawable();
-//        if (drawable == null)
-//            return;
-//        if (drawable.getIntrinsicWidth() == 0 || drawable.getIntrinsicHeight() == 0)
-//            return;
-//
-//        drawable.draw(canvas);
 
-        canvas.drawCircle(100, startY, 12f, pointPaint);
-        canvas.drawCircle(300, endY, 12f, pointPaint);
+        canvas.drawLine(500, startY, 500, endY, pointPaint);
 
         if (points.size() > 0) {
             for (P p : points) {
                 canvas.drawCircle(p.x, p.y, 12f, pointPaint);
-//                canvas.drawPoint(p.x, p.y, pointPaint);
             }
         }
-
     }
 
     @Override
@@ -93,26 +86,32 @@ public class PointZoomView extends ImageView {
         if (drawable != null) {
             imageWidth = drawable.getIntrinsicWidth();
             imageHeight = drawable.getIntrinsicHeight();
-//            startY = (viewHeight - imageHeight) / 2;
-//            endY = startY + imageHeight;
-            Log.d("zhou", "w-h: " + imageWidth + "," + imageHeight);
-//            Log.d("zhou", "start-: " + startY + "," + endY);
         }
     }
 
     @Override
     public void setImageBitmap(Bitmap bm) {
         super.setImageBitmap(bm);
-        matrix.set(getMatrix());
-        float[] value = new float[9];
-        matrix.getValues(value);
-        imageWidth = getWidth() / value[Matrix.MSCALE_X];
-        imageHeight = (getHeight() - value[Matrix.MTRANS_Y] * 2) / value[Matrix.MSCALE_Y];
+//        matrix.set(getMatrix());
+//        float[] value = new float[9];
+//        matrix.getValues(value);
+//        imageWidth = getWidth() / value[Matrix.MSCALE_X];
+//        imageHeight = (getHeight() - value[Matrix.MTRANS_Y] * 2) / value[Matrix.MSCALE_Y];
+        if (bm == null || bm.isRecycled())
+            return;
+        imageWidth = bm.getWidth();
+        imageHeight = bm.getHeight();
 
-        startY = (getHeight() - imageHeight) / 2;
-        endY = startY + imageHeight;
-        Log.d("zhou", "w-h: " + imageWidth + "," + imageHeight);
-        Log.d("zhou", "start-: " + startY + "," + endY);
+        float _w = viewWidth / imageWidth;
+        float _h = viewHeight / imageHeight;
+        scale = (_w < _h ? _w : _h);
+//        scale = scale > 0 ? scale : 1f;
+
+        startY = (viewHeight - imageHeight * scale) / 2;
+        endY = startY + imageHeight * scale;
+        Log.d("zhou", "image:w-h: " + imageWidth + "," + imageHeight);
+        Log.d("zhou", "view:w-h: " + viewWidth + "," + viewHeight);
+        Log.d("zhou", "start-: " + startY + "," + endY + " --" + scale);
     }
 
 
@@ -131,8 +130,12 @@ public class PointZoomView extends ImageView {
                         float x = event.getX();
                         float y = event.getY();
                         points.add(new P(x, y));
-                        Log.d("zhou", "point: " + x + "," + y);
-                        Log.d("zhou", "point2: " + event.getRawX() + "," + event.getRawY());
+                        if (listener != null) {
+                            if (y < startY || y > endY)
+                                listener.outRoom();
+                            else
+                                listener.getPercent(x / viewWidth, (y - startY) / (viewHeight - 2 * startY));
+                        }
                         invalidate();
                     }
                     break;
@@ -141,14 +144,26 @@ public class PointZoomView extends ImageView {
         }
     }
 
-}
 
-class P {
-    float x = 0, y = 0;
+    class P {
+        float x = 0, y = 0;
 
-    P(float x, float y) {
-        this.x = x;
-        this.y = y;
+        P(float x, float y) {
+            this.x = x;
+            this.y = y;
+        }
+    }
+
+    private PercentListener listener;
+
+    public void setListener(PercentListener listener) {
+        this.listener = listener;
+    }
+
+    public interface PercentListener {
+        void getPercent(float x, float y);
+
+        void outRoom();
     }
 }
 
