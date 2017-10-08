@@ -24,6 +24,7 @@ import com.zhou.android.main.PhotoPickerActivity;
 import com.zhou.android.main.PointZoomActivity;
 import com.zhou.android.main.ScrollTestActivity;
 import com.zhou.android.main.SurfaceActivity;
+import com.zhou.android.retrofit.RetrofitActivity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -51,6 +52,7 @@ public class MainActivity extends AppCompatActivity {
         list.add(new GridViewItem(SimpleListKotlinActivity.class, "Kotlin"));
         list.add(new GridViewItem(PointZoomActivity.class, "Point Zoom"));
         list.add(new GridViewItem(PhotoPickerActivity.class, "图片选择"));
+        list.add(new GridViewItem(RetrofitActivity.class, "Retrofit"));
         list.add(new GridViewItem("Test", "测试"));
         list.add(new GridViewItem("Apple", "苹果"));
         list.add(new GridViewItem("Banana", "香蕉"));
