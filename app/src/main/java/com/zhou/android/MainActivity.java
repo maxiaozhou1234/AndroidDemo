@@ -22,6 +22,7 @@ import com.zhou.android.main.FloatBallActivity;
 import com.zhou.android.main.ForbidScreenshotActivity;
 import com.zhou.android.main.PhotoPickerActivity;
 import com.zhou.android.main.PointZoomActivity;
+import com.zhou.android.main.RecyclerViewScrollActivity;
 import com.zhou.android.main.ScrollTestActivity;
 import com.zhou.android.main.SurfaceActivity;
 import com.zhou.android.retrofit.RetrofitActivity;
@@ -53,6 +54,7 @@ public class MainActivity extends AppCompatActivity {
         list.add(new GridViewItem(PointZoomActivity.class, "Point Zoom"));
         list.add(new GridViewItem(PhotoPickerActivity.class, "图片选择"));
         list.add(new GridViewItem(RetrofitActivity.class, "Retrofit"));
+        list.add(new GridViewItem(RecyclerViewScrollActivity.class, "RecyclerViewScroll"));
         list.add(new GridViewItem("Test", "测试"));
         list.add(new GridViewItem("Apple", "苹果"));
         list.add(new GridViewItem("Banana", "香蕉"));
