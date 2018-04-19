@@ -1,6 +1,7 @@
 package com.zhou.android.adapter;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -57,8 +58,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        ViewHolder holder = new ViewHolder(LayoutInflater.from(context).inflate(R.layout.listformat_photo_item, null));
-        return holder;
+        return new ViewHolder(LayoutInflater.from(context).inflate(R.layout.listformat_photo_item, parent,false));
     }
 
     @Override
@@ -69,7 +69,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
         } else {
             holder.iv.setTag(-1, position);
             Uri p = path.get(position);
-            Picasso.with(context).load(p).into(holder.iv);
+            Picasso.with(context).load(p).config(Bitmap.Config.RGB_565).into(holder.iv);
             holder.iv.setOnClickListener(onClickListener);
             holder.iv.setOnLongClickListener(onLongClickListener);
         }

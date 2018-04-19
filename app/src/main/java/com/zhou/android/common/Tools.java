@@ -1,10 +1,17 @@
 package com.zhou.android.common;
 
 import android.app.ActivityManager;
+import android.content.ContentProvider;
+import android.content.ContentResolver;
 import android.content.Context;
+import android.database.Cursor;
+import android.net.Uri;
+import android.provider.MediaStore;
+import android.text.TextUtils;
 import android.util.DisplayMetrics;
 import android.view.WindowManager;
 
+import java.io.File;
 import java.lang.reflect.Field;
 import java.util.Calendar;
 import java.util.List;
@@ -78,5 +85,28 @@ public class Tools {
             statusHeight = (int) (getDpi(context) * 25 + 0.5f);
         }
         return statusHeight;
+    }
+
+    public static Uri parseImageAbsolutePath(ContentResolver contentResolver, String path) {
+        Uri uri = null;
+        if (!TextUtils.isEmpty(path)) {
+            if (path.startsWith("file://")) {
+                path = path.substring("file://".length(), path.length());
+            }
+            Cursor cursor = contentResolver.query(MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+                    new String[]{MediaStore.Images.Media._ID},
+                    MediaStore.Images.Media.DATA + "='" + path + "'", null, null);
+            if (cursor != null && cursor.moveToFirst()) {
+                long id = cursor.getLong(0);
+                Uri tmp = Uri.parse("content://media/external/images/media/" + id);
+                if (tmp != null)
+                    uri = tmp;
+            }
+            if (cursor != null) {
+                cursor.close();
+            }
+        }
+
+        return uri;
     }
 }

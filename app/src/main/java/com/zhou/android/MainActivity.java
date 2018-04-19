@@ -25,6 +25,8 @@ import com.zhou.android.main.PointZoomActivity;
 import com.zhou.android.main.RecyclerViewScrollActivity;
 import com.zhou.android.main.ScrollTestActivity;
 import com.zhou.android.main.SurfaceActivity;
+import com.zhou.android.main.VideoActivity;
+import com.zhou.android.model.ui.PicassoActivity;
 import com.zhou.android.retrofit.RetrofitActivity;
 
 import java.util.ArrayList;
@@ -55,6 +57,8 @@ public class MainActivity extends AppCompatActivity {
         list.add(new GridViewItem(PhotoPickerActivity.class, "图片选择"));
         list.add(new GridViewItem(RetrofitActivity.class, "Retrofit"));
         list.add(new GridViewItem(RecyclerViewScrollActivity.class, "RecyclerViewScroll"));
+        list.add(new GridViewItem(PicassoActivity.class, "Picasso 显示"));
+        list.add(new GridViewItem(VideoActivity.class, "视频播放"));
         list.add(new GridViewItem("Test", "测试"));
         list.add(new GridViewItem("Apple", "苹果"));
         list.add(new GridViewItem("Banana", "香蕉"));

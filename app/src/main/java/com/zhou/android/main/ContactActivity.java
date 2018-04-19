@@ -6,6 +6,7 @@ import android.content.ContentResolver;
 import android.content.DialogInterface;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
+import android.os.Message;
 import android.provider.ContactsContract;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
@@ -29,7 +30,7 @@ import java.util.List;
 
 /**
  * 通讯录
- * 
+ * <p>
  * Created by ZhOu on 2017/5/23.
  */
 
@@ -60,8 +61,11 @@ public class ContactActivity extends BaseActivity {
         };
         listView.setAdapter(adapter);
         asyncHandler = new AsyncQueryHandler(getContentResolver()) {
+
             @Override
             protected void onQueryComplete(int token, Object cookie, Cursor cursor) {
+                if (isFinishing())
+                    return;
                 if (0 == token) {
                     if (cursor != null) {
                         while (cursor.moveToNext()) {
