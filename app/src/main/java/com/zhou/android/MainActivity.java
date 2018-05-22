@@ -25,7 +25,9 @@ import com.zhou.android.main.PointZoomActivity;
 import com.zhou.android.main.RecyclerViewScrollActivity;
 import com.zhou.android.main.ScrollTestActivity;
 import com.zhou.android.main.SurfaceActivity;
+import com.zhou.android.main.UdpReceiverActivity;
 import com.zhou.android.main.VideoActivity;
+import com.zhou.android.model.ui.OkHttpActivity;
 import com.zhou.android.model.ui.PicassoActivity;
 import com.zhou.android.retrofit.RetrofitActivity;
 
@@ -34,6 +36,7 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
+    private List<GridViewItem> list = new ArrayList<>();
     private GridView gridView;
 
     @Override
@@ -41,7 +44,6 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         gridView = (GridView) findViewById(R.id.gridView);
-        final List<GridViewItem> list = new ArrayList<>();
         list.add(new GridViewItem(SurfaceActivity.class, "界面绘制"));
         list.add(new GridViewItem(FingerPrintActivity.class, "指纹解锁"));
         list.add(new GridViewItem(ScrollTestActivity.class, "滑动测试"));
@@ -59,6 +61,8 @@ public class MainActivity extends AppCompatActivity {
         list.add(new GridViewItem(RecyclerViewScrollActivity.class, "RecyclerViewScroll"));
         list.add(new GridViewItem(PicassoActivity.class, "Picasso 显示"));
         list.add(new GridViewItem(VideoActivity.class, "视频播放"));
+        list.add(new GridViewItem(OkHttpActivity.class, "OkHttp"));
+        list.add(new GridViewItem(UdpReceiverActivity.class, "Udp 监听"));
         list.add(new GridViewItem("Test", "测试"));
         list.add(new GridViewItem("Apple", "苹果"));
         list.add(new GridViewItem("Banana", "香蕉"));
@@ -73,7 +77,6 @@ public class MainActivity extends AppCompatActivity {
                 try {
                     startActivity(new Intent(MainActivity.this, item.clz));
                 } catch (Exception e) {
-//                    e.printStackTrace();
                     Toast.makeText(MainActivity.this, String.format("start %s failed", TextUtils.isEmpty(item.zhName) ? item.targetClass : item.zhName), Toast.LENGTH_SHORT).show();
                 }
             }
@@ -90,7 +93,6 @@ public class MainActivity extends AppCompatActivity {
                         startActivity(new Intent(MainActivity.this, item.clz));
                     }
                 } catch (Exception e) {
-//                    e.printStackTrace();
                 }
         }
     }

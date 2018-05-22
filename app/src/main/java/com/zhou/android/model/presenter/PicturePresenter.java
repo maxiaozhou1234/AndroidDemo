@@ -7,12 +7,27 @@ import android.content.ContentUris;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.Paint;
+import android.graphics.PorterDuff;
+import android.graphics.PorterDuffXfermode;
 import android.net.Uri;
+import android.os.Build;
 import android.provider.MediaStore;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.graphics.BitmapCompat;
 import android.util.Log;
 
+import com.squareup.picasso.Callback;
+import com.squareup.picasso.MemoryPolicy;
+import com.squareup.picasso.NetworkPolicy;
+import com.squareup.picasso.Picasso;
+import com.squareup.picasso.RequestCreator;
+import com.squareup.picasso.Transformation;
+import com.zhou.android.R;
 import com.zhou.android.common.Tools;
 import com.zhou.android.model.view.IPictureView;
 
@@ -162,5 +177,76 @@ public class PicturePresenter {
             intent.setDataAndType(target, "image/*");
             context.get().startActivity(intent);
         }
+    }
+
+    public void loadImageView() {
+
+        iPictureView.clearImageView();
+
+        boolean cache = iPictureView.getCache();
+        boolean disk = iPictureView.getDisk();
+        boolean transformation = iPictureView.getTransformation();
+
+        Picasso picasso = Picasso.with(context.get());
+        picasso.setIndicatorsEnabled(true);
+        picasso.setLoggingEnabled(true);
+
+        String path = "https://avatars2.githubusercontent.com/u/9563634?s=400&u=6c9844a5ee91e0385888cbd5708af59f4062d651&v=4";
+        RequestCreator requestCreator = picasso.load(path)
+                .config(Bitmap.Config.RGB_565)
+                .placeholder(R.drawable.ic_empty_zhihu)
+                .error(R.drawable.ic_failed)
+                .fit();
+
+        if (!cache) {
+            requestCreator.memoryPolicy(MemoryPolicy.NO_CACHE);
+        }
+        if (!disk) {
+            requestCreator.networkPolicy(NetworkPolicy.NO_CACHE, NetworkPolicy.NO_STORE);
+        }
+
+        if (transformation) {
+            final Paint paint = new Paint();
+            paint.setAntiAlias(true);
+            paint.setColor(0xffcccccc);
+            paint.setStyle(Paint.Style.FILL);
+            final float round = Tools.dip2pxf(context.get(), 8);
+            requestCreator.transform(new Transformation() {
+                @Override
+                public Bitmap transform(Bitmap source) {
+
+                    Bitmap src = Bitmap.createBitmap(source, 0, 0, source.getWidth(), source.getHeight());
+                    Canvas canvas = new Canvas(src);
+                    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
+                        float r = source.getWidth() / 4 * 3;
+                        canvas.drawCircle(source.getWidth() / 2, source.getHeight() / 2, r, paint);
+                    } else {
+                        canvas.drawRoundRect(round, round, source.getWidth() - round, source.getHeight() - round,
+                                round, round, paint);
+                    }
+                    canvas.drawBitmap(source, 0, 0, paint);
+                    if (!source.isRecycled()) {
+                        source.recycle();
+                    }
+                    return src;
+                }
+
+                @Override
+                public String key() {
+                    return "PicassoTransformation";
+                }
+            });
+        }
+        requestCreator.into(iPictureView.getTarget(), new Callback() {
+            @Override
+            public void onSuccess() {
+                iPictureView.showToast("success");
+            }
+
+            @Override
+            public void onError() {
+                iPictureView.showToast("error");
+            }
+        });
     }
 }

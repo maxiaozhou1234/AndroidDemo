@@ -25,8 +25,12 @@ public class Tools {
 
     public static int dip2px(Context context, int d) {
         float density = context.getResources().getDisplayMetrics().density;
-        int value = (int) (density * d + 0.5F);
-        return value;
+        return (int) (density * d + 0.5F);
+    }
+
+    public static float dip2pxf(Context context, int d) {
+        float density = context.getResources().getDisplayMetrics().density;
+        return density * d + 0.5F;
     }
 
     public static int getScreenWidth(Context context) {

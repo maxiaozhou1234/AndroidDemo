@@ -5,6 +5,12 @@ import android.support.annotation.NonNull;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.View;
+import android.widget.CheckBox;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 
 import com.squareup.picasso.Picasso;
 import com.zhou.android.R;
@@ -25,6 +31,11 @@ import java.util.List;
 
 public class PicassoActivity extends BaseActivity implements IPictureView {
 
+    private RecyclerView recyclerView;
+    private LinearLayout ll_other;
+    private CheckBox cb_cache, cb_disk, cb_transformation;
+    private ImageView imageView;
+
     private PictureAdapter pictureAdapter;
     private List<String> data = new ArrayList<>();
     private PicturePresenter picturePresenter = new PicturePresenter(this, this);
@@ -37,7 +48,13 @@ public class PicassoActivity extends BaseActivity implements IPictureView {
     @Override
     protected void init() {
 
-        RecyclerView recyclerView = (RecyclerView) findViewById(R.id.recyclerView);
+        recyclerView = (RecyclerView) findViewById(R.id.recyclerView);
+        ll_other = (LinearLayout) findViewById(R.id.ll_other);
+        cb_cache = (CheckBox) findViewById(R.id.cb_cache);
+        cb_disk = (CheckBox) findViewById(R.id.cb_disk);
+        cb_transformation = (CheckBox) findViewById(R.id.cb_transformation);
+        imageView = (ImageView) findViewById(R.id.imageView);
+
         recyclerView.setLayoutManager(new GridLayoutManager(this, 4));
         recyclerView.addItemDecoration(new DividerItemDecoration(this));
         pictureAdapter = new PictureAdapter(this, data);
@@ -56,11 +73,49 @@ public class PicassoActivity extends BaseActivity implements IPictureView {
                 picturePresenter.onItemClick(uri);
             }
         });
+
+        findViewById(R.id.btn_load).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                picturePresenter.loadImageView();
+            }
+        });
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_picasso, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (R.id.menu_other == item.getItemId()) {
+            switchView(true);
+            return true;
+        } else
+            return super.onOptionsItemSelected(item);
+    }
+
+    private void switchView(boolean showOther) {
+        if (!showOther) {
+            Picasso.with(this).setIndicatorsEnabled(false);
+        }
+        recyclerView.setVisibility(showOther ? View.GONE : View.VISIBLE);
+        ll_other.setVisibility(showOther ? View.VISIBLE : View.GONE);
     }
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         picturePresenter.onRequestPermissionsResult(requestCode, permissions, grantResults);
+    }
+
+    @Override
+    public void back() {
+        if (ll_other.isShown())
+            switchView(false);
+        else
+            super.back();
     }
 
     @Override
@@ -93,6 +148,31 @@ public class PicassoActivity extends BaseActivity implements IPictureView {
     @Override
     public void showToast(String message) {
         ToastUtils.show(PicassoActivity.this, message);
+    }
+
+    @Override
+    public boolean getCache() {
+        return cb_cache.isChecked();
+    }
+
+    @Override
+    public boolean getDisk() {
+        return cb_disk.isChecked();
+    }
+
+    @Override
+    public boolean getTransformation() {
+        return cb_transformation.isChecked();
+    }
+
+    @Override
+    public ImageView getTarget() {
+        return imageView;
+    }
+
+    @Override
+    public void clearImageView() {
+        imageView.setImageDrawable(null);
     }
 
 }

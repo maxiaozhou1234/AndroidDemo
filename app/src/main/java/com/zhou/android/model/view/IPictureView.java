@@ -1,5 +1,7 @@
 package com.zhou.android.model.view;
 
+import android.widget.ImageView;
+
 import java.util.List;
 
 /**
@@ -13,4 +15,14 @@ public interface IPictureView {
     void onShow(List<String> pictures);
 
     void showToast(String message);
+
+    boolean getCache();
+
+    boolean getDisk();
+
+    boolean getTransformation();
+
+    ImageView getTarget();
+
+    void clearImageView();
 }
