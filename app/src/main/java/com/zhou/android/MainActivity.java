@@ -27,6 +27,7 @@ import com.zhou.android.main.ScrollTestActivity;
 import com.zhou.android.main.SurfaceActivity;
 import com.zhou.android.main.UdpReceiverActivity;
 import com.zhou.android.main.VideoActivity;
+import com.zhou.android.model.ui.WeatherActivity;
 import com.zhou.android.model.ui.OkHttpActivity;
 import com.zhou.android.model.ui.PicassoActivity;
 import com.zhou.android.retrofit.RetrofitActivity;
@@ -63,6 +64,7 @@ public class MainActivity extends AppCompatActivity {
         list.add(new GridViewItem(VideoActivity.class, "视频播放"));
         list.add(new GridViewItem(OkHttpActivity.class, "OkHttp"));
         list.add(new GridViewItem(UdpReceiverActivity.class, "Udp 监听"));
+        list.add(new GridViewItem(WeatherActivity.class, "和风天气"));
         list.add(new GridViewItem("Test", "测试"));
         list.add(new GridViewItem("Apple", "苹果"));
         list.add(new GridViewItem("Banana", "香蕉"));

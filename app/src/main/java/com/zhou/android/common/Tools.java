@@ -8,13 +8,24 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.provider.MediaStore;
 import android.text.TextUtils;
+import android.util.Base64;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.WindowManager;
 
 import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.Field;
+import java.security.GeneralSecurityException;
+import java.security.MessageDigest;
 import java.util.Calendar;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeMap;
+
+import sun.misc.BASE64Encoder;
 
 /**
  * 工具类

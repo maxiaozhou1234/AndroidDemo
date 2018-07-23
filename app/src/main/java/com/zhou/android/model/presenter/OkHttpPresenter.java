@@ -4,6 +4,7 @@ import android.os.Environment;
 import android.os.Handler;
 import android.util.Log;
 
+import com.zhou.android.common.LogInterceptor;
 import com.zhou.android.model.view.IOkHttpView;
 
 import java.io.File;
@@ -202,38 +203,5 @@ public class OkHttpPresenter {
                         }
                     }
                 });
-    }
-
-    private class LogInterceptor implements Interceptor {
-
-        private static final String TAG = "LogInterceptor";
-
-        @Override
-        public Response intercept(Chain chain) throws IOException {
-            Request request = chain.request();
-            Response response = chain.proceed(request);
-            String method = request.method();
-            Log.d(TAG, "\r\n");
-            Log.d(TAG, "----------START----------");
-            Log.d(TAG, "| url: " + request.url().toString());
-            String content = response.body().string();
-            if ("POST".equals(method)) {
-                RequestBody body = request.body();
-                if (body instanceof FormBody) {
-                    StringBuilder builder = new StringBuilder();
-                    FormBody formBody = (FormBody) body;
-                    for (int i = 0; i < formBody.size(); i++) {
-                        builder.append(formBody.encodedName(i) + "=" + formBody.encodedValue(i) + ",");
-                    }
-                    builder.delete(builder.length() - 1, builder.length());
-                    Log.d(TAG, "| params: {" + builder.toString() + "}");
-                }
-            }
-//            Log.d(TAG, "| response: " + content);
-            Log.d(TAG, "-----------END-----------");
-            return response.newBuilder()
-                    .body(ResponseBody.create(response.body().contentType(), content))
-                    .build();
-        }
     }
 }
