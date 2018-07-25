@@ -1,18 +1,15 @@
 package com.zhou.android.model.ui;
 
 import android.app.ProgressDialog;
+import android.os.Looper;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.zhou.android.R;
 import com.zhou.android.common.BaseActivity;
 import com.zhou.android.model.presenter.WeatherPresenter;
 import com.zhou.android.model.view.IWeatherView;
-
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.util.Iterator;
 
 /**
  * 天气
@@ -21,7 +18,7 @@ import java.util.Iterator;
 
 public class WeatherActivity extends BaseActivity implements IWeatherView {
 
-    private TextView location, text;
+    private TextView location, weather;
     private ProgressDialog progressDialog;
 
     private WeatherPresenter presenter;
@@ -34,9 +31,9 @@ public class WeatherActivity extends BaseActivity implements IWeatherView {
     @Override
     protected void init() {
         location = (TextView) findViewById(R.id.location);
-        text = (TextView) findViewById(R.id.text);
+        weather = (TextView) findViewById(R.id.text);
 
-        presenter = new WeatherPresenter(this);
+        presenter = new WeatherPresenter(this, this);
     }
 
     @Override
@@ -58,8 +55,18 @@ public class WeatherActivity extends BaseActivity implements IWeatherView {
     }
 
     @Override
-    public TextView getLocationView() {
-        return location;
+    public void setLocation(final String address) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                location.setText(address);
+            }
+        });
+    }
+
+    @Override
+    public String getLocation() {
+        return location.getText().toString();
     }
 
     @Override
@@ -68,9 +75,10 @@ public class WeatherActivity extends BaseActivity implements IWeatherView {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                text.setText(msg);
+                weather.setText(msg);
             }
         });
+
     }
 
     @Override
@@ -85,8 +93,31 @@ public class WeatherActivity extends BaseActivity implements IWeatherView {
 
     @Override
     public void hideRequestWindow() {
-        if (progressDialog != null) {
-            progressDialog.dismiss();
+        if (Looper.myLooper() != Looper.getMainLooper()
+                && progressDialog != null
+                && progressDialog.isShowing()) {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    progressDialog.dismiss();
+                }
+            });
+
+        } else {
+            if (progressDialog != null && progressDialog.isShowing()) {
+                progressDialog.dismiss();
+            }
         }
+    }
+
+    @Override
+    public void toast(String msg) {
+        Toast.makeText(WeatherActivity.this, msg, Toast.LENGTH_LONG).show();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        presenter.onDestroy();
     }
 }
