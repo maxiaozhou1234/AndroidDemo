@@ -1,0 +1,14 @@
+apply plugin: 'java'
+apply plugin: 'idea'
+
+dependencies {
+//    compile 'io.reactivex.rxjava2:rxjava:2.2.2'
+    compile 'io.reactivex:rxjava:1.1.5'
+}
+
+sourceCompatibility = "1.7"
+targetCompatibility = "1.7"
+
+tasks.withType(JavaCompile) {
+    compileTask -> compileTask.dependsOn tasks.findByName('idea')
+}
