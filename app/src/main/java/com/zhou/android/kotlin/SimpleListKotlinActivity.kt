@@ -15,7 +15,7 @@ class SimpleListKotlinActivity : AppCompatActivity() {
         val actionBar = supportActionBar
         actionBar?.title = "Kotlin"
         actionBar?.setDisplayHomeAsUpEnabled(true)
-        var listView = findViewById(R.id.listView) as ListView
+        var listView = findViewById<ListView>(R.id.listView)
         var data: ArrayList<String> = ArrayList()
         for (i in 0..20) {
             data.add("测试示例：" + i)
