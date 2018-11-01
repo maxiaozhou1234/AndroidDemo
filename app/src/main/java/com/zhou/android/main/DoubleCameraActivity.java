@@ -104,7 +104,9 @@ public class DoubleCameraActivity extends BaseActivity {
         holderFront.addCallback(new SurfaceHolder.Callback() {
             @Override
             public void surfaceCreated(SurfaceHolder holder) {
-//                openCamera(map.get(FRONT), holder);
+                if (isBack) {
+                    openCamera(map.get(FRONT), holder);
+                }
             }
 
             @Override

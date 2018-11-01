@@ -9,6 +9,11 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
+    <TextureView
+        android:id="@+id/texture_front"
+        android:layout_width="150dp"
+        android:layout_height="200dp" />
+
     <ImageButton
         android:id="@+id/ib_change"
         android:layout_width="wrap_content"

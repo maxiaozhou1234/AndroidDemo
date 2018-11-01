@@ -3,6 +3,7 @@ package com.zhou.android.main;
 import android.Manifest;
 import android.content.Context;
 import android.content.pm.PackageManager;
+import android.graphics.ImageFormat;
 import android.graphics.SurfaceTexture;
 import android.hardware.camera2.CameraAccessException;
 import android.hardware.camera2.CameraCaptureSession;
@@ -12,12 +13,16 @@ import android.hardware.camera2.CameraManager;
 import android.hardware.camera2.CaptureFailure;
 import android.hardware.camera2.CaptureRequest;
 import android.hardware.camera2.TotalCaptureResult;
+import android.hardware.camera2.params.StreamConfigurationMap;
+import android.media.Image;
+import android.media.ImageReader;
 import android.os.Build;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.RequiresApi;
 import android.support.v4.app.ActivityCompat;
 import android.util.Log;
+import android.util.Size;
 import android.view.Surface;
 import android.view.TextureView;
 import android.view.View;
@@ -27,6 +32,8 @@ import com.zhou.android.common.BaseActivity;
 import com.zhou.android.common.ToastUtils;
 
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 
 /**
@@ -40,11 +47,20 @@ public class DoubleNewCameraActivity extends BaseActivity {
     private final static String BACK = "camera_back";
 
     private CameraManager cameraManager;
-    private TextureView textureBack;
-    private Handler backgroundHandler;
+    private TextureView textureBack, textureFront;
+//    private Handler backgroundHandler, frontHandler;
 
     private HashMap<String, CameraConfig> map = new HashMap<>();
     private boolean isBackCamera = true;
+
+    private ImageReader imageReader;
+    private ImageReader.OnImageAvailableListener onImageAvailableListener = new ImageReader.OnImageAvailableListener() {
+        @Override
+        public void onImageAvailable(ImageReader reader) {
+            Image image = reader.acquireNextImage();
+            Log.d("image", "size [ w: " + image.getWidth() + " h: " + image.getHeight() + " ]");
+        }
+    };
 
     @Override
     protected void setContentView() {
@@ -54,8 +70,10 @@ public class DoubleNewCameraActivity extends BaseActivity {
     @Override
     protected void init() {
         textureBack = findViewById(R.id.texture_back);
+        textureFront = findViewById(R.id.texture_front);
 
-        backgroundHandler = new Handler();
+        Handler backgroundHandler = new Handler();
+        Handler frontHandler = new Handler();
 
         cameraManager = (CameraManager) getSystemService(Context.CAMERA_SERVICE);
         try {
@@ -66,9 +84,27 @@ public class DoubleNewCameraActivity extends BaseActivity {
                 if (cameraOrientation == null)
                     continue;
                 if (cameraOrientation == CameraCharacteristics.LENS_FACING_FRONT) {
-                    map.put(FRONT, new CameraConfig(id, characteristics, deviceFrontStateCallback));
+                    map.put(FRONT, new CameraConfig(id, characteristics, deviceFrontStateCallback, frontHandler));
                 } else if (cameraOrientation == CameraCharacteristics.LENS_FACING_BACK) {
-                    map.put(BACK, new CameraConfig(id, characteristics, deviceBackStateCallback));
+//                    if (map.containsKey(BACK)) {
+//                        map.put(FRONT, new CameraConfig(id, characteristics, deviceFrontStateCallback, frontHandler));
+//                    } else {
+                    map.put(BACK, new CameraConfig(id, characteristics, deviceBackStateCallback, backgroundHandler));
+//                }
+                    StreamConfigurationMap size = characteristics.get(
+                            CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP);
+                    if (size != null) {
+                        Size largest = Collections.max(Arrays.asList(size.getOutputSizes(ImageFormat.JPEG)),
+                                new Comparator<Size>() {
+                                    @Override
+                                    public int compare(Size lhs, Size rhs) {
+                                        return Long.signum((long) lhs.getWidth() * lhs.getHeight() -
+                                                (long) rhs.getWidth() * rhs.getHeight());
+                                    }
+                                });
+                        imageReader = ImageReader.newInstance(largest.getWidth(), largest.getHeight(), ImageFormat.JPEG, 2);
+                        imageReader.setOnImageAvailableListener(onImageAvailableListener, backgroundHandler);
+                    }
                 }
             }
         } catch (CameraAccessException e) {
@@ -83,10 +119,18 @@ public class DoubleNewCameraActivity extends BaseActivity {
             public void onClick(View v) {
                 closeCamera(map.get(isBackCamera ? BACK : FRONT));
                 isBackCamera = !isBackCamera;
-                if (textureBack.isAvailable()) {
-                    openCamera(map.get(isBackCamera ? BACK : FRONT));
+                if (isBackCamera) {
+                    if (textureBack.isAvailable()) {
+                        openCamera(map.get(isBackCamera ? BACK : FRONT));
+                    } else {
+                        textureBack.setSurfaceTextureListener(textureListenerBack);
+                    }
                 } else {
-                    textureBack.setSurfaceTextureListener(textureListener);
+                    if (textureFront.isAvailable()) {
+                        openCamera(map.get(FRONT));
+                    } else {
+                        textureFront.setSurfaceTextureListener(textureListenerFront);
+                    }
                 }
             }
         });
@@ -95,17 +139,49 @@ public class DoubleNewCameraActivity extends BaseActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        if (textureBack.isAvailable()) {
-            openCamera(map.get(isBackCamera ? BACK : FRONT));
+        if (isBackCamera) {
+            if (textureBack.isAvailable()) {
+//            openCamera(map.get(isBackCamera ? BACK : FRONT));
+                openCamera(map.get(BACK));
+            } else {
+                textureBack.setSurfaceTextureListener(textureListenerBack);
+            }
         } else {
-            textureBack.setSurfaceTextureListener(textureListener);
+            if (textureFront.isAvailable()) {
+                openCamera(map.get(FRONT));
+            } else {
+                textureFront.setSurfaceTextureListener(textureListenerFront);
+            }
         }
     }
 
-    private TextureView.SurfaceTextureListener textureListener = new TextureView.SurfaceTextureListener() {
+    private TextureView.SurfaceTextureListener textureListenerFront = new TextureView.SurfaceTextureListener() {
         @Override
         public void onSurfaceTextureAvailable(SurfaceTexture surface, int width, int height) {
-            openCamera(map.get(isBackCamera ? BACK : FRONT));
+//            openCamera(map.get(isBackCamera ? BACK : FRONT));
+            openCamera(map.get(FRONT));
+        }
+
+        @Override
+        public void onSurfaceTextureSizeChanged(SurfaceTexture surface, int width, int height) {
+
+        }
+
+        @Override
+        public boolean onSurfaceTextureDestroyed(SurfaceTexture surface) {
+            return true;
+        }
+
+        @Override
+        public void onSurfaceTextureUpdated(SurfaceTexture surface) {
+
+        }
+    };
+
+    private TextureView.SurfaceTextureListener textureListenerBack = new TextureView.SurfaceTextureListener() {
+        @Override
+        public void onSurfaceTextureAvailable(SurfaceTexture surface, int width, int height) {
+            openCamera(map.get(BACK));
         }
 
         @Override
@@ -127,7 +203,7 @@ public class DoubleNewCameraActivity extends BaseActivity {
     private CameraDevice.StateCallback deviceBackStateCallback = new CameraDevice.StateCallback() {
         @Override
         public void onOpened(@NonNull CameraDevice camera) {
-            createCameraSession(map.get(BACK), camera);
+            createCameraSession(textureBack, map.get(BACK), camera);
         }
 
         @Override
@@ -146,7 +222,7 @@ public class DoubleNewCameraActivity extends BaseActivity {
     private CameraDevice.StateCallback deviceFrontStateCallback = new CameraDevice.StateCallback() {
         @Override
         public void onOpened(@NonNull CameraDevice camera) {
-            createCameraSession(map.get(FRONT), camera);
+            createCameraSession(textureFront, map.get(FRONT), camera);
         }
 
         @Override
@@ -178,20 +254,24 @@ public class DoubleNewCameraActivity extends BaseActivity {
             ToastUtils.show(this, "This app does not have camera permission");
             return;
         }
+        if (config == null) {
+            Log.d("camera", "CameraConfig is null.");
+            return;
+        }
         String cameraId = config.cameraId;
         if (cameraManager == null) {
             cameraManager = (CameraManager) getSystemService(Context.CAMERA_SERVICE);
         }
         try {
-            cameraManager.openCamera(cameraId, config.deviceStateCallback, backgroundHandler);
+            cameraManager.openCamera(cameraId, config.deviceStateCallback, config.handler);
         } catch (CameraAccessException e) {
             e.printStackTrace();
         }
     }
 
-    private void createCameraSession(final CameraConfig config, CameraDevice cameraDevice) {
+    private void createCameraSession(TextureView textureView, final CameraConfig config, CameraDevice cameraDevice) {
 
-        Surface surface = new Surface(textureBack.getSurfaceTexture());
+        Surface surface = new Surface(textureView.getSurfaceTexture());
         try {
             if (config != null) {
                 config.cameraDevice = cameraDevice;
@@ -205,15 +285,14 @@ public class DoubleNewCameraActivity extends BaseActivity {
 
                     if (null != config) {
                         config.cameraCaptureSession = session;
-                    }
-                    requestBuilder.set(CaptureRequest.CONTROL_AF_MODE, CaptureRequest.CONTROL_AF_MODE_CONTINUOUS_PICTURE);
+                        requestBuilder.set(CaptureRequest.CONTROL_AF_MODE, CaptureRequest.CONTROL_AF_MODE_CONTINUOUS_PICTURE);
 
-                    try {
-                        session.setRepeatingRequest(requestBuilder.build(), captureCallback, backgroundHandler);
-                    } catch (CameraAccessException e) {
-                        e.printStackTrace();
+                        try {
+                            session.setRepeatingRequest(requestBuilder.build(), captureCallback, config.handler);
+                        } catch (CameraAccessException e) {
+                            e.printStackTrace();
+                        }
                     }
-
                 }
 
                 @Override
@@ -221,6 +300,7 @@ public class DoubleNewCameraActivity extends BaseActivity {
                     Log.d("camera", "config failed.");
                 }
             }, null);
+
         } catch (CameraAccessException e) {
             e.printStackTrace();
         }
@@ -248,13 +328,26 @@ public class DoubleNewCameraActivity extends BaseActivity {
         CameraDevice.StateCallback deviceStateCallback;
         CameraCaptureSession cameraCaptureSession;
 
-        CameraConfig(String cameraId, CameraCharacteristics characteristics, CameraDevice.StateCallback deviceStateCallback) {
+        Handler handler;
+
+        CameraConfig(String cameraId, CameraCharacteristics characteristics, @NonNull CameraDevice.StateCallback deviceStateCallback, @NonNull Handler handler) {
             this.cameraId = cameraId;
             Integer orientation = characteristics.get(CameraCharacteristics.SENSOR_ORIENTATION);
             this.orientation = orientation == null ? 0 : orientation;
             Integer level = characteristics.get(CameraCharacteristics.INFO_SUPPORTED_HARDWARE_LEVEL);
             fullSupport = level != null && level == CameraCharacteristics.INFO_SUPPORTED_HARDWARE_LEVEL_FULL;
             this.deviceStateCallback = deviceStateCallback;
+            this.handler = handler;
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        closeCamera(map.get(isBackCamera ? BACK : FRONT));
+        if (imageReader != null) {
+            imageReader.close();
+            imageReader = null;
         }
     }
 }
