@@ -1,4 +1,4 @@
-package com.zhou.android.common;
+package com.zhou.android.camera2;
 
 import android.graphics.ImageFormat;
 import android.graphics.SurfaceTexture;
@@ -7,7 +7,6 @@ import android.hardware.camera2.CameraCaptureSession;
 import android.hardware.camera2.CameraCharacteristics;
 import android.hardware.camera2.CameraDevice;
 import android.hardware.camera2.CaptureRequest;
-import android.hardware.camera2.params.InputConfiguration;
 import android.hardware.camera2.params.StreamConfigurationMap;
 import android.media.ImageReader;
 import android.os.Build;
@@ -50,10 +49,6 @@ public class CameraConfig {
     private Size largest;
 
     public CameraConfig(String cameraId, CameraCharacteristics characteristics, @Nullable TextureView textureView, OnImageAvailableListener listener, Handler handler) {
-        this(cameraId, characteristics, 0, textureView, listener, handler);
-    }
-
-    public CameraConfig(String cameraId, CameraCharacteristics characteristics, int displayRotation, @Nullable TextureView textureView, OnImageAvailableListener listener, Handler handler) {
 
         this.cameraId = cameraId;
         this.textureView = textureView;
@@ -75,6 +70,7 @@ public class CameraConfig {
                         }
                     });
             Log.d(TAG, "width = " + largest.getWidth() + " height = " + largest.getHeight());
+            //三通道 YUV  YV12,YUV_420_888,NV21 但 NV21 不支持
             imageReader = ImageReader.newInstance(largest.getWidth(), largest.getHeight(), ImageFormat.YV12, 1);
             imageReader.setOnImageAvailableListener(imageAvailableListener, handler);
         }

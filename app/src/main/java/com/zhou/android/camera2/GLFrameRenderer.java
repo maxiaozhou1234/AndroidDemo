@@ -1,4 +1,4 @@
-package com.zhou.android.common;
+package com.zhou.android.camera2;
 
 import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;

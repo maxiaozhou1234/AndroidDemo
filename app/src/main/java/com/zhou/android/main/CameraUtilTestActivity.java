@@ -1,5 +1,6 @@
 package com.zhou.android.main;
 
+import android.opengl.GLSurfaceView;
 import android.os.Build;
 import android.util.Log;
 import android.util.Size;
@@ -7,12 +8,12 @@ import android.view.TextureView;
 import android.widget.Toast;
 
 import com.zhou.android.R;
+import com.zhou.android.camera2.DoubleCameraUtil;
 import com.zhou.android.common.BaseActivity;
-import com.zhou.android.common.DoubleCameraUtil;
+import com.zhou.android.opengl.GLFrameRenderer;
 
 import java.nio.ByteBuffer;
 import java.util.concurrent.Semaphore;
-import java.util.concurrent.TimeUnit;
 
 /**
  * DoubleCameraUtil Test
@@ -26,8 +27,8 @@ public class CameraUtilTestActivity extends BaseActivity {
     private ByteBuffer doubleBuffer, tmpBuffer;
     private byte[] tmpCopy;
 
-//    private GLSurfaceView glSurface;
-//    private GLRenderer renderer;
+    private GLSurfaceView glSurface;
+    private GLFrameRenderer renderer;
 
     private Semaphore semaphore = new Semaphore(1);
 
@@ -47,11 +48,11 @@ public class CameraUtilTestActivity extends BaseActivity {
         TextureView textureView = findViewById(R.id.textureView);
         cameraUtil = new DoubleCameraUtil(this, textureView, null);
 
-//        glSurface = findViewById(R.id.glSurface);
-//        renderer = new GLRenderer(0);
-//        glSurface.setEGLContextClientVersion(2);
-//        glSurface.setRenderer(renderer);
-//        glSurface.setRenderMode(GLSurfaceView.RENDERMODE_WHEN_DIRTY);
+        glSurface = findViewById(R.id.glSurface);
+        glSurface.setEGLContextClientVersion(2);
+        renderer = new GLFrameRenderer(glSurface);
+        glSurface.setRenderer(renderer);
+        glSurface.setRenderMode(GLSurfaceView.RENDERMODE_WHEN_DIRTY);
     }
 
     @Override
@@ -66,6 +67,9 @@ public class CameraUtilTestActivity extends BaseActivity {
             cameraUtil.setPreviewFrameCallback(new DoubleCameraUtil.OnPreviewFrameCallback() {
                 @Override
                 public void onCameraFront(byte[][] bytes, int orientation) {
+                    if (renderer != null && bytes.length == 3) {
+                        renderer.update(bytes[0], bytes[1], bytes[2]);
+                    }
                 }
 
                 @Override
@@ -76,37 +80,37 @@ public class CameraUtilTestActivity extends BaseActivity {
                 @Override
                 public void onCameraFront(byte[] bytes, int orientation) {
 
-                    if (semaphore.tryAcquire()) {
-                        try {
-                            doubleBuffer.put(bytes, 0, capacity);
-                            doubleBuffer.put(tmpCopy, 0, capacity);
-                            doubleBuffer.put(bytes, capacity, capacity / 4);
-                            doubleBuffer.put(tmpCopy, capacity, capacity / 4);
-                            doubleBuffer.put(bytes, capacity * 5 / 4, capacity / 4);
-                            doubleBuffer.put(tmpCopy, capacity * 5 / 4, capacity / 4);
-
-                            doubleBuffer.flip();
-                            byte[] data = doubleBuffer.array();
-                            doubleBuffer.flip();
-                            doubleBuffer.clear();
-                        } finally {
-                            semaphore.release();
-                        }
-                    }
+//                    if (semaphore.tryAcquire()) {
+//                        try {
+//                            doubleBuffer.put(bytes, 0, capacity);
+//                            doubleBuffer.put(tmpCopy, 0, capacity);
+//                            doubleBuffer.put(bytes, capacity, capacity / 4);
+//                            doubleBuffer.put(tmpCopy, capacity, capacity / 4);
+//                            doubleBuffer.put(bytes, capacity * 5 / 4, capacity / 4);
+//                            doubleBuffer.put(tmpCopy, capacity * 5 / 4, capacity / 4);
+//
+//                            doubleBuffer.flip();
+//                            byte[] data = doubleBuffer.array();
+//                            doubleBuffer.flip();
+//                            doubleBuffer.clear();
+//                        } finally {
+//                            semaphore.release();
+//                        }
+//                    }
 
                     //发送
                 }
 
                 @Override
                 public void onCameraBack(byte[] bytes, int orientation) {
-                    try {
-                        if (semaphore.tryAcquire(100, TimeUnit.MILLISECONDS)) {
-                            tmpCopy = bytes;
-                            semaphore.release();
-                        }
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
+//                    try {
+//                        if (semaphore.tryAcquire(100, TimeUnit.MILLISECONDS)) {
+//                            tmpCopy = bytes;
+//                            semaphore.release();
+//                        }
+//                    } catch (InterruptedException e) {
+//                        e.printStackTrace();
+//                    }
                 }
             });
         }
@@ -115,6 +119,22 @@ public class CameraUtilTestActivity extends BaseActivity {
     @Override
     protected void onResume() {
         super.onResume();
+
+        if (!renderer.isInit()) {
+
+            glSurface.post(new Runnable() {
+                @Override
+                public void run() {
+                    int w = glSurface.getWidth();
+                    int h = glSurface.getHeight();
+                    Log.d("camera_util", "width = " + w + " , height = " + h);
+
+                    Size size = cameraUtil.getSize();
+                    renderer.update(w, h, size.getWidth(), size.getHeight());
+                }
+            });
+        }
+
         if (cameraUtil != null) {
             cameraUtil.startPreview(this);
         }

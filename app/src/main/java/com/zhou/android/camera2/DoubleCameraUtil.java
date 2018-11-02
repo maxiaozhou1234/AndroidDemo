@@ -1,4 +1,4 @@
-package com.zhou.android.common;
+package com.zhou.android.camera2;
 
 import android.Manifest;
 import android.content.Context;
@@ -20,6 +20,8 @@ import android.util.Log;
 import android.util.Size;
 import android.view.TextureView;
 
+import com.libyuv.util.YuvUtil;
+
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -38,6 +40,8 @@ public class DoubleCameraUtil {
     private CameraManager cameraManager;
     private Handler handler;
     private HandlerThread handlerThread;
+
+    private Size size = null;
 
     private List<CameraConfig> cameraConfig = null;
 
@@ -182,15 +186,30 @@ public class DoubleCameraUtil {
     }
 
     public Size getSize() {
-        return Collections.max(cameraConfig, new Comparator<CameraConfig>() {
-            @Override
-            public int compare(CameraConfig o1, CameraConfig o2) {
-                return Long.signum(o1.getFrameSize() - o2.getFrameSize());
-            }
-        }).getSize();
+        if (size == null) {
+            size = Collections.max(cameraConfig, new Comparator<CameraConfig>() {
+                @Override
+                public int compare(CameraConfig o1, CameraConfig o2) {
+                    return Long.signum(o1.getFrameSize() - o2.getFrameSize());
+                }
+            }).getSize();
+        }
+        return size;
     }
 
-    private byte[][] getBytes(Image image) {
+    private int capacity = -1;
+
+    /**
+     * 获取流
+     *
+     * @param image
+     * @param orientation 旋转方向
+     */
+    private byte[][] getBytes(Image image, int orientation) {
+        if (capacity == -1) {
+            Size size = getSize();
+            capacity = (int) (size.getWidth() * size.getHeight() * 1.5);
+        }
         int len = image.getPlanes().length;
         byte[][] bytes = new byte[len][];
         int count = 0;
@@ -208,39 +227,34 @@ public class DoubleCameraUtil {
         return bytes;
     }
 
-    private int capacity = -1;
-
-    private byte[] getBytes2(Image image) {
-        if (capacity == -1) {
-            Size size = getSize();
-            capacity = (int) (size.getWidth() * size.getHeight() * 1.5);
-        }
-        int len = image.getPlanes().length;
-        byte[] bytes = new byte[capacity];
-        int count = 0;
-        for (int i = 0; i < len; i++) {
-            ByteBuffer buffer = image.getPlanes()[i].getBuffer();
-            int remaining = buffer.remaining();
-            byte[] data = new byte[remaining];
-            byte[] _data = new byte[remaining];
-            buffer.get(data);
-
-            System.arraycopy(data, 0, bytes, count, remaining);
-            count += remaining;
-        }
-        Log.d(TAG, "bytes = " + count);
-        return bytes;
-    }
-
     //预览处理
     private OnImageAvailableListener frontAvailableListener = new OnImageAvailableListener() {
         @Override
         public void onImageAvailable(ImageReader reader) {
             Image image = reader.acquireLatestImage();
-            Log.d(TAG, " size = " + reader.getWidth() * reader.getHeight() + " ,width = " + reader.getWidth() + " height = " + reader.getHeight() + " = " + " bytes = " + getBytes(image).length);
             if (previewFrameCallback != null) {
-//                previewFrameCallback.onCameraFront(getBytes(image), getOrientation());
-                previewFrameCallback.onCameraFront(getBytes2(image), getOrientation());
+                byte[][] bytes = getBytes(image, getOrientation());
+                byte[] _bytes = new byte[capacity];
+                int count = 0;
+                for (byte[] b : bytes) {
+                    System.arraycopy(b, 0, _bytes, count, b.length);
+                    count += b.length;
+                }
+//                int orientation = getOrientation();
+//                if (orientation == 90 || orientation == 270) {
+//                    byte[][] tmp = new byte[3][];
+//                    tmp[0] = new byte[bytes[0].length];
+//                    tmp[1] = new byte[bytes[1].length];
+//                    tmp[2] = new byte[bytes[2].length];
+//
+//                    YuvUtil.i420RotatePlane(bytes[0], bytes[1], bytes[2], tmp[0], tmp[1], tmp[2],
+//                            getSize().getHeight(), getSize().getWidth(), orientation);
+//                    previewFrameCallback.onCameraFront(tmp, getOrientation());
+//                } else {
+//
+//                }
+                previewFrameCallback.onCameraFront(bytes, getOrientation());
+                previewFrameCallback.onCameraFront(_bytes, getOrientation());
             }
             image.close();
         }
@@ -251,8 +265,15 @@ public class DoubleCameraUtil {
         public void onImageAvailable(ImageReader reader) {
             Image image = reader.acquireLatestImage();
             if (previewFrameCallback != null) {
-//                previewFrameCallback.onCameraBack(getBytes(image), getOrientation());
-                previewFrameCallback.onCameraBack(getBytes2(image), getOrientation());
+                byte[][] bytes = getBytes(image, getOrientation());
+                byte[] _bytes = new byte[capacity];
+                int count = 0;
+                for (byte[] b : bytes) {
+                    System.arraycopy(b, 0, _bytes, count, b.length);
+                    count += b.length;
+                }
+                previewFrameCallback.onCameraBack(bytes, getOrientation());
+                previewFrameCallback.onCameraBack(_bytes, getOrientation());
             }
             image.close();
         }
