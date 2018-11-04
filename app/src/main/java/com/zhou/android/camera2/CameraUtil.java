@@ -23,13 +23,7 @@ import android.util.Size;
 import android.view.TextureView;
 
 import java.nio.ByteBuffer;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-
-import it.sephiroth.android.library.easing.Back;
 
 /**
  * Camera2 工具类
