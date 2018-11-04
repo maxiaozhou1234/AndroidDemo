@@ -2,6 +2,7 @@ package com.zhou.android.common;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
 
@@ -31,10 +32,12 @@ public abstract class BaseActivity extends AppCompatActivity {
     }
 
     public void back() {
-        finish();
+        ActivityCompat.finishAfterTransition(this);
     }
 
     protected abstract void setContentView();
+
     protected abstract void init();
+
     protected abstract void addListener();
 }

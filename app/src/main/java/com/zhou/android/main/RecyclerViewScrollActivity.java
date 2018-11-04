@@ -171,7 +171,7 @@ public class RecyclerViewScrollActivity extends BaseActivity implements View.OnC
                 position = -1;
             }
         }
-        if (position != -1) {
+        if (position != -1 && position < data.size()) {
             hideSoftInput();
             et_position.clearFocus();
             moveToPosition(position);

@@ -1,8 +1,11 @@
 package com.zhou.android;
 
+import android.app.ActivityOptions;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.view.View;
@@ -24,6 +27,7 @@ import com.zhou.android.main.PhotoPickerActivity;
 import com.zhou.android.main.PointZoomActivity;
 import com.zhou.android.main.RecyclerViewScrollActivity;
 import com.zhou.android.main.ScrollTestActivity;
+import com.zhou.android.share.ShareActivity;
 import com.zhou.android.main.SurfaceActivity;
 import com.zhou.android.main.UdpReceiverActivity;
 import com.zhou.android.main.VideoActivity;
@@ -59,12 +63,13 @@ public class MainActivity extends AppCompatActivity {
         list.add(new GridViewItem(PointZoomActivity.class, "Point Zoom"));
         list.add(new GridViewItem(PhotoPickerActivity.class, "图片选择"));
         list.add(new GridViewItem(RetrofitActivity.class, "Retrofit"));
-        list.add(new GridViewItem(RecyclerViewScrollActivity.class, "RecyclerViewScroll"));
+        list.add(new GridViewItem(RecyclerViewScrollActivity.class, "ViewScroll"));
         list.add(new GridViewItem(PicassoActivity.class, "Picasso 显示"));
         list.add(new GridViewItem(VideoActivity.class, "视频播放"));
         list.add(new GridViewItem(OkHttpActivity.class, "OkHttp"));
         list.add(new GridViewItem(UdpReceiverActivity.class, "Udp 监听"));
         list.add(new GridViewItem(WeatherActivity.class, "和风天气"));
+        list.add(new GridViewItem(ShareActivity.class, "视图分享"));
         list.add(new GridViewItem("Test", "测试"));
         list.add(new GridViewItem("Apple", "苹果"));
         list.add(new GridViewItem("Banana", "香蕉"));
@@ -77,7 +82,12 @@ public class MainActivity extends AppCompatActivity {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 GridViewItem item = list.get(position);
                 try {
-                    startActivity(new Intent(MainActivity.this, item.clz));
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+                        ActivityOptions options = ActivityOptions.makeScaleUpAnimation(view, view.getWidth() / 2, view.getHeight() / 2, 0, 0);
+                        ActivityCompat.startActivity(MainActivity.this, new Intent(MainActivity.this, item.clz), options.toBundle());
+                    } else {
+                        startActivity(new Intent(MainActivity.this, item.clz));
+                    }
                 } catch (Exception e) {
                     Toast.makeText(MainActivity.this, String.format("start %s failed", TextUtils.isEmpty(item.zhName) ? item.targetClass : item.zhName), Toast.LENGTH_SHORT).show();
                 }

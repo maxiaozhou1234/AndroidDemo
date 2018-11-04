@@ -7,4 +7,5 @@
     <string name="match_devices">已配对设备</string>
     <string name="use_devices">可用设备</string>
     <string name="picasso_tip">MEMORY(Color.GREEN)\nDISK(Color.BLUE)\nNETWORK(Color.RED)</string>
+    <string name="cover">music cover</string>
 </resources>
