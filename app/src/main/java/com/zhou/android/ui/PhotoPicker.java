@@ -6,31 +6,22 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
-import android.content.res.TypedArray;
-import android.graphics.Color;
 import android.net.Uri;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AlertDialog;
-import android.support.v7.widget.AlertDialogLayout;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
-import android.util.TypedValue;
-import android.view.Gravity;
-import android.view.KeyEvent;
 import android.widget.LinearLayout;
-import android.widget.TextView;
 
 import com.zhihu.matisse.Matisse;
 import com.zhihu.matisse.MimeType;
 import com.zhihu.matisse.engine.impl.GlideEngine;
-import com.zhihu.matisse.filter.Filter;
 import com.zhihu.matisse.internal.entity.CaptureStrategy;
 import com.zhou.android.R;
 import com.zhou.android.adapter.RecyclerAdapter;
 import com.zhou.android.adapter.RecyclerListener;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -47,7 +38,7 @@ public class PhotoPicker extends LinearLayout {
     private RecyclerAdapter recyclerAdapter;
     private int spanCount = 4;
 
-    private Dialog dialog;
+//    private Dialog dialog;
     private AlertDialog ad;
     private int removeIndex = -1, showIndex = -1;
 

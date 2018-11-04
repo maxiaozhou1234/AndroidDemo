@@ -6,46 +6,50 @@ import java.util.Random;
 
 import rx.Observable;
 import rx.Subscriber;
+import rx.functions.Action0;
+import rx.functions.Action1;
 import rx.functions.Func1;
 
 public class main {
     public static void main(String[] arg) {
 
 //        a2b();
-        aAnda();
+//        aAnda();
+        observable();
     }
 
-    private static void a2b() {
-        Random r = new Random();
-        List<Integer> numbers = new ArrayList<>();
-        for (int i = 0; i < 5; i++) {
-            numbers.add(r.nextInt(101));
-        }
-        Observable.from(numbers)
-                .map(new Func1<Integer, Boolean>() {
+    private static void observable() {
+        Observable observable =
+                Observable.create(new Observable.OnSubscribe<String>() {
+            @Override
+            public void call(Subscriber<? super String> subscriber) {
+                subscriber.onNext("100");
+            }
+        });
+        Subscriber<String> subscriber = new Subscriber<String>() {
+            @Override
+            public void onCompleted() {
 
-                    @Override
-                    public Boolean call(Integer integer) {
-                        System.out.print(integer);
-                        return integer % 2 == 0;
-                    }
-                })
-                .subscribe(new Subscriber<Boolean>() {
-                    @Override
-                    public void onCompleted() {
+            }
 
-                    }
+            @Override
+            public void onError(Throwable throwable) {
 
-                    @Override
-                    public void onError(Throwable e) {
+            }
 
-                    }
+            @Override
+            public void onNext(String s) {
+                System.out.println(s);
+            }
+        };
+        observable.subscribe(subscriber);
 
-                    @Override
-                    public void onNext(Boolean aBoolean) {
-                        System.out.println("  result: " + aBoolean);
-                    }
-                });
+        observable.subscribe(new Action1<String>() {
+            @Override
+            public void call(String s) {
+                System.out.println("second "+s);
+            }
+        });
     }
 
     private static void aAnda() {

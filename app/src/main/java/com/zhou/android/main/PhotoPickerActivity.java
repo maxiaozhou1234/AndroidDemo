@@ -51,10 +51,15 @@ public class PhotoPickerActivity extends BaseActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        if (tv.getText().length() > 0)
-            tv.setText("");
-        else
-            tv.setText(photoPicker.getPhotos().toString().replaceAll("[\\[|\\]]", ""));
-        return true;
+        int id = item.getItemId();
+        if (id == R.id.menu_ok) {
+            if (tv.getText().length() > 0)
+                tv.setText("");
+            else
+                tv.setText(photoPicker.getPhotos().toString().replaceAll("[\\[|\\]]", ""));
+            return true;
+        } else {
+            return super.onOptionsItemSelected(item);
+        }
     }
 }
