@@ -5,6 +5,7 @@ import android.os.Build;
 import android.support.annotation.RequiresApi;
 import android.util.Log;
 import android.util.Size;
+import android.view.SurfaceView;
 import android.view.TextureView;
 import android.view.View;
 import android.widget.Toast;
@@ -29,10 +30,9 @@ public class CameraUtilTestActivity extends BaseActivity {
     private ByteBuffer doubleBuffer, tmpBuffer;
     private byte[] tmpCopy;
 
+    private SurfaceView surface;
     private GLSurfaceView glSurface;
     private GLFrameRenderer renderer;
-
-//    private Semaphore semaphore = new Semaphore(1);
 
     @Override
     protected void setContentView() {
@@ -48,7 +48,8 @@ public class CameraUtilTestActivity extends BaseActivity {
             return;
         }
         TextureView textureView = findViewById(R.id.textureView);
-        cameraUtil = new CameraUtil(this, null, textureView);
+        surface = findViewById(R.id.surface);
+        cameraUtil = new CameraUtil(this, textureView, surface);
 
         glSurface = findViewById(R.id.glSurface);
         glSurface.setEGLContextClientVersion(2);
@@ -78,9 +79,9 @@ public class CameraUtilTestActivity extends BaseActivity {
             cameraUtil.setPreviewFrameCallback(new CameraUtil.OnPreviewFrameCallback() {
                 @Override
                 public void onCameraFront(byte[][] bytes, int orientation) {
-//                    if (renderer != null && bytes.length == 3) {
-//                        renderer.update(bytes[0], bytes[1], bytes[2]);
-//                    }
+                    if (renderer != null && bytes.length == 3) {
+                        renderer.update(bytes[0], bytes[1], bytes[2]);
+                    }
                 }
 
                 @Override

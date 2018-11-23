@@ -17,7 +17,10 @@ import android.support.annotation.RequiresApi;
 import android.util.Log;
 import android.util.Size;
 import android.view.Surface;
+import android.view.SurfaceHolder;
+import android.view.SurfaceView;
 import android.view.TextureView;
+import android.view.View;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -34,6 +37,8 @@ import java.util.List;
 public class CameraConfig {
 
     private final static String TAG = "CameraConfig";
+    private final static int TYPE_TEXTURE_VIEW = 0;
+    private final static int TYPE_SURFACE_VIEW = 1;
     private String[] _error = {"ERROR_CAMERA_IN_USE", "ERROR_MAX_CAMERAS_IN_USE", "ERROR_CAMERA_DISABLED", "ERROR_CAMERA_DEVICE", "ERROR_CAMERA_SERVICE"};
 
     String cameraId;
@@ -42,33 +47,46 @@ public class CameraConfig {
     private CameraCaptureSession cameraCaptureSession;
     CameraDevice.StateCallback cameraStateCallback;
 
+    private int type = -1;
+
     private Handler handler;
-    TextureView textureView;
+    //     TextureView textureView;
     private ImageReader imageReader;
+    private View view;
     private OnImageAvailableListener imageAvailableListener;
     private Size largest;
 
-    public CameraConfig(String cameraId, CameraCharacteristics characteristics, @Nullable TextureView textureView, OnImageAvailableListener listener, Handler handler) {
+    public CameraConfig(String cameraId, Size size, @Nullable View view, OnImageAvailableListener listener, Handler handler) {
+        if (view != null) {
+            this.view = view;
+            if (view instanceof TextureView) {
+                type = TYPE_TEXTURE_VIEW;
+            } else if (view instanceof SurfaceView) {
+                type = TYPE_SURFACE_VIEW;
+            } else {
+                throw new IllegalArgumentException("不支持类型");
+            }
+        }
 
         this.cameraId = cameraId;
-        this.textureView = textureView;
         this.imageAvailableListener = listener;
         this.handler = handler;
 
-        StreamConfigurationMap size = characteristics.get(
-                CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP);
+//        StreamConfigurationMap size = characteristics.get(
+//                CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP);
         if (size != null) {
             //暂定使用最大的尺寸 最小尺寸
-            largest = Collections.max(Arrays.asList(size.getOutputSizes(ImageFormat.JPEG)),
-                    new Comparator<Size>() {
-                        @Override
-                        public int compare(Size lhs, Size rhs) {
-                            return Long.signum((long) rhs.getWidth() * rhs.getHeight() -
-                                    (long) lhs.getWidth() * lhs.getHeight());
-//                            return Long.signum((long) lhs.getWidth() * lhs.getHeight() -
-//                                    (long) rhs.getWidth() * rhs.getHeight());
-                        }
-                    });
+//            largest = Collections.max(Arrays.asList(size.getOutputSizes(ImageFormat.JPEG)),
+//                    new Comparator<Size>() {
+//                        @Override
+//                        public int compare(Size lhs, Size rhs) {
+//                            return Long.signum((long) rhs.getWidth() * rhs.getHeight() -
+//                                    (long) lhs.getWidth() * lhs.getHeight());
+////                            return Long.signum((long) lhs.getWidth() * lhs.getHeight() -
+////                                    (long) rhs.getWidth() * rhs.getHeight());
+//                        }
+//                    });
+            largest = size;
             Log.d(TAG, "width = " + largest.getWidth() + " height = " + largest.getHeight());
             //三通道 YUV  YV12,YUV_420_888,NV21 但 NV21 不支持
             imageReader = ImageReader.newInstance(largest.getWidth(), largest.getHeight(), ImageFormat.YV12, 1);
@@ -95,27 +113,6 @@ public class CameraConfig {
                 Log.e(TAG, _error[error]);
             }
         };
-
-        //noinspection ConstantConditions
-        int mSensorOrientation = characteristics.get(CameraCharacteristics.SENSOR_ORIENTATION);
-//        boolean swappedDimensions = false;
-//        switch (displayRotation) {
-//            case Surface.ROTATION_0:
-//            case Surface.ROTATION_180:
-//                if (mSensorOrientation == 90 || mSensorOrientation == 270) {
-//                    swappedDimensions = true;
-//                }
-//                break;
-//            case Surface.ROTATION_90:
-//            case Surface.ROTATION_270:
-//                if (mSensorOrientation == 0 || mSensorOrientation == 180) {
-//                    swappedDimensions = true;
-//                }
-//                break;
-//            default:
-//                Log.e(TAG, "Display rotation is invalid: " + displayRotation);
-//        }
-        listener.setOrientation(mSensorOrientation);
     }
 
     private void createCameraSession() {
@@ -123,13 +120,12 @@ public class CameraConfig {
         try {
             captureRequestBuilder = cameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW);
 
-            List<Surface> output = new ArrayList<>(textureView == null ? 1 : 2);
+            List<Surface> output = new ArrayList<>(view == null ? 1 : 2);
             output.add(imageReader.getSurface());
             captureRequestBuilder.addTarget(imageReader.getSurface());
-            if (textureView != null) {
-                SurfaceTexture surfaceTexture = textureView.getSurfaceTexture();
-                assert surfaceTexture != null;
-                Surface surface = new Surface(surfaceTexture);
+
+            Surface surface = getSurface();
+            if (surface != null) {
                 output.add(surface);
                 captureRequestBuilder.addTarget(surface);
             }
@@ -209,6 +205,86 @@ public class CameraConfig {
 
     public Size getSize() {
         return largest;
+    }
+
+    private Surface getSurface() {
+        if (type == TYPE_TEXTURE_VIEW) {
+            SurfaceTexture surfaceTexture = ((TextureView) view).getSurfaceTexture();
+            assert surfaceTexture != null;
+            return new Surface(surfaceTexture);
+        } else if (type == TYPE_SURFACE_VIEW) {
+            return ((SurfaceView) view).getHolder().getSurface();
+        }
+        return null;
+    }
+
+    public void startPreview() {
+        if (callback == null)
+            return;
+        if (view != null) {
+            if (type == TYPE_TEXTURE_VIEW) {
+                TextureView textureView = (TextureView) view;
+                if (textureView.isAvailable()) {
+                    callback.onSurfaceTextureAvailable(this);
+                } else {
+                    textureView.setSurfaceTextureListener(new TextureView.SurfaceTextureListener() {
+                        @Override
+                        public void onSurfaceTextureAvailable(SurfaceTexture surface, int width, int height) {
+                            callback.onSurfaceTextureAvailable(CameraConfig.this);
+                        }
+
+                        @Override
+                        public void onSurfaceTextureSizeChanged(SurfaceTexture surface, int width, int height) {
+
+                        }
+
+                        @Override
+                        public boolean onSurfaceTextureDestroyed(SurfaceTexture surface) {
+                            return true;
+                        }
+
+                        @Override
+                        public void onSurfaceTextureUpdated(SurfaceTexture surface) {
+
+                        }
+                    });
+                }
+            } else if (type == TYPE_SURFACE_VIEW) {
+                if (((SurfaceView) view).getHolder().getSurface().isValid()) {
+                    callback.onSurfaceTextureAvailable(CameraConfig.this);
+                } else {
+                    ((SurfaceView) view).getHolder().addCallback(new SurfaceHolder.Callback() {
+                        @Override
+                        public void surfaceCreated(SurfaceHolder holder) {
+                            callback.onSurfaceTextureAvailable(CameraConfig.this);
+                        }
+
+                        @Override
+                        public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
+
+                        }
+
+                        @Override
+                        public void surfaceDestroyed(SurfaceHolder holder) {
+
+                        }
+                    });
+                }
+            }
+        } else {
+            callback.onSurfaceTextureAvailable(this);
+        }
+    }
+
+    private SurfaceCallback callback;
+
+    public void setSurfaceCallback(SurfaceCallback callback) {
+        this.callback = callback;
+    }
+
+    public interface SurfaceCallback {
+
+        void onSurfaceTextureAvailable(CameraConfig config);
     }
 
 }

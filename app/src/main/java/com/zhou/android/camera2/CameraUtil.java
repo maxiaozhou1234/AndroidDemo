@@ -1,29 +1,33 @@
 package com.zhou.android.camera2;
 
 import android.Manifest;
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.graphics.ImageFormat;
-import android.graphics.SurfaceTexture;
 import android.hardware.camera2.CameraAccessException;
 import android.hardware.camera2.CameraCharacteristics;
 import android.hardware.camera2.CameraManager;
+import android.hardware.camera2.params.StreamConfigurationMap;
 import android.media.Image;
 import android.media.ImageReader;
 import android.os.Build;
 import android.os.Handler;
 import android.os.HandlerThread;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
+import android.support.annotation.RequiresPermission;
 import android.support.v4.app.ActivityCompat;
 import android.util.ArrayMap;
 import android.util.Log;
 import android.util.Size;
-import android.view.TextureView;
+import android.view.View;
 
 import java.nio.ByteBuffer;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 
 /**
  * Camera2 工具类
@@ -44,7 +48,7 @@ public class CameraUtil {
     private ArrayMap<String, CameraConfig> cameraConfig = new ArrayMap<>();
     private int capacity = -1;
 
-    private TextureView frontTextureView = null, backTextureView = null;
+    private View frontTextureView = null, backTextureView = null;
 
     public CameraUtil(Context context) {
         this(context, null, null);
@@ -53,7 +57,7 @@ public class CameraUtil {
     /**
      * 传入需预览的 TextureView 控件，如不需要预览可传 null
      */
-    public CameraUtil(Context context, @Nullable TextureView frontTextureView, @Nullable TextureView backTextureView) {
+    public CameraUtil(Context context, @Nullable View frontTextureView, @Nullable View backTextureView) {
         this.frontTextureView = frontTextureView;
         this.backTextureView = backTextureView;
         init(context);
@@ -70,20 +74,47 @@ public class CameraUtil {
 
         cameraManager = (CameraManager) context.getSystemService(Context.CAMERA_SERVICE);
 //        WindowManager wm = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
+//        int displayRotation = wm.getDefaultDisplay().getRotation();
+//        int degree = 0;
+//        switch (displayRotation) {
+//            case Surface.ROTATION_0:
+//                degree = 0;
+//                break;
+//            case Surface.ROTATION_180:
+//                degree = 180;
+//                break;
+//            case Surface.ROTATION_90:
+//                degree = 90;
+//                break;
+//            case Surface.ROTATION_270:
+//                degree = 270;
+//                break;
+//        }
+//        Log.e(TAG, "displayRotation:" + displayRotation + " ,degree:" + degree);
         try {
             String[] ids = cameraManager.getCameraIdList();
             Log.i(TAG, "camera count = " + ids.length);
             for (String id : ids) {
                 CameraCharacteristics characteristics = cameraManager.getCameraCharacteristics(id);
                 Integer cameraOrientation = characteristics.get(CameraCharacteristics.LENS_FACING);
+                Integer sensorOrientation = characteristics.get(CameraCharacteristics.SENSOR_ORIENTATION);
+                if (sensorOrientation == null) {
+                    sensorOrientation = 0;
+                }
+                Log.e(TAG, "SensorOrientation = " + sensorOrientation);
                 if (cameraOrientation == null)
                     continue;
-//                    int displayRotation = wm.getDefaultDisplay().getRotation();
+                StreamConfigurationMap size = characteristics.get(
+                        CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP);
                 if (cameraOrientation == CameraCharacteristics.LENS_FACING_FRONT) {
-                    CameraConfig config = new CameraConfig(id, characteristics, frontTextureView, frontAvailableListener, handler);
+                    CameraConfig config = new CameraConfig(id, calculationSize(size), frontTextureView, frontAvailableListener, handler);
+                    config.setSurfaceCallback(surfaceCallback);
+                    frontAvailableListener.setOrientation(sensorOrientation);
                     cameraConfig.put(FRONT, config);
                 } else if (cameraOrientation == CameraCharacteristics.LENS_FACING_BACK) {
-                    CameraConfig config = new CameraConfig(id, characteristics, backTextureView, backAvailableListener, handler);
+                    CameraConfig config = new CameraConfig(id, calculationSize(size), backTextureView, backAvailableListener, handler);
+                    config.setSurfaceCallback(surfaceCallback);
+                    backAvailableListener.setOrientation(sensorOrientation);
                     cameraConfig.put(BACK, config);
                 }
             }
@@ -141,41 +172,13 @@ public class CameraUtil {
             cameraManager = (CameraManager) context.getSystemService(Context.CAMERA_SERVICE);
         }
         capacity = -1;
-        final CameraConfig config = cameraConfig.get(isCameraBack ? BACK : FRONT);
+        CameraConfig config = cameraConfig.get(isCameraBack ? BACK : FRONT);
         if (config != null) {
-            if (config.textureView != null) {
-                if (config.textureView.isAvailable()) {
-                    openCamera(cameraManager, config);
-                } else {
-                    config.textureView.setSurfaceTextureListener(new TextureView.SurfaceTextureListener() {
-                        @Override
-                        public void onSurfaceTextureAvailable(SurfaceTexture surface, int width, int height) {
-                            openCamera(cameraManager, config);
-                        }
-
-                        @Override
-                        public void onSurfaceTextureSizeChanged(SurfaceTexture surface, int width, int height) {
-
-                        }
-
-                        @Override
-                        public boolean onSurfaceTextureDestroyed(SurfaceTexture surface) {
-                            return true;
-                        }
-
-                        @Override
-                        public void onSurfaceTextureUpdated(SurfaceTexture surface) {
-
-                        }
-                    });
-                }
-            } else {
-                openCamera(cameraManager, config);
-            }
+            config.startPreview();
         }
     }
 
-    @SuppressLint("MissingPermission")
+    @RequiresPermission(android.Manifest.permission.CAMERA)
     private void openCamera(CameraManager cameraManager, CameraConfig config) {
         try {
             cameraManager.openCamera(config.cameraId, config.cameraStateCallback, handler);
@@ -206,6 +209,24 @@ public class CameraUtil {
         return size;
     }
 
+    private Size calculationSize(StreamConfigurationMap map) {
+        if (map != null) {
+            return Collections.max(Arrays.asList(map.getOutputSizes(ImageFormat.JPEG)),
+                    new Comparator<Size>() {
+                        @Override
+                        public int compare(Size lhs, Size rhs) {
+                            return Long.signum((long) rhs.getWidth() * rhs.getHeight() -
+                                    (long) lhs.getWidth() * lhs.getHeight());
+//                            return Long.signum((long) lhs.getWidth() * lhs.getHeight() -
+//                                    (long) rhs.getWidth() * rhs.getHeight());
+                        }
+                    });
+        }
+        return null;
+    }
+
+    private Size size = null;
+
     /**
      * 获取流
      *
@@ -214,7 +235,7 @@ public class CameraUtil {
      */
     private byte[][] getBytes(Image image, int orientation) {
         if (capacity == -1) {
-            Size size = getSize();
+            size = getSize();//Size
             capacity = (int) (size.getWidth() * size.getHeight() * 1.5);
         }
         int len = image.getPlanes().length;
@@ -224,14 +245,47 @@ public class CameraUtil {
             ByteBuffer buffer = image.getPlanes()[i].getBuffer();
             int remaining = buffer.remaining();
             byte[] data = new byte[remaining];
-            byte[] _data = new byte[remaining];
             buffer.get(data);
-            System.arraycopy(data, 0, _data, 0, remaining);
-            bytes[i] = _data;
+            bytes[i] = data;
+//            bytes[i] = fixOrientation(data, size, orientation);
             count += remaining;
         }
         Log.d(TAG, "bytes = " + count);
         return bytes;
+    }
+
+    boolean error = false;
+
+    private byte[] fixOrientation(byte[] src, Size size, int orientation) {
+        if (error)
+            return src;
+        if (size == null)
+            return src;
+        if (orientation == 0 || orientation == 180)
+            return src;
+        int index = 0;
+        int column = size.getWidth();
+        int row = size.getWidth() * size.getHeight() > src.length ? size.getHeight() / 4 : size.getHeight();
+        try {
+            byte[] dest = new byte[src.length];
+            int len = src.length;
+//            if (orientation == 90) {
+                for (int i = 0; i < len; i++) {
+                    // x = i % raw; y = i/raw;  index = x + raw * y;
+                    // x` = column - i / raw; y` = i % raw;
+                    index = (column - i / row) + (i % row) * column - 1;
+                    dest[i] = src[index];
+                }
+//            } else {
+//
+//            }
+            return dest;
+        } catch (Exception e) {
+            e.printStackTrace();
+            Log.e(TAG, "index = " + index + " < " + row + " , " + column + " >");
+            error = true;
+            return src;
+        }
     }
 
     //预览处理
@@ -283,6 +337,13 @@ public class CameraUtil {
                 previewFrameCallback.onCameraBack(_bytes, getOrientation());
             }
             image.close();
+        }
+    };
+
+    private CameraConfig.SurfaceCallback surfaceCallback = new CameraConfig.SurfaceCallback() {
+        @Override
+        public void onSurfaceTextureAvailable(CameraConfig config) {
+            openCamera(cameraManager, config);
         }
     };
 
