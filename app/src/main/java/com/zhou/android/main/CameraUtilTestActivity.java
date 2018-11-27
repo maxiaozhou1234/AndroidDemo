@@ -16,7 +16,6 @@ import com.zhou.android.common.BaseActivity;
 import com.zhou.android.opengl.GLFrameRenderer;
 
 import java.nio.ByteBuffer;
-import java.util.concurrent.Semaphore;
 
 /**
  * CameraUtil Test
