@@ -2,11 +2,15 @@ package com.zhou.android.main;
 
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.drawable.AnimationDrawable;
 import android.net.Uri;
 import android.os.Build;
 import android.provider.Settings;
 import android.support.v7.app.AlertDialog;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.zhou.android.R;
@@ -20,6 +24,9 @@ import com.zhou.android.service.FloatBallService;
  */
 
 public class FloatBallActivity extends BaseActivity {
+
+    private ImageView wifi;
+
     @Override
     protected void setContentView() {
         setContentView(R.layout.activity_floatball);
@@ -32,6 +39,8 @@ public class FloatBallActivity extends BaseActivity {
                 showAlertDialog();
             }
         }
+
+        wifi = findViewById(R.id.wifi);
     }
 
     @Override
@@ -53,6 +62,14 @@ public class FloatBallActivity extends BaseActivity {
             if (Tools.isServiceRunning(this, FloatBallService.class.getName())) {
                 stopService(new Intent(this, FloatBallService.class));
             }
+        } else if (R.id.startAnim == id) {
+
+            wifi.setBackgroundResource(R.drawable.wifi_anim);
+            AnimationDrawable animation = (AnimationDrawable) wifi.getBackground();
+            animation.start();
+
+        } else if (R.id.stopAnim == id) {
+            stopAnimation();
         }
     }
 
@@ -84,5 +101,23 @@ public class FloatBallActivity extends BaseActivity {
                 });
         AlertDialog alertDialog = builder.create();
         alertDialog.show();
+    }
+
+    private void stopAnimation(){
+        AnimationDrawable animation = null;
+        try {
+            animation = (AnimationDrawable) wifi.getBackground();
+        } catch (ClassCastException e) {
+            e.printStackTrace();
+        }
+        if (animation != null && animation.isRunning()) {
+            animation.stop();
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        stopAnimation();
+        super.onDestroy();
     }
 }
