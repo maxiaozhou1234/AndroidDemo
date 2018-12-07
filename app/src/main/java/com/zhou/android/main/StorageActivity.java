@@ -9,6 +9,7 @@ import android.content.pm.IPackageStatsObserver;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.PackageStats;
+import android.os.Build;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
@@ -46,6 +47,7 @@ public class StorageActivity extends BaseActivity {
     private final static String TAG = "storage";
     private final static int RequestCode = 0x1001;
     private TextView text;
+    private StringBuilder sb = new StringBuilder();
 
     private PackageObserver packageObserver;
 
@@ -68,7 +70,7 @@ public class StorageActivity extends BaseActivity {
 
         checkExceptSystemCapacity();
         append("================================");
-        getAppSize();
+        getStorageWith_7_1();
     }
 
     /**
@@ -111,8 +113,17 @@ public class StorageActivity extends BaseActivity {
         @Override
         public void onGetStatsCompleted(PackageStats pStats, boolean succeeded) throws RemoteException {
 
+            sb.setLength(0);
+            sb.append(pStats.packageName)
+                    .append("\ncode = ")
+                    .append(getUnit(pStats.codeSize))
+                    .append(" ,data = ")
+                    .append(getUnit(pStats.dataSize))
+                    .append(" ,cache = ")
+                    .append(getUnit(pStats.cacheSize));
+
             Message msg = handler.obtainMessage();
-            msg.obj = pStats.toString();
+            msg.obj = sb.toString();
             msg.sendToTarget();
         }
     }
@@ -137,8 +148,9 @@ public class StorageActivity extends BaseActivity {
             }
             StorageStatsManager stats = getSystemService(StorageStatsManager.class);
             return stats.getTotalBytes(id);
-        } catch (NullPointerException | IOException e) {
+        } catch (NoSuchFieldError | NoClassDefFoundError | NullPointerException | IOException e) {
             e.printStackTrace();
+            ToastUtils.show(this, "获取存储大小失败");
             return 0;
         }
     }
@@ -153,7 +165,11 @@ public class StorageActivity extends BaseActivity {
     private UUID getUuid(String fsUuid) {
         UUID id;
         if (fsUuid == null) {
-            id = StorageManager.UUID_DEFAULT;
+            try {
+                id = StorageManager.UUID_DEFAULT;
+            } catch (NoSuchFieldError e) {
+                id = UUID.fromString("41217664-9172-527a-b3d5-edabb50a7d69");
+            }
         } else {
             id = UUID.fromString(fsUuid);
         }
@@ -210,20 +226,35 @@ public class StorageActivity extends BaseActivity {
 
     private void getAppSize() {
         boolean flag = false;
-        Method[] methods = PackageManager.class.getMethods();
-        for (Method m : methods) {
-            if ("getPackageSizeInfo".equals(m.getName())) {
-                Class<?>[] classes = m.getParameterTypes();
-                if (classes.length == 2 || classes.length == 3) {
-                    flag = true;
-                    break;
-                }
+        try {
+            PackageManager.class.getMethod("getPackageSizeInfo", String.class, IPackageStatsObserver.class);
+            flag = true;
+        } catch (NoSuchMethodException e) {
+            try {
+                PackageManager.class.getMethod("getPackageSizeInfo", String.class, int.class, IPackageStatsObserver.class);
+                flag = true;
+            } catch (NoSuchMethodException ee) {
+                flag = false;
             }
         }
+//        Method[] methods = PackageManager.class.getMethods();
+//        for (Method m : methods) {
+//            if ("getPackageSizeInfo".equals(m.getName())) {
+//                Class<?>[] classes = m.getParameterTypes();
+//                if (classes.length == 2 || classes.length == 3) {
+//                    flag = true;
+//                    break;
+//                }
+//            }
+//        }
         if (flag) {
             useIPackageStatsObserver();
         } else {
-            useStorageManager();
+            if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.LOLLIPOP_MR1) {
+                getStorageWith_7_1();
+            } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                getStorageWith_8();
+            }
         }
     }
 
@@ -269,7 +300,7 @@ public class StorageActivity extends BaseActivity {
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            useStorageManager();
+                            getStorageWith_8();
                         }
                     });
                 }
@@ -278,9 +309,9 @@ public class StorageActivity extends BaseActivity {
         ).start();
     }
 
-    private void useStorageManager() {
+    private void getStorageWith_8() {
 
-        Log.d(TAG, "useStorageManager");
+        Log.d(TAG, "getStorageWith_8");
         //这里的权限检查有问题，模拟器一直返回 -1
 //        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
 //
@@ -321,7 +352,7 @@ public class StorageActivity extends BaseActivity {
                         total += totalSize;
                     }
                     Message msg = handler.obtainMessage();
-                    msg.obj = "totalSize = " + getUnit(totalSize) + " ,used = " + getUnit(used) + " ,free = " + getUnit(totalSize - used);
+                    msg.obj = "totalSize = " + getUnit(totalSize) + " ,used(with system) = " + getUnit(used) + " ,free = " + getUnit(totalSize - used);
                     msg.sendToTarget();
 
                     Method getId = obj.getClass().getDeclaredMethod("getId");
@@ -341,9 +372,105 @@ public class StorageActivity extends BaseActivity {
                     //外置存储
                 }
             }
-            Log.d(TAG, "总内存 total = " + getUnit(total, 1000) + " ,已用 used = " + getUnit(used, 1000));
+            Log.d(TAG, "总内存 total = " + getUnit(total, 1000) + " ,已用 used(with system) = " + getUnit(used, 1000));
             Message msg = handler.obtainMessage();
-            msg.obj = "总内存 total = " + getUnit(total, 1000) + "\n已用 used = " + getUnit(used, 1000) + "\n可用 available = " + getUnit(total - used, 1000);
+            msg.obj = "总内存 total = " + getUnit(total, 1000) + "\n已用 used(with system) = " + getUnit(used, 1000) + "\n可用 available = " + getUnit(total - used, 1000);
+            msg.sendToTarget();
+
+        } catch (SecurityException e) {
+            AlertDialog ad = new AlertDialog.Builder(this)
+                    .setTitle("警告")
+                    .setMessage("缺少权限：permission.PACKAGE_USAGE_STATS\n" + e.getMessage() + "\n需要在\"设置>安全\"中给应用提供权限")
+                    .setPositiveButton("设置", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            Intent intent = new Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS);
+                            startActivity(intent);
+                        }
+                    })
+                    .setNegativeButton("拒绝", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.dismiss();
+                            ToastUtils.show(StorageActivity.this, "已拒绝，请手动开启");
+                        }
+                    })
+                    .create();
+            ad.show();
+        } catch (Exception e) {
+            e.printStackTrace();
+            ToastUtils.show(this, "无法获取应用内存大小");
+        }
+    }
+
+    /**
+     * robot 7.1
+     */
+    private void getStorageWith_7_1() {
+        StorageManager storageManager = (StorageManager) getSystemService(Context.STORAGE_SERVICE);
+
+        try {
+            Method getVolumes = storageManager.getClass().getDeclaredMethod("getVolumes");
+            List<Object> getVolumeInfo = (List<Object>) getVolumes.invoke(storageManager);
+            long total = 0L, used = 0L;
+            for (Object obj : getVolumeInfo) {
+
+                Field getType = obj.getClass().getField("type");
+                int type = getType.getInt(obj);
+
+                Log.d(TAG, "type: " + type);
+                if (type == 1) {//TYPE_PRIVATE
+                    Method getFsUuid = obj.getClass().getDeclaredMethod("getFsUuid");
+                    String fsUuid = (String) getFsUuid.invoke(obj);
+
+                    Method getPrimaryStorageSize = StorageManager.class.getMethod("getPrimaryStorageSize");
+                    long totalSize = (long) getPrimaryStorageSize.invoke(storageManager);
+                    long systemSize = 0L;
+
+                    Method isMountedReadable = obj.getClass().getDeclaredMethod("isMountedReadable");
+                    boolean readable = (boolean) isMountedReadable.invoke(obj);
+                    if (readable) {
+                        Method file = obj.getClass().getDeclaredMethod("getPath");
+                        File f = (File) file.invoke(obj);
+
+//                        Log.d(TAG, "SD totalSize " + getUnit(totalSize, 1000) + " , 盘总共 = " + getUnit(f.getTotalSpace(), 1000) + ", 可用 = " + getUnit(f.getFreeSpace(), 1000));
+                        String _msg = "剩余总内存：" + getUnit(f.getTotalSpace()) + "\n可用内存：" + getUnit(f.getFreeSpace()) + "\n已用内存：" + getUnit(f.getTotalSpace() - f.getFreeSpace());
+                        Log.d(TAG, _msg);
+
+                        Message msg = handler.obtainMessage();
+                        systemSize = totalSize - f.getTotalSpace();
+                        msg.obj = _msg;
+                        msg.sendToTarget();
+
+                        used += totalSize - f.getFreeSpace();
+                        total += totalSize;
+                    }
+                    String data = "设备内存大小：" + getUnit(totalSize) + "\n系统大小：" + getUnit(systemSize);
+                    Log.d(TAG, data);
+                    Message msg = handler.obtainMessage();
+                    msg.obj = data + "\ntotalSize = " + getUnit(totalSize) + " ,used(with system) = " + getUnit(used) + " ,free = " + getUnit(totalSize - used);
+                    msg.sendToTarget();
+
+//                    Method getId = obj.getClass().getDeclaredMethod("getId");
+//                    String id = (String) getId.invoke(obj);
+//                    if (!TextUtils.isEmpty(id)) {
+//                        Method findVolumeById = storageManager.getClass().getDeclaredMethod("findVolumeById", String.class);
+//                        Object sharedObj = findVolumeById.invoke(storageManager, id.replace("private", "emulated"));//VolumeInfo
+//                        readable = (boolean) isMountedReadable.invoke(sharedObj);
+//
+//                        UUID volumeId = getUuid(fsUuid);
+//                        UUID shareVolumeId = getUuid((String) getFsUuid.invoke(sharedObj));
+//                        //查询内置内存中的应用，外置内存同理
+//                        measure(volumeId, readable ? shareVolumeId : null);
+//                    }
+
+                } else if (type == 0) {//TYPE_PUBLIC
+                    //外置存储
+                }
+            }
+            Log.d(TAG, "总内存 total = " + getUnit(total, 1000) + " ,已用 used(with system) = " + getUnit(used, 1000));
+            Message msg = handler.obtainMessage();
+            msg.obj = "总内存 total = " + getUnit(total, 1000) + "\n已用 used(with system) = " + getUnit(used, 1000) + "\n可用 available = " + getUnit(total - used, 1000);
             msg.sendToTarget();
 
         } catch (SecurityException e) {
