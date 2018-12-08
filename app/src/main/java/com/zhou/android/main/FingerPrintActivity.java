@@ -1,12 +1,14 @@
 package com.zhou.android.main;
 
 import android.Manifest;
+import android.annotation.TargetApi;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.pm.PackageManager;
 import android.hardware.fingerprint.FingerprintManager;
+import android.os.Build;
 import android.os.CancellationSignal;
 import android.os.Handler;
 import android.os.Message;
@@ -30,7 +32,7 @@ import com.zhou.android.ui.PwdEditText;
 /**
  * Created by ZhOu on 2017/2/9.
  */
-
+@TargetApi(Build.VERSION_CODES.M)
 public class FingerPrintActivity extends BaseActivity {
 
     private final static String TAG = "zhou";

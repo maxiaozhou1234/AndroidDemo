@@ -17,6 +17,7 @@ import android.os.RemoteException;
 import android.os.StatFs;
 import android.os.UserHandle;
 import android.os.storage.StorageManager;
+import android.os.storage.StorageVolume;
 import android.provider.Settings;
 import android.support.v7.app.AlertDialog;
 import android.text.TextUtils;
@@ -26,6 +27,7 @@ import android.widget.TextView;
 
 import com.zhou.android.R;
 import com.zhou.android.common.BaseActivity;
+import com.zhou.android.common.StorageQueryUtil;
 import com.zhou.android.common.ToastUtils;
 
 import java.io.File;
@@ -70,7 +72,9 @@ public class StorageActivity extends BaseActivity {
 
         checkExceptSystemCapacity();
         append("================================");
-        getStorageWith_7_1();
+//        query();
+        StorageQueryUtil.queryWithStorageManager(this);
+
     }
 
     /**
@@ -78,11 +82,25 @@ public class StorageActivity extends BaseActivity {
      */
     private void checkExceptSystemCapacity() {
         StatFs statFs = new StatFs(Environment.getExternalStorageDirectory().getPath());
+
+        //存储块
+        long blockCount = statFs.getBlockCount();
+        //块大小
+        long blockSize = statFs.getBlockSize();
+        //可用块数量
+        long availableCount = statFs.getAvailableBlocks();
+        //剩余块数量，注：这个包含保留块（including reserved blocks）即应用无法使用的空间
+        long freeBlocks = statFs.getFreeBlocks();
+
         long totalSize = statFs.getTotalBytes();
         long availableSize = statFs.getAvailableBytes();
 
         append("total = " + getUnit(totalSize));
         append("availableSize = " + getUnit(availableSize));
+        append("=========");
+        append("total = " + getUnit(blockSize * blockCount));
+        append("available = " + getUnit(blockSize * availableCount));
+        append("free = " + getUnit(blockSize * freeBlocks));
     }
 
     private String[] units = {"B", "KB", "MB", "GB", "TB"};
@@ -136,6 +154,7 @@ public class StorageActivity extends BaseActivity {
     };
 
     /**
+     * API 26 android O
      * 获取总共容量大小，包括系统大小
      */
     public long getTotalSize(String fsUuid) {
@@ -151,7 +170,7 @@ public class StorageActivity extends BaseActivity {
         } catch (NoSuchFieldError | NoClassDefFoundError | NullPointerException | IOException e) {
             e.printStackTrace();
             ToastUtils.show(this, "获取存储大小失败");
-            return 0;
+            return -1;
         }
     }
 
@@ -423,7 +442,7 @@ public class StorageActivity extends BaseActivity {
                     Method getFsUuid = obj.getClass().getDeclaredMethod("getFsUuid");
                     String fsUuid = (String) getFsUuid.invoke(obj);
 
-                    Method getPrimaryStorageSize = StorageManager.class.getMethod("getPrimaryStorageSize");
+                    Method getPrimaryStorageSize = StorageManager.class.getMethod("getPrimaryStorageSize");//5.0 6.0没有
                     long totalSize = (long) getPrimaryStorageSize.invoke(storageManager);
                     long systemSize = 0L;
 
@@ -496,6 +515,140 @@ public class StorageActivity extends BaseActivity {
         } catch (Exception e) {
             e.printStackTrace();
             ToastUtils.show(this, "无法获取应用内存大小");
+        }
+    }
+
+    private void query() {
+        //5.0 查外置存储
+        StorageManager storageManager = (StorageManager) getSystemService(Context.STORAGE_SERVICE);
+        float unit = 1024;
+        int version = Build.VERSION.SDK_INT;
+        if (version <= Build.VERSION_CODES.M) {//小于6.0
+            try {
+                Method getVolumeList = StorageManager.class.getDeclaredMethod("getVolumeList");
+                StorageVolume[] volumeList = (StorageVolume[]) getVolumeList.invoke(storageManager);
+                long totalSize = 0, availableSize = 0;
+                if (volumeList != null) {
+                    Method getPathFile = null;
+                    for (StorageVolume volume : volumeList) {
+                        if (getPathFile == null) {
+                            getPathFile = volume.getClass().getDeclaredMethod("getPathFile");
+                        }
+                        File file = (File) getPathFile.invoke(volume);
+                        totalSize += file.getTotalSpace();
+                        availableSize += file.getUsableSpace();
+                    }
+                }
+                String data = "设备内存大小：" + getUnit(totalSize, unit);
+                Log.d(TAG, data);
+                Message msg = handler.obtainMessage();
+                msg.obj = data + "\ntotalSize = " + getUnit(totalSize, unit) + " ,availableSize = " + getUnit(availableSize, unit);
+                msg.sendToTarget();
+            } catch (NoSuchMethodException e) {
+                e.printStackTrace();
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+            } catch (InvocationTargetException e) {
+                e.printStackTrace();
+            }
+
+        } else {
+
+            try {
+                Method getVolumes = StorageManager.class.getDeclaredMethod("getVolumes");//6.0
+                List<Object> getVolumeInfo = (List<Object>) getVolumes.invoke(storageManager);
+                long total = 0L, used = 0L;
+                for (Object obj : getVolumeInfo) {
+
+                    Field getType = obj.getClass().getField("type");
+                    int type = getType.getInt(obj);
+
+                    Log.d(TAG, "type: " + type);
+                    if (type == 1) {//TYPE_PRIVATE
+
+                        long totalSize = 0L;
+
+                        //获取内置内存总大小
+                        if (version >= Build.VERSION_CODES.O) {//8.0
+                            unit = 1000;
+                            Method getFsUuid = obj.getClass().getDeclaredMethod("getFsUuid");
+                            String fsUuid = (String) getFsUuid.invoke(obj);
+                            totalSize = getTotalSize(fsUuid);//8.0 以后使用
+                        } else if (version >= Build.VERSION_CODES.N_MR1) {//7.1.1
+                            Method getPrimaryStorageSize = StorageManager.class.getMethod("getPrimaryStorageSize");//5.0 6.0 7.0没有
+                            totalSize = (long) getPrimaryStorageSize.invoke(storageManager);
+                        }
+                        long systemSize = 0L;
+
+                        Method isMountedReadable = obj.getClass().getDeclaredMethod("isMountedReadable");
+                        boolean readable = (boolean) isMountedReadable.invoke(obj);
+                        if (readable) {
+                            Method file = obj.getClass().getDeclaredMethod("getPath");
+                            File f = (File) file.invoke(obj);
+
+                            if (totalSize == 0) {
+                                totalSize = f.getTotalSpace();
+                            }
+                            String _msg = "剩余总内存：" + getUnit(f.getTotalSpace(), unit) + "\n可用内存：" + getUnit(f.getFreeSpace(), unit) + "\n已用内存：" + getUnit(f.getTotalSpace() - f.getFreeSpace(), unit);
+                            Log.d(TAG, _msg);
+
+                            Message msg = handler.obtainMessage();
+                            systemSize = totalSize - f.getTotalSpace();
+                            msg.obj = _msg;
+                            msg.sendToTarget();
+
+                            used += totalSize - f.getFreeSpace();
+                            total += totalSize;
+                        }
+                        String data = "设备内存大小：" + getUnit(totalSize, unit) + "\n系统大小：" + getUnit(systemSize, unit);
+                        Log.d(TAG, data);
+                        Message msg = handler.obtainMessage();
+                        msg.obj = data + "\ntotalSize = " + getUnit(totalSize, unit) + " ,used(with system) = " + getUnit(used, unit) + " ,free = " + getUnit(totalSize - used, unit);
+                        msg.sendToTarget();
+
+                    } else if (type == 0) {//TYPE_PUBLIC
+                        //外置存储
+                        Method isMountedReadable = obj.getClass().getDeclaredMethod("isMountedReadable");
+                        boolean readable = (boolean) isMountedReadable.invoke(obj);
+                        if (readable) {
+                            Method file = obj.getClass().getDeclaredMethod("getPath");
+                            File f = (File) file.invoke(obj);
+                            used += f.getTotalSpace() - f.getFreeSpace();
+                            total += f.getTotalSpace();
+                        }
+                    } else if (type == 2) {//TYPE_EMULATED
+
+                    }
+                }
+                Log.d(TAG, "总内存 total = " + getUnit(total, 1000) + " ,已用 used(with system) = " + getUnit(used, 1000));
+                Message msg = handler.obtainMessage();
+                msg.obj = "总内存 total = " + getUnit(total, 1000) + "\n已用 used(with system) = " + getUnit(used, 1000) + "\n可用 available = " + getUnit(total - used, 1000);
+                msg.sendToTarget();
+
+            } catch (SecurityException e) {
+                AlertDialog ad = new AlertDialog.Builder(this)
+                        .setTitle("警告")
+                        .setMessage("缺少权限：permission.PACKAGE_USAGE_STATS\n" + e.getMessage() + "\n需要在\"设置>安全\"中给应用提供权限")
+                        .setPositiveButton("设置", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                Intent intent = new Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS);
+                                startActivity(intent);
+                            }
+                        })
+                        .setNegativeButton("拒绝", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.dismiss();
+                                ToastUtils.show(StorageActivity.this, "已拒绝，请手动开启");
+                            }
+                        })
+                        .create();
+                ad.show();
+            } catch (Exception e) {
+                e.printStackTrace();
+                ToastUtils.show(this, "无法获取应用内存大小");
+            }
         }
     }
 }
