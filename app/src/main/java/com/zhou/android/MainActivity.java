@@ -17,6 +17,7 @@ import com.zhou.android.adapter.GridViewAdapter;
 import com.zhou.android.bluetooth.BluetoothActivity;
 import com.zhou.android.item.GridViewItem;
 import com.zhou.android.kotlin.SimpleListKotlinActivity;
+import com.zhou.android.main.AppSizeActivity;
 import com.zhou.android.main.BroadcastReceiverActivity;
 import com.zhou.android.main.CallLogActivity;
 import com.zhou.android.main.CameraImageActivity;
@@ -119,6 +120,7 @@ public class MainActivity extends AppCompatActivity {
             list.add(new GridViewItem(CameraImageActivity.class, "摄像预览"));
             list.add(new GridViewItem(CameraUtilTestActivity.class, "CameraUtil"));
             list.add(new GridViewItem(StorageActivity.class, "存储空间"));
+            list.add(new GridViewItem(AppSizeActivity.class, "App空间"));
 
             list.add(new GridViewItem("Test", "测试"));
             list.add(new GridViewItem("Apple", "苹果"));

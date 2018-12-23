@@ -183,6 +183,10 @@
             android:name="com.zhou.android.main.StorageActivity"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustResize|stateAlwaysHidden" />
+        <activity
+            android:name="com.zhou.android.main.AppSizeActivity"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="adjustResize|stateAlwaysHidden" />
 
         <service
             android:name=".service.FloatBallService"

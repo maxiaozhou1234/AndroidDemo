@@ -21,6 +21,7 @@ import java.security.MessageDigest;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
@@ -123,5 +124,16 @@ public class Tools {
         }
 
         return uri;
+    }
+
+    private static String[] units = {"B", "KB", "MB", "GB", "TB"};
+
+    public static String getUnit(float size) {
+        int index = 0;
+        while (size > 1024 && index < 4) {
+            size = size / 1024;
+            index++;
+        }
+        return String.format(Locale.getDefault(), " %.2f %s", size, units[index]);
     }
 }
