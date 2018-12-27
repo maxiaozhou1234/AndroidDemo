@@ -13,6 +13,7 @@ import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.WindowManager;
 
+import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Field;
@@ -135,5 +136,15 @@ public class Tools {
             index++;
         }
         return String.format(Locale.getDefault(), " %.2f %s", size, units[index]);
+    }
+
+    public static void closeIO(Closeable... closeable) {
+        for (Closeable c : closeable) {
+            try {
+                c.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
     }
 }

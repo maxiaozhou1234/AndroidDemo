@@ -63,7 +63,7 @@ public class WeatherPresenter {
                 .build();
 
         Request request = new Request.Builder()
-                .url("https://free-api.heweather.com/s6/weather/now?parameters")
+                .url("https://key_free-api.heweather.com/s6/weather/now?parameters")
                 .post(body)
                 .build();
 
