@@ -108,12 +108,12 @@ object StorageUtil {
 
         } else {
             val statFs = StatFs(Environment.getExternalStorageDirectory().path)
-            val size = statFs.blockSize
+            val size = statFs.blockSizeLong
 
             with(map) {
-                put(key_total, (size * statFs.blockCount).toLong())
-                put(key_used, (size * (statFs.blockCount - statFs.availableBlocks)).toLong())
-                put(key_available, (size * statFs.availableBlocks).toLong())
+                put(key_total, size * statFs.blockCountLong)
+                put(key_used, size * (statFs.blockCountLong - statFs.availableBlocksLong))
+                put(key_available, size * statFs.availableBlocksLong)
                 put(key_system, -1)
                 map
             }
@@ -256,14 +256,15 @@ object StorageUtil {
             reason = "NoSuchMethodException"
         }
 
-
         for (info in list) {
             val packageName = info.packageName
             val icon = pm.getApplicationIcon(packageName) ?: default
 
-            method?.invoke(pm, packageName, observer ?: run {
+            if (observer == null) {
                 observer = StorageUtil.StatsObserver(map, count, callback)
-            }) ?: run {
+            }
+
+            method?.invoke(pm, packageName, observer) ?: run {
                 error = OTHER_ERROR
                 reason = "other error"
             }

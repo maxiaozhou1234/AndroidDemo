@@ -3,13 +3,26 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:padding="8dp">
+    android:paddingLeft="8dp"
+    android:paddingTop="8dp">
+
+    <Button
+        android:id="@+id/btn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="2dp"
+        android:text="button"
+        android:textSize="14sp"
+        android:visibility="gone" />
 
     <LinearLayout
+        android:id="@+id/topLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="4dp"
-        android:background="@color/light_gray"
+        android:layout_marginRight="8dp"
+        android:background="@drawable/bg_round_card"
+        android:elevation="4dp"
         android:orientation="vertical"
         android:padding="12dp">
 
@@ -17,7 +30,7 @@
             android:id="@+id/textStorage"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textColor="@color/black"
+            android:textColor="@color/white"
             android:textSize="16sp" />
 
         <ProgressBar
@@ -33,23 +46,22 @@
         android:id="@+id/layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/light_gray"
-        android:divider="@drawable/bg_divider"
+        android:layout_marginBottom="4dp"
+        android:layout_marginRight="8dp"
+        android:animateLayoutChanges="true"
+        android:background="@drawable/bg_round_card"
+        android:elevation="4dp"
         android:orientation="vertical"
         android:padding="8dp"
-        android:showDividers="middle" />
-
-    <!--<Button-->
-    <!--android:id="@+id/btnClean"-->
-    <!--android:layout_width="wrap_content"-->
-    <!--android:layout_height="wrap_content"-->
-    <!--android:layout_gravity="right"-->
-    <!--android:text="清除缓存"-->
-    <!--android:textSize="14sp" />-->
+        android:translationZ="2dp" />
 
     <ListView
         android:id="@+id/listView"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp"
+        android:background="@drawable/bg_white"
+        android:translationZ="7dp" />
 
 </LinearLayout>

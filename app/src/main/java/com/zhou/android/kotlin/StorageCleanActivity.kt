@@ -25,6 +25,7 @@ class StorageCleanActivity : BaseActivity() {
     private val _colors = arrayOf("#ffffff00", "#ff6aa84f", "#ff3d85c6", "#ffff9900", "#fff92ce9")
 
     lateinit var adapter: CommonAdapter<AppDetail>
+    lateinit var topLayout: LinearLayout
     lateinit var layout: LinearLayout
     lateinit var listView: ListView
     var total = 1L
@@ -38,6 +39,7 @@ class StorageCleanActivity : BaseActivity() {
     override fun init() {
         val textStorage: TextView = findViewById(R.id.textStorage)
         val progress: ProgressBar = findViewById(R.id.progress)
+        topLayout = findViewById(R.id.topLayout)
         layout = findViewById(R.id.layout)
         listView = findViewById(R.id.listView)
 
@@ -125,56 +127,67 @@ class StorageCleanActivity : BaseActivity() {
     override fun addListener() {
 
         //1 与 java 类似写法
-//        findViewById<View>(R.id.btnClean).setOnClickListener(object : View.OnClickListener {
+//        findViewById<View>(R.id.btn).setOnClickListener(object : View.OnClickListener {
 //            override fun onClick(v: View?) {
 //
 //            }
 //        })
 
         //2 lambda 表达式，使用“{ }”代替
-//        findViewById<View>(R.id.btnClean).setOnClickListener({ v ->
+//        findViewById<View>(R.id.btn).setOnClickListener({ v ->
 //            Log.d(TAG, "onClick")
 //        })
 
         //3 lambda 如果参数做为函数且为最后一个，可以将花括号移出到括号后面
-//        findViewById<View>(R.id.btnClean).setOnClickListener() { v ->
+//        findViewById<View>(R.id.btn).setOnClickListener() { v ->
 //            Log.d(TAG, "onClick")
 //        }
 
         //4 lambda 移动到外面，括号没有参数，括号可以省略
-//        findViewById<View>(R.id.btnClean).setOnClickListener { v ->
+//        findViewById<View>(R.id.btn).setOnClickListener { v ->
 //            Log.d(TAG, "onClick")
 //        }
 
         //5 lambda 最终版
-//        findViewById<View>(R.id.btnClean).setOnClickListener {
-//                        StorageUtil.cleanAppCache(this@StorageCleanActivity, arrayOf(this@StorageCleanActivity.packageName), object : StorageUtil.CleanCallback {
-//                override fun callback(packageName: String, bool: Boolean) {
-//                    if (bool) {
-//                        this@StorageCleanActivity.data.filter {
-//                            it.packageName == packageName
-//                        }.apply {
-//                            if (size == 1) {
-//                                val app = this[0]
-//                                app.cache = 0
-//                                this@StorageCleanActivity.adapter.notifyDataSetChanged()
-//                            }
-//                        }
-//                    } else {
-//                        ToastUtils.show(this@StorageCleanActivity, "清除缓存失败")
-//                    }
-//                }
-//            })
-//            ToastUtils.show(this@StorageCleanActivity, "onClick")
-//        }
+        findViewById<View>(R.id.btn).setOnClickListener {
 
-        listView.setOnItemClickListener { parent, view, position, id ->
+            if (layout.translationY == 0f) {
+                layout.translationY = (topLayout.top + topLayout.height / 2 - layout.top).toFloat()
+                layout.translationX = Tools.dip2pxf(this@StorageCleanActivity, 6)
+
+                listView.tag = listView.top
+                listView.top -= layout.height
+            } else {
+                layout.translationY = 0f
+                layout.translationX = 0f
+                listView.top += layout.height
+            }
+        }
+
+        listView.setOnItemClickListener { _, _, position, _ ->
             val app = data[position]
             startActivity(Intent().apply {
                 action = Settings.ACTION_APPLICATION_DETAILS_SETTINGS
                 data = Uri.fromParts("package", app.packageName, null)
             })
         }
+
+        listView.setOnScrollListener(object : AbsListView.OnScrollListener {
+            override fun onScroll(view: AbsListView?, firstVisibleItem: Int, visibleItemCount: Int, totalItemCount: Int) {
+                val child = view?.getChildAt(0)
+                child?.apply {
+                    val y = firstVisibleItem * (child.height) - (child.top)
+//                    scroll(y)
+                    Log.d("zhou", "scrollY = $y")
+                }
+            }
+
+            override fun onScrollStateChanged(view: AbsListView?, scrollState: Int) {
+
+            }
+        })
+
+
     }
 
     private fun createItem(text: String, percent: Int) {
@@ -217,6 +230,35 @@ class StorageCleanActivity : BaseActivity() {
                 getView<TextView>(R.id.size).text = app.getAppString()
             }
         }
+
+    }
+
+    var layoutLimitY = -1f
+    var layoutLimitX = -1f
+    var listLimitTop = -1
+    private fun scroll(scrollY: Int) {
+
+        if (scrollY == 0) {
+            return
+        }
+        if (layoutLimitY == -1f) {
+            layoutLimitY = (topLayout.top + topLayout.height / 2 - layout.top).toFloat()
+            layoutLimitX = Tools.dip2pxf(this@StorageCleanActivity, 6)
+            listLimitTop = layout.height
+        }
+
+        if (layout.translationY <= layoutLimitY) {
+            layout.translationY = scrollY * 1f
+            layout.translationX = (scrollY / layoutLimitY) * layoutLimitX
+        }
+        if (scrollY < listLimitTop) {
+            listView.top = scrollY
+        }
+
+//        layout.translationY = 0f
+//        layout.translationX = 0f
+//
+//        listView.top = 100
 
     }
 }
