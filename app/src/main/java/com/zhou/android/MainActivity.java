@@ -29,6 +29,7 @@ import com.zhou.android.main.DoubleNewCameraActivity;
 import com.zhou.android.main.FingerPrintActivity;
 import com.zhou.android.main.FloatBallActivity;
 import com.zhou.android.main.ForbidScreenshotActivity;
+import com.zhou.android.main.NestedScrollActivity;
 import com.zhou.android.main.PhotoPickerActivity;
 import com.zhou.android.main.PointZoomActivity;
 import com.zhou.android.main.RecyclerViewScrollActivity;
@@ -95,7 +96,10 @@ public class MainActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         if (list.size() == 0) {
-
+            list.add(new GridViewItem(NestedScrollActivity.class, "嵌套滑动"));
+            list.add(new GridViewItem(StorageCleanActivity.class, "内存查询kt"));
+            list.add(new GridViewItem(StorageActivity.class, "存储空间"));
+            list.add(new GridViewItem(AppSizeActivity.class, "App空间"));
             list.add(new GridViewItem(SurfaceActivity.class, "界面绘制"));
             list.add(new GridViewItem(FingerPrintActivity.class, "指纹解锁"));
             list.add(new GridViewItem(ScrollTestActivity.class, "滑动测试"));
@@ -120,9 +124,6 @@ public class MainActivity extends AppCompatActivity {
             list.add(new GridViewItem(DoubleNewCameraActivity.class, "前后摄像2"));
             list.add(new GridViewItem(CameraImageActivity.class, "摄像预览"));
             list.add(new GridViewItem(CameraUtilTestActivity.class, "CameraUtil"));
-            list.add(new GridViewItem(StorageActivity.class, "存储空间"));
-            list.add(new GridViewItem(AppSizeActivity.class, "App空间"));
-            list.add(new GridViewItem(StorageCleanActivity.class, "内存查询kt"));
 
             list.add(new GridViewItem("Test", "测试"));
             list.add(new GridViewItem("Apple", "苹果"));

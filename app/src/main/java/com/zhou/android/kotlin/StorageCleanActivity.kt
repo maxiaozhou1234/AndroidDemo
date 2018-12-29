@@ -12,13 +12,10 @@ import android.view.View
 import android.widget.*
 import com.zhou.android.R
 import com.zhou.android.common.*
-import java.io.File
-import java.io.FileOutputStream
-import java.io.IOException
 
 class StorageCleanActivity : BaseActivity() {
 
-    private val TAG = "clean"
+    private val TAG = "storage"
 
     private var dp8 = 0f
     private var count = 0
@@ -26,11 +23,15 @@ class StorageCleanActivity : BaseActivity() {
 
     lateinit var adapter: CommonAdapter<AppDetail>
     lateinit var topLayout: LinearLayout
-    lateinit var layout: LinearLayout
+    lateinit var itemLayout: LinearLayout
     lateinit var listView: ListView
     var total = 1L
     val data = mutableListOf<AppDetail>()
     private val map = HashMap<String, View>()
+    private var lastScrollY = 0
+    var layoutLimitY = -1f
+    var layoutLimitX = -1f
+    var listLimit = -1f
 
     override fun setContentView() {
         setContentView(R.layout.activity_storage_clean)
@@ -40,13 +41,15 @@ class StorageCleanActivity : BaseActivity() {
         val textStorage: TextView = findViewById(R.id.textStorage)
         val progress: ProgressBar = findViewById(R.id.progress)
         topLayout = findViewById(R.id.topLayout)
-        layout = findViewById(R.id.layout)
+        itemLayout = findViewById(R.id.itemLayout)
         listView = findViewById(R.id.listView)
 
         adapter = AppAdapter(this, data, R.layout.layout_app)
         listView.adapter = adapter
 
         dp8 = Tools.dip2pxf(this, 8)
+        layoutLimitX = Tools.dip2pxf(this@StorageCleanActivity, 6)
+//        layoutLimitY = -Tools.dip2pxf(this@StorageCleanActivity, 40)
 
         val map = StorageUtil.queryMyPhone(this)
         total = map[StorageUtil.key_total] ?: 1
@@ -96,32 +99,32 @@ class StorageCleanActivity : BaseActivity() {
             }
         })
 
-        Thread {
-            val file = File(cacheDir.path + "/cache.txt")
-            if (!file.exists()) {
-                file.createNewFile()
-                Log.d(TAG, "create file")
-            }
-            var fos: FileOutputStream? = null
-            try {
-                fos = FileOutputStream(file, true)
-                fos.write("增加测试数据abcd\n".toByteArray())
-                fos.close()
-            } catch (e: IOException) {
-                e.printStackTrace()
-            } finally {
-                Tools.closeIO(fos)
-            }
-
-            val reader = file.bufferedReader()
-            var line: String? = reader.readLine()
-            while (line != null) {
-                Log.i(TAG, line)
-                line = reader.readLine()
-            }
-            Log.d(TAG, "end")
-            Tools.closeIO(reader)
-        }.start()
+//        Thread {
+//            val file = File(cacheDir.path + "/cache.txt")
+//            if (!file.exists()) {
+//                file.createNewFile()
+//                Log.d(TAG, "create file")
+//            }
+//            var fos: FileOutputStream? = null
+//            try {
+//                fos = FileOutputStream(file, true)
+//                fos.write("增加测试数据abcd\n".toByteArray())
+//                fos.close()
+//            } catch (e: IOException) {
+//                e.printStackTrace()
+//            } finally {
+//                Tools.closeIO(fos)
+//            }
+//
+//            val reader = file.bufferedReader()
+//            var line: String? = reader.readLine()
+//            while (line != null) {
+//                Log.i(TAG, line)
+//                line = reader.readLine()
+//            }
+//            Log.d(TAG, "end")
+//            Tools.closeIO(reader)
+//        }.start()
     }
 
     override fun addListener() {
@@ -151,16 +154,16 @@ class StorageCleanActivity : BaseActivity() {
         //5 lambda 最终版
         findViewById<View>(R.id.btn).setOnClickListener {
 
-            if (layout.translationY == 0f) {
-                layout.translationY = (topLayout.top + topLayout.height / 2 - layout.top).toFloat()
-                layout.translationX = Tools.dip2pxf(this@StorageCleanActivity, 6)
+            if (itemLayout.translationY == 0f) {
+                itemLayout.translationY = (topLayout.top + topLayout.height / 2 - itemLayout.top).toFloat()
+                itemLayout.translationX = Tools.dip2pxf(this@StorageCleanActivity, 6)
 
                 listView.tag = listView.top
-                listView.top -= layout.height
+                listView.top -= itemLayout.height
             } else {
-                layout.translationY = 0f
-                layout.translationX = 0f
-                listView.top += layout.height
+                itemLayout.translationY = 0f
+                itemLayout.translationX = 0f
+                listView.top += itemLayout.height
             }
         }
 
@@ -175,10 +178,11 @@ class StorageCleanActivity : BaseActivity() {
         listView.setOnScrollListener(object : AbsListView.OnScrollListener {
             override fun onScroll(view: AbsListView?, firstVisibleItem: Int, visibleItemCount: Int, totalItemCount: Int) {
                 val child = view?.getChildAt(0)
-                child?.apply {
+                if (child != null) {
                     val y = firstVisibleItem * (child.height) - (child.top)
-//                    scroll(y)
-                    Log.d("zhou", "scrollY = $y")
+                    Log.d(TAG, "scrollY = $y , lastDex = $lastDex , dex = ${y - lastScrollY}")
+                    scroll(y)
+                    lastScrollY = y
                 }
             }
 
@@ -186,8 +190,6 @@ class StorageCleanActivity : BaseActivity() {
 
             }
         })
-
-
     }
 
     private fun createItem(text: String, percent: Int) {
@@ -209,7 +211,7 @@ class StorageCleanActivity : BaseActivity() {
         view.findViewById<View>(R.id.dot).setBackgroundDrawable(drawable)
         view.findViewById<TextView>(R.id.text).text = text
         view.findViewById<ProgressBar>(R.id.progress).progress = if (percent == 0) percent + 1 else percent
-        layout.addView(view)
+        itemLayout.addView(view)
         map.put(text, view)
     }
 
@@ -217,7 +219,7 @@ class StorageCleanActivity : BaseActivity() {
         val view = View(this)
         view.layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, Tools.dip2px(this, 3))
         view.setBackgroundColor(Color.parseColor("#FF303F9F"))
-        layout.addView(view)
+        itemLayout.addView(view)
     }
 
     class AppAdapter(context: Context, val data: List<AppDetail>, layout: Int) : CommonAdapter<AppDetail>(context, data, layout) {
@@ -233,32 +235,43 @@ class StorageCleanActivity : BaseActivity() {
 
     }
 
-    var layoutLimitY = -1f
-    var layoutLimitX = -1f
-    var listLimitTop = -1
+    private var lastDex = 0 //不知为何出现一些跳变，用这个过滤一下
     private fun scroll(scrollY: Int) {
 
-        if (scrollY == 0) {
+        if (layoutLimitY == -1f) {
+            layoutLimitY = (topLayout.top + topLayout.height / 2 - itemLayout.top).toFloat()
+            listLimit = -itemLayout.height * 1.2f
+            Log.d(TAG, "listLimit = $listLimit")
+        }
+        val up = lastScrollY <= scrollY
+        var y = scrollY * -1f
+        val dex = scrollY - lastScrollY
+        if (Math.abs(lastDex - dex) > 10) {
+            lastDex = dex
             return
         }
-        if (layoutLimitY == -1f) {
-            layoutLimitY = (topLayout.top + topLayout.height / 2 - layout.top).toFloat()
-            layoutLimitX = Tools.dip2pxf(this@StorageCleanActivity, 6)
-            listLimitTop = layout.height
-        }
 
-        if (layout.translationY <= layoutLimitY) {
-            layout.translationY = scrollY * 1f
-            layout.translationX = (scrollY / layoutLimitY) * layoutLimitX
-        }
-        if (scrollY < listLimitTop) {
-            listView.top = scrollY
-        }
+        if (up && itemLayout.translationY > layoutLimitY) {//true:由下往上划
+            if (lastScrollY > -layoutLimitY) {
+                y = itemLayout.translationY - dex
+                if (y <= layoutLimitY) {
+                    y = layoutLimitY
+                    listView.animate().translationY(listLimit)
+                }
+            }
+            itemLayout.translationY = y
+            itemLayout.translationX = y * layoutLimitX / layoutLimitY
 
-//        layout.translationY = 0f
-//        layout.translationX = 0f
-//
-//        listView.top = 100
+        } else if (!up && itemLayout.translationY != 0f) {
+            y = itemLayout.translationY - dex
+            if (y > 0f) {
+                y = 0f
+            }
+//            listView.animate().translationY(y * listLimit / layoutLimitY)
+            listView.animate().translationY(0f)
+            itemLayout.translationY = y
+            itemLayout.translationX = y * layoutLimitX / layoutLimitY
+        }
 
     }
 }
