@@ -20,8 +20,9 @@
             android:textSize="22sp" />
 
         <TextView
+            android:id="@+id/label"
             android:layout_width="match_parent"
-            android:layout_height="80dp"
+            android:layout_height="200dp"
             android:layout_marginTop="20dp"
             android:background="@drawable/bg_round_card"
             android:gravity="center"
