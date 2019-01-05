@@ -1,6 +1,8 @@
 package com.zhou.android.main;
 
+import android.Manifest;
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.ImageFormat;
@@ -22,6 +24,7 @@ import android.os.HandlerThread;
 import android.os.Message;
 import android.support.annotation.NonNull;
 import android.support.annotation.RequiresApi;
+import android.support.v4.app.ActivityCompat;
 import android.util.Log;
 import android.util.Size;
 import android.view.Surface;
@@ -208,6 +211,9 @@ public class CameraImageActivity extends BaseActivity {
             cameraManager = (CameraManager) getSystemService(Context.CAMERA_SERVICE);
         }
         try {
+            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+                return;
+            }
             cameraManager.openCamera(cameraId, deviceBackStateCallback, handler);
         } catch (CameraAccessException e) {
             e.printStackTrace();

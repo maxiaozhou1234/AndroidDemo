@@ -15,52 +15,58 @@
         android:textSize="14sp"
         android:visibility="gone" />
 
-    <LinearLayout
-        android:id="@+id/topLayout"
+    <com.zhou.android.ui.CardStackLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginRight="8dp"
-        android:layout_marginBottom="4dp"
-        android:background="@drawable/bg_round_card"
-        android:elevation="4dp"
-        android:orientation="vertical"
-        android:padding="12dp">
+        android:layout_height="match_parent">
 
-        <TextView
-            android:id="@+id/textStorage"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textColor="@color/white"
-            android:textSize="16sp" />
 
-        <ProgressBar
-            android:id="@+id/progress"
-            style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+        <LinearLayout
+            android:id="@+id/topLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:max="100"
-            android:progress="50" />
-    </LinearLayout>
+            android:layout_marginRight="8dp"
+            android:layout_marginBottom="4dp"
+            android:background="@drawable/bg_round_card"
+            android:elevation="4dp"
+            android:orientation="vertical"
+            android:padding="12dp">
 
-    <LinearLayout
-        android:id="@+id/itemLayout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginRight="8dp"
-        android:layout_marginBottom="4dp"
-        android:animateLayoutChanges="true"
-        android:background="@drawable/bg_round_card"
-        android:elevation="4dp"
-        android:orientation="vertical"
-        android:padding="8dp"
-        android:translationZ="2dp" />
+            <TextView
+                android:id="@+id/textStorage"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/white"
+                android:textSize="16sp" />
 
-    <ListView
-        android:id="@+id/listView"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginRight="8dp"
-        android:background="@drawable/shape_rectangle"
-        android:translationZ="7dp" />
+            <ProgressBar
+                android:id="@+id/progress"
+                style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:max="100"
+                android:progress="50" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/itemLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="8dp"
+            android:layout_marginBottom="4dp"
+            android:animateLayoutChanges="true"
+            android:background="@drawable/bg_round_card"
+            android:elevation="4dp"
+            android:orientation="vertical"
+            android:padding="8dp"
+            android:translationZ="2dp" />
+
+        <ListView
+            android:id="@+id/listView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="8dp"
+            android:background="@drawable/shape_rectangle"
+            android:translationZ="7dp" />
+    </com.zhou.android.ui.CardStackLayout>
 
 </LinearLayout>

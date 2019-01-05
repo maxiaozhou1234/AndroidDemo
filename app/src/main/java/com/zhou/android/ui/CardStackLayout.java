@@ -1,7 +1,6 @@
 package com.zhou.android.ui;
 
 import android.content.Context;
-import android.nfc.TagLostException;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.view.MotionEventCompat;
@@ -13,21 +12,22 @@ import android.view.View;
 import android.view.ViewConfiguration;
 import android.view.ViewGroup;
 
+import com.zhou.android.common.ScrollableViewCompat;
+
 public class CardStackLayout extends ViewGroup {
 
     private final static String TAG = "scroll";
 
-
     private float downY, lastMotionY;
     private int pointerId = -1;
     private boolean isDragging = false;
+    private boolean isSetOffset = false;
 
-    private int dexY = 0;
-    private boolean canScroll = true;
     private int touchSlop;
 
     private int limitOffset = 0, targetCurrentOffset = 0, targetEndOffset = 0;
     private View target = null;
+    private ScrollableViewCompat.IScrollView iScrollView = null;
 
     public CardStackLayout(@NonNull Context context) {
         this(context, null);
@@ -59,6 +59,9 @@ public class CardStackLayout extends ViewGroup {
         int count = getChildCount();
         for (int i = 0; i < count; i++) {
             View child = getChildAt(i);
+            if (child.getVisibility() != View.VISIBLE) {
+                continue;
+            }
             measureChild(child, widthMeasureSpec, heightMeasureSpec);
             MarginLayoutParams lp = (MarginLayoutParams) child.getLayoutParams();
             maxWidth = Math.max(maxWidth, child.getMeasuredWidth());
@@ -78,9 +81,12 @@ public class CardStackLayout extends ViewGroup {
 //        final int parentRight = getPaddingRight();
 
         int layoutTop = top;
+        int limitFirstChild = 0;
         for (int i = 0; i < count; i++) {
             View child = getChildAt(i);
-
+            if (child.getVisibility() != View.VISIBLE) {
+                continue;
+            }
             int width = child.getMeasuredWidth();
             int height = child.getMeasuredHeight();
             MarginLayoutParams lp = (MarginLayoutParams) child.getLayoutParams();
@@ -93,17 +99,29 @@ public class CardStackLayout extends ViewGroup {
 //            } else {
 //                child.layout(left, layoutTop - dexY, left + width, layoutTop + height);
 //            }
+            if (i == 0 && limitOffset == 0) {
+                limitFirstChild = layoutTop + height / 2;
+            }
+
+            if (i == count - 1 && height != 0) {
+                if (!isSetOffset || limitOffset == 0) {
+                    limitOffset = targetCurrentOffset = layoutTop - limitFirstChild;
+                    Log.d(TAG, "default limit = " + limitOffset);
+                }
+                height += limitOffset;
+            }
             child.layout(left + lp.leftMargin, layoutTop, left + width - lp.rightMargin, layoutTop + height);
             layoutTop += height;
         }
         if (count > 1) {
             target = getChildAt(count - 1);
+            iScrollView = ScrollableViewCompat.getScrollView(target);
         }
     }
 
     @Override
     public boolean onInterceptTouchEvent(MotionEvent event) {
-        if (!isEnabled() || childCanScroll()) {
+        if (!isEnabled() || viewCanScrollUp()) {
             return false;
         }
         int action = event.getAction();
@@ -147,7 +165,7 @@ public class CardStackLayout extends ViewGroup {
     @Override
     public boolean onTouchEvent(MotionEvent event) {
 
-        if (!isEnabled() || childCanScroll()) {
+        if (!isEnabled() || viewCanScrollUp()) {
             return false;
         }
 
@@ -176,14 +194,24 @@ public class CardStackLayout extends ViewGroup {
                 if (isDragging) {
                     //处理
                     float dy = y - lastMotionY;
-                    moveAllView(dy);
+//                    moveAllView(dy);
                     if (dy < 0 && targetCurrentOffset + dy <= targetEndOffset) {//父布局到顶了，事件重写下发
+                        moveAllView(dy);
                         //重新下发，必须先触发down才能使move被子view拦截到
                         Log.d(TAG, "dispatch action down");
                         int tmp = event.getAction();
                         event.setAction(MotionEvent.ACTION_DOWN);
                         dispatchTouchEvent(event);
                         event.setAction(tmp);
+                    } else if (dy > 0 && targetCurrentOffset + dy >= limitOffset) {
+                        Log.d(TAG, "到达限制区域");
+                        if (targetCurrentOffset != limitOffset) {
+                            moveAllView(limitOffset - targetCurrentOffset);
+                            targetCurrentOffset = limitOffset;
+                        }
+                        isDragging = false;
+                    } else {
+                        moveAllView(dy);
                     }
                     lastMotionY = y;
                 }
@@ -202,7 +230,9 @@ public class CardStackLayout extends ViewGroup {
     }
 
     public void setTargetOffset(int offset) {
+        isSetOffset = true;
         this.limitOffset = this.targetCurrentOffset = offset;
+        requestLayout();
     }
 
     @Override
@@ -238,20 +268,36 @@ public class CardStackLayout extends ViewGroup {
         }
     }
 
-    private boolean childCanScroll() {
-        return false;
+    private boolean viewCanScrollUp() {
+        boolean flag = iScrollView != null && iScrollView.viewCanScrollUp();
+        Log.i(TAG, "viewCanScrollUp = " + flag);
+        return flag;
     }
 
     private void moveAllView(float dy) {//偏移量
         int _target = (int) (targetCurrentOffset + dy);
         _target = Math.max(_target, targetEndOffset);
-        ViewCompat.offsetTopAndBottom(target, _target - targetCurrentOffset);
+        int offset = _target - targetCurrentOffset;
+        ViewCompat.offsetTopAndBottom(target, offset);
+        for (int i = 1; i < getChildCount() - 1; i++) {
+            View child = getChildAt(i);
+//            int off = Math.round(offset * 1f / (getChildCount() - i) + i * 0.5f);
+//            Log.d(TAG, "index = " + i + " ,dy = " + offset + " ,off  = " + off);
+//            ViewCompat.offsetTopAndBottom(child, off);
+            ViewCompat.offsetTopAndBottom(child, offset / 2);
+        }
         targetCurrentOffset = _target;
-        Log.d(TAG, "update view,offset = " + dy + " current = " + targetCurrentOffset);
     }
 
     public void testCompat(int dis) {
         ViewCompat.offsetTopAndBottom(target, dis);
     }
 
+//    @Override
+//    public void requestLayout() {
+//        if (target != null) {
+//            limitOffset = 0;
+//        }
+//        super.requestLayout();
+//    }
 }

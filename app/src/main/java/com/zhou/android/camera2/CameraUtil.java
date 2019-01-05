@@ -1,6 +1,7 @@
 package com.zhou.android.camera2;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.graphics.ImageFormat;
@@ -178,6 +179,7 @@ public class CameraUtil {
         }
     }
 
+    @SuppressLint("MissingPermission")
     @RequiresPermission(android.Manifest.permission.CAMERA)
     private void openCamera(CameraManager cameraManager, CameraConfig config) {
         try {
@@ -341,6 +343,7 @@ public class CameraUtil {
     };
 
     private CameraConfig.SurfaceCallback surfaceCallback = new CameraConfig.SurfaceCallback() {
+        @SuppressLint("MissingPermission")
         @Override
         public void onSurfaceTextureAvailable(CameraConfig config) {
             openCamera(cameraManager, config);

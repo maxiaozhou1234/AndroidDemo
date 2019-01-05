@@ -20,15 +20,32 @@
             android:textSize="22sp" />
 
         <TextView
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:layout_marginTop="8dp"
+            android:background="@drawable/bg_gray"
+            android:gravity="center"
+            android:text="灰色"
+            android:textColor="@color/white"
+            android:textSize="22sp" />
+
+        <TextView
             android:id="@+id/label"
             android:layout_width="match_parent"
-            android:layout_height="200dp"
-            android:layout_marginTop="20dp"
+            android:layout_height="60dp"
+            android:layout_marginTop="10dp"
             android:background="@drawable/bg_round_card"
             android:gravity="center"
             android:text="标签"
             android:textColor="@color/white"
             android:textSize="22sp" />
+
+        <ListView
+            android:id="@+id/listView"
+            android:layout_width="match_parent"
+            android:layout_height="200dp"
+            android:layout_marginTop="20dp"
+            android:background="@drawable/bg_round_card" />
     </com.zhou.android.ui.CardStackLayout>
 
     <Button

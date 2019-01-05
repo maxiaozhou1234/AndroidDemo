@@ -175,21 +175,21 @@ class StorageCleanActivity : BaseActivity() {
             })
         }
 
-        listView.setOnScrollListener(object : AbsListView.OnScrollListener {
-            override fun onScroll(view: AbsListView?, firstVisibleItem: Int, visibleItemCount: Int, totalItemCount: Int) {
-                val child = view?.getChildAt(0)
-                if (child != null) {
-                    val y = firstVisibleItem * (child.height) - (child.top)
-                    Log.d(TAG, "scrollY = $y , lastDex = $lastDex , dex = ${y - lastScrollY}")
-                    scroll(y)
-                    lastScrollY = y
-                }
-            }
-
-            override fun onScrollStateChanged(view: AbsListView?, scrollState: Int) {
-
-            }
-        })
+//        listView.setOnScrollListener(object : AbsListView.OnScrollListener {
+//            override fun onScroll(view: AbsListView?, firstVisibleItem: Int, visibleItemCount: Int, totalItemCount: Int) {
+//                val child = view?.getChildAt(0)
+//                if (child != null) {
+//                    val y = firstVisibleItem * (child.height) - (child.top)
+//                    Log.d(TAG, "scrollY = $y , lastDex = $lastDex , dex = ${y - lastScrollY}")
+//                    scroll(y)
+//                    lastScrollY = y
+//                }
+//            }
+//
+//            override fun onScrollStateChanged(view: AbsListView?, scrollState: Int) {
+//
+//            }
+//        })
     }
 
     private fun createItem(text: String, percent: Int) {
