@@ -77,8 +77,6 @@ public class CardStackLayout extends ViewGroup {
     @Override
     protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
         int count = getChildCount();
-//        final int parentLeft = getPaddingLeft();
-//        final int parentRight = getPaddingRight();
 
         int layoutTop = top;
         int limitFirstChild = 0;
@@ -93,21 +91,15 @@ public class CardStackLayout extends ViewGroup {
 
             left += lp.leftMargin;
             layoutTop += lp.topMargin;
-//            if (i == 0) {
-//                int _l = dexY != 0 ? 30 : 0;
-//                child.layout(left + _l, layoutTop, left + width - _l, layoutTop + height);
-//            } else {
-//                child.layout(left, layoutTop - dexY, left + width, layoutTop + height);
-//            }
             if (i == 0 && limitOffset == 0) {
                 limitFirstChild = layoutTop + height / 2;
             }
 
             if (i == count - 1 && height != 0) {
-                if (!isSetOffset || limitOffset == 0) {
-                    limitOffset = targetCurrentOffset = layoutTop - limitFirstChild;
-                    Log.d(TAG, "default limit = " + limitOffset);
-                }
+                //这里判读高度不为 0 是因为如 ListView 在未填充数据时，
+                //高度为0，这时再设置我们的位移进去会出现一个空占用大小，不合适
+                //这里的高度测量有点问题，如果target之上的视图大小发生变化，target的大小也需要重新计算
+                limitOffset = targetCurrentOffset = layoutTop - limitFirstChild;
                 height += limitOffset;
             }
             child.layout(left + lp.leftMargin, layoutTop, left + width - lp.rightMargin, layoutTop + height);
@@ -127,8 +119,7 @@ public class CardStackLayout extends ViewGroup {
         int action = event.getAction();
         int pointIndex;
         switch (action) {
-            case MotionEvent.ACTION_DOWN:
-                Log.d(TAG, "action down");
+            case MotionEvent.ACTION_DOWN://按压
                 pointerId = event.getPointerId(0);
                 pointIndex = event.findPointerIndex(pointerId);
                 if (pointIndex < 0) {
@@ -136,17 +127,15 @@ public class CardStackLayout extends ViewGroup {
                 }
                 isDragging = false;
                 downY = event.getY(pointIndex);
-//                return true;
                 break;
-            case MotionEvent.ACTION_MOVE:
-                Log.d(TAG, "action move");
+            case MotionEvent.ACTION_MOVE://移动
                 pointIndex = event.findPointerIndex(pointerId);
                 if (pointIndex < 0) {
                     return false;
                 }
                 float y = event.getY(pointIndex);
                 Log.d(TAG, "y = " + y);
-                checkScrollBound(y);
+                checkScrollBound(y);//检查边界是否拦截该事件
                 break;
             case MotionEvent.ACTION_POINTER_UP:
                 onSecondaryPointerUp(event);
@@ -157,8 +146,6 @@ public class CardStackLayout extends ViewGroup {
                 isDragging = false;
                 break;
         }
-
-        Log.d(TAG, "status = " + isDragging);
         return isDragging;
     }
 
@@ -181,10 +168,8 @@ public class CardStackLayout extends ViewGroup {
                 }
                 isDragging = false;
                 downY = event.getY(pointIndex);
-                return true;
-//                break;
+                return true;//消耗掉才会触发下面的 move
             case MotionEvent.ACTION_MOVE:
-                Log.d(TAG, "touch action move");
                 pointIndex = event.findPointerIndex(pointerId);
                 if (pointIndex < 0) {
                     return false;
@@ -203,7 +188,7 @@ public class CardStackLayout extends ViewGroup {
                         event.setAction(MotionEvent.ACTION_DOWN);
                         dispatchTouchEvent(event);
                         event.setAction(tmp);
-                    } else if (dy > 0 && targetCurrentOffset + dy >= limitOffset) {
+                    } else if (dy > 0 && targetCurrentOffset + dy >= limitOffset) {//target 还原，如果已经还原就不让再下滑
                         Log.d(TAG, "到达限制区域");
                         if (targetCurrentOffset != limitOffset) {
                             moveAllView(limitOffset - targetCurrentOffset);
@@ -225,7 +210,6 @@ public class CardStackLayout extends ViewGroup {
                 isDragging = false;
                 break;
         }
-        Log.d(TAG, "touch status = " + isDragging);
         return isDragging;
     }
 
@@ -278,12 +262,11 @@ public class CardStackLayout extends ViewGroup {
         int _target = (int) (targetCurrentOffset + dy);
         _target = Math.max(_target, targetEndOffset);
         int offset = _target - targetCurrentOffset;
-        ViewCompat.offsetTopAndBottom(target, offset);
+        ViewCompat.offsetTopAndBottom(target, offset);//最后一个视图偏移
+        //如果多于两个，其余也做偏移
+        // 但这个暂不能用，各个view偏移量需按百分比算，也需要给各个view添加上偏移位移限制
         for (int i = 1; i < getChildCount() - 1; i++) {
             View child = getChildAt(i);
-//            int off = Math.round(offset * 1f / (getChildCount() - i) + i * 0.5f);
-//            Log.d(TAG, "index = " + i + " ,dy = " + offset + " ,off  = " + off);
-//            ViewCompat.offsetTopAndBottom(child, off);
             ViewCompat.offsetTopAndBottom(child, offset / 2);
         }
         targetCurrentOffset = _target;

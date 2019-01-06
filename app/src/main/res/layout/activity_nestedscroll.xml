@@ -19,31 +19,31 @@
             android:textColor="@color/white"
             android:textSize="22sp" />
 
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="40dp"
-            android:layout_marginTop="8dp"
-            android:background="@drawable/bg_gray"
-            android:gravity="center"
-            android:text="灰色"
-            android:textColor="@color/white"
-            android:textSize="22sp" />
+        <!--<TextView-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="40dp"-->
+        <!--android:layout_marginTop="8dp"-->
+        <!--android:background="@drawable/bg_gray"-->
+        <!--android:gravity="center"-->
+        <!--android:text="灰色"-->
+        <!--android:textColor="@color/white"-->
+        <!--android:textSize="22sp" />-->
 
-        <TextView
-            android:id="@+id/label"
-            android:layout_width="match_parent"
-            android:layout_height="60dp"
-            android:layout_marginTop="10dp"
-            android:background="@drawable/bg_round_card"
-            android:gravity="center"
-            android:text="标签"
-            android:textColor="@color/white"
-            android:textSize="22sp" />
+        <!--<TextView-->
+        <!--android:id="@+id/label"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="60dp"-->
+        <!--android:layout_marginTop="10dp"-->
+        <!--android:background="@drawable/bg_round_card"-->
+        <!--android:gravity="center"-->
+        <!--android:text="标签"-->
+        <!--android:textColor="@color/white"-->
+        <!--android:textSize="22sp" />-->
 
         <ListView
             android:id="@+id/listView"
             android:layout_width="match_parent"
-            android:layout_height="200dp"
+            android:layout_height="500dp"
             android:layout_marginTop="20dp"
             android:background="@drawable/bg_round_card" />
     </com.zhou.android.ui.CardStackLayout>
@@ -52,15 +52,7 @@
         android:id="@+id/btn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="button" />
-
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="80dp"
-        android:background="@drawable/bg_round_card"
-        android:gravity="center"
-        android:text="顶部标签"
-        android:textColor="@color/white"
-        android:textSize="22sp" />
+        android:text="button"
+        android:visibility="gone" />
 
 </LinearLayout>

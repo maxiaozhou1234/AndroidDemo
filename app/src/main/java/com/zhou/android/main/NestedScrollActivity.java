@@ -1,7 +1,9 @@
 package com.zhou.android.main;
 
+import android.support.v4.view.NestedScrollingParentHelper;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
 
 import com.zhou.android.R;
 import com.zhou.android.common.BaseActivity;
