@@ -19,6 +19,7 @@ import android.os.UserHandle;
 import android.os.storage.StorageManager;
 import android.os.storage.StorageVolume;
 import android.provider.Settings;
+import android.support.annotation.RequiresApi;
 import android.support.v7.app.AlertDialog;
 import android.text.TextUtils;
 import android.util.Log;
@@ -157,6 +158,7 @@ public class StorageActivity extends BaseActivity {
      * API 26 android O
      * 获取总共容量大小，包括系统大小
      */
+    @RequiresApi(api = 26)
     public long getTotalSize(String fsUuid) {
         try {
             UUID id;
@@ -165,7 +167,7 @@ public class StorageActivity extends BaseActivity {
             } else {
                 id = UUID.fromString(fsUuid);
             }
-            StorageStatsManager stats = getSystemService(StorageStatsManager.class);
+            StorageStatsManager stats = (StorageStatsManager) getSystemService(Context.STORAGE_STATS_SERVICE);
             return stats.getTotalBytes(id);
         } catch (NoSuchFieldError | NoClassDefFoundError | NullPointerException | IOException e) {
             e.printStackTrace();
