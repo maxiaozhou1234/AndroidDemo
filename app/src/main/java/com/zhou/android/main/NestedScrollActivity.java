@@ -1,9 +1,8 @@
 package com.zhou.android.main;
 
-import android.support.v4.view.NestedScrollingParentHelper;
+import android.util.Log;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
-import android.widget.RelativeLayout;
 
 import com.zhou.android.R;
 import com.zhou.android.common.BaseActivity;
@@ -55,15 +54,18 @@ public class NestedScrollActivity extends BaseActivity {
 //                return false;
 //            }
 //        });
+
     }
 
     @Override
     protected void addListener() {
-        findViewById(R.id.btn).setOnClickListener(v -> {
-            cardStack.testCompat(flag ? -50 : 20);
-            flag = !flag;
-        });
     }
 
-
+    @Override
+    protected void onResume() {
+        super.onResume();
+        cardStack.post(() -> {
+            Log.d("scroll", "w h = " + cardStack.getWidth() + " , " + cardStack.getHeight());
+        });
+    }
 }

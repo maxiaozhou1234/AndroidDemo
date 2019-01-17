@@ -49,12 +49,18 @@ public class CardStackLayout extends ViewGroup {
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
 
-        boolean measureMatchParentChildren =
-                MeasureSpec.getMode(widthMeasureSpec) != MeasureSpec.EXACTLY ||
-                        MeasureSpec.getMode(heightMeasureSpec) != MeasureSpec.EXACTLY;
+//        boolean measureMatchParentChildren =
+//                MeasureSpec.getMode(widthMeasureSpec) != MeasureSpec.EXACTLY ||
+//                        MeasureSpec.getMode(heightMeasureSpec) != MeasureSpec.EXACTLY;
+        int width = MeasureSpec.getSize(widthMeasureSpec);
+        int height = MeasureSpec.getSize(heightMeasureSpec);
+        int widthMode = MeasureSpec.getMode(widthMeasureSpec);
+        int heightMode = MeasureSpec.getMode(heightMeasureSpec);
 
-        int maxWidth = 0;
-        int maxHeight = 0;
+        Log.d(TAG, "width,height = [" + width + " , " + height + "]");
+
+        int maxWidth = getPaddingLeft() + getPaddingRight();
+        int maxHeight = getPaddingTop() + getPaddingBottom();
 
         int count = getChildCount();
         for (int i = 0; i < count; i++) {
@@ -63,14 +69,29 @@ public class CardStackLayout extends ViewGroup {
                 continue;
             }
             measureChild(child, widthMeasureSpec, heightMeasureSpec);
+            Log.d(TAG, "child[" + i + "] size = " + child.getMeasuredWidth() + "," + child.getMeasuredHeight());
             MarginLayoutParams lp = (MarginLayoutParams) child.getLayoutParams();
-            maxWidth = Math.max(maxWidth, child.getMeasuredWidth());
+            maxWidth = Math.max(maxWidth, child.getMeasuredWidth() + lp.leftMargin + lp.rightMargin);
             maxHeight += child.getMeasuredHeight() + lp.topMargin + lp.bottomMargin;
         }
-        if (measureMatchParentChildren) {
-            setMeasuredDimension(maxWidth, maxHeight);
+
+        if (heightMode == MeasureSpec.EXACTLY) {
+            setMeasuredDimension(width, height);
         } else {
-            super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+            if (maxHeight > height) {
+                setMeasuredDimension(width, height);
+                View child = getChildAt(getChildCount() - 1);
+                final MarginLayoutParams lp = (MarginLayoutParams) child.getLayoutParams();
+                int dex = maxHeight - height;
+                int nWidthMeasureSpec = MeasureSpec.makeMeasureSpec(child.getMeasuredWidth(),
+                        lp.width == LayoutParams.MATCH_PARENT ? MeasureSpec.EXACTLY : lp.width);
+                int nHeightMeasureSpec = MeasureSpec.makeMeasureSpec(child.getMeasuredHeight() - dex + limitOffset,
+                        lp.height == LayoutParams.MATCH_PARENT ? MeasureSpec.EXACTLY : lp.height);
+                child.measure(nWidthMeasureSpec, nHeightMeasureSpec);
+                Log.d(TAG, "last Child height = " + child.getMeasuredHeight());
+            } else {
+                setMeasuredDimension(width, maxHeight);
+            }
         }
     }
 
@@ -78,31 +99,33 @@ public class CardStackLayout extends ViewGroup {
     protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
         int count = getChildCount();
 
-        int layoutTop = top;
+        int layoutTop = top + getPaddingTop();
         int limitFirstChild = 0;
         for (int i = 0; i < count; i++) {
             View child = getChildAt(i);
             if (child.getVisibility() != View.VISIBLE) {
                 continue;
             }
-            int width = child.getMeasuredWidth();
+            final int width = child.getMeasuredWidth();
             int height = child.getMeasuredHeight();
             MarginLayoutParams lp = (MarginLayoutParams) child.getLayoutParams();
 
-            left += lp.leftMargin;
+            int layoutLeft = left + getPaddingLeft() + lp.leftMargin;
             layoutTop += lp.topMargin;
             if (i == 0 && limitOffset == 0) {
                 limitFirstChild = layoutTop + height / 2;
+                Log.v(TAG, "child[0] top = " + layoutTop + " ,limit = " + limitFirstChild + " ,height = " + height);
             }
 
-            if (i == count - 1 && height != 0) {
+            if (i == count - 1 && height != 0 && limitFirstChild != 0) {
                 //这里判读高度不为 0 是因为如 ListView 在未填充数据时，
                 //高度为0，这时再设置我们的位移进去会出现一个空占用大小，不合适
                 //这里的高度测量有点问题，如果target之上的视图大小发生变化，target的大小也需要重新计算
                 limitOffset = targetCurrentOffset = layoutTop - limitFirstChild;
+                Log.v(TAG, "limit = " + limitOffset + ",top = " + layoutTop + " last height = " + height);
                 height += limitOffset;
             }
-            child.layout(left + lp.leftMargin, layoutTop, left + width - lp.rightMargin, layoutTop + height);
+            child.layout(layoutLeft, layoutTop, layoutLeft + width, layoutTop + height);
             layoutTop += height;
         }
         if (count > 1) {
