@@ -7,7 +7,7 @@
     <com.zhou.android.ui.CardStackLayout
         android:id="@+id/cardStack"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:padding="6dp">
 
         <TextView
@@ -19,20 +19,11 @@
             android:textColor="@color/white"
             android:textSize="22sp" />
 
-        <!--<TextView-->
-        <!--android:layout_width="match_parent"-->
-        <!--android:layout_height="40dp"-->
-        <!--android:layout_marginTop="8dp"-->
-        <!--android:background="@drawable/bg_gray"-->
-        <!--android:gravity="center"-->
-        <!--android:text="灰色"-->
-        <!--android:textColor="@color/white"-->
-        <!--android:textSize="22sp" />-->
 
         <!--<TextView-->
         <!--android:id="@+id/label"-->
         <!--android:layout_width="match_parent"-->
-        <!--android:layout_height="60dp"-->
+        <!--android:layout_height="match_parent"-->
         <!--android:layout_marginTop="10dp"-->
         <!--android:background="@drawable/bg_round_card"-->
         <!--android:gravity="center"-->

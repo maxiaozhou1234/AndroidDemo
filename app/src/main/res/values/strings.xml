@@ -8,4 +8,5 @@
     <string name="use_devices">可用设备</string>
     <string name="picasso_tip">MEMORY(Color.GREEN)\nDISK(Color.BLUE)\nNETWORK(Color.RED)</string>
     <string name="cover">music cover</string>
+    <string name="card_stack_behavior">com.zhou.android.common.CardStackBehavior</string>
 </resources>

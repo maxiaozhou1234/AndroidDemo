@@ -6,7 +6,6 @@ import android.widget.ListView;
 
 import com.zhou.android.R;
 import com.zhou.android.common.BaseActivity;
-import com.zhou.android.common.Tools;
 import com.zhou.android.ui.CardStackLayout;
 
 import java.util.ArrayList;
@@ -20,9 +19,6 @@ public class NestedScrollActivity extends BaseActivity {
     private final static String TAG = "scroll";
 
     private CardStackLayout cardStack;
-    private int scrollY = 0;
-    private boolean flag = true;
-
     private ListView listView;
 
     @Override
@@ -42,18 +38,6 @@ public class NestedScrollActivity extends BaseActivity {
         }
         ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, android.R.id.text1, data);
         listView.setAdapter(adapter);
-
-        scrollY = Tools.dip2px(this, 200);
-//        cardStack.setTargetOffset(scrollY);
-
-//        TextView label = findViewById(R.id.label);
-//        label.setOnTouchListener(new View.OnTouchListener() {
-//            @Override
-//            public boolean onTouch(View v, MotionEvent event) {
-//                Log.d("zhou", "onTouch");
-//                return false;
-//            }
-//        });
 
     }
 

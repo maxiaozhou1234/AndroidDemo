@@ -80,18 +80,29 @@ public class CardStackLayout extends ViewGroup {
         } else {
             if (maxHeight > height) {
                 setMeasuredDimension(width, height);
-                View child = getChildAt(getChildCount() - 1);
-                final MarginLayoutParams lp = (MarginLayoutParams) child.getLayoutParams();
-                int dex = maxHeight - height;
-                int nWidthMeasureSpec = MeasureSpec.makeMeasureSpec(child.getMeasuredWidth(),
-                        lp.width == LayoutParams.MATCH_PARENT ? MeasureSpec.EXACTLY : lp.width);
-                int nHeightMeasureSpec = MeasureSpec.makeMeasureSpec(child.getMeasuredHeight() - dex + limitOffset,
-                        lp.height == LayoutParams.MATCH_PARENT ? MeasureSpec.EXACTLY : lp.height);
-                child.measure(nWidthMeasureSpec, nHeightMeasureSpec);
-                Log.d(TAG, "last Child height = " + child.getMeasuredHeight());
+//                View child = getChildAt(getChildCount() - 1);
+//                final MarginLayoutParams lp = (MarginLayoutParams) child.getLayoutParams();
+//                int dex = maxHeight - height;
+//                int nWidthMeasureSpec = MeasureSpec.makeMeasureSpec(child.getMeasuredWidth(),
+//                        lp.width == LayoutParams.MATCH_PARENT ? MeasureSpec.EXACTLY : lp.width);
+//                int nHeightMeasureSpec = MeasureSpec.makeMeasureSpec(child.getMeasuredHeight() - dex + limitOffset,
+//                        lp.height == LayoutParams.MATCH_PARENT ? MeasureSpec.EXACTLY : lp.height);
+//                child.measure(nWidthMeasureSpec, nHeightMeasureSpec);
             } else {
                 setMeasuredDimension(width, maxHeight);
             }
+        }
+        if (getChildCount() > 1) {//处理最后一个view，扩展高度
+            View child = getChildAt(getChildCount() - 1);
+            final MarginLayoutParams lp = (MarginLayoutParams) child.getLayoutParams();
+            int dex = maxHeight > height ? maxHeight - height : 0;
+            int nWidthMeasureSpec = MeasureSpec.makeMeasureSpec(child.getMeasuredWidth(),
+                    lp.width == LayoutParams.MATCH_PARENT ? MeasureSpec.EXACTLY : lp.width);
+            int nHeightMeasureSpec = MeasureSpec.makeMeasureSpec(child.getMeasuredHeight() - dex + limitOffset,
+                    lp.height == LayoutParams.MATCH_PARENT ? MeasureSpec.EXACTLY : lp.height);
+            child.measure(nWidthMeasureSpec, nHeightMeasureSpec);
+            Log.d(TAG, "last Child height = " + child.getMeasuredHeight());
+
         }
     }
 

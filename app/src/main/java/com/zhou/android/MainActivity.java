@@ -29,6 +29,7 @@ import com.zhou.android.main.DoubleNewCameraActivity;
 import com.zhou.android.main.FingerPrintActivity;
 import com.zhou.android.main.FloatBallActivity;
 import com.zhou.android.main.ForbidScreenshotActivity;
+import com.zhou.android.main.NestedBehaviorActivity;
 import com.zhou.android.main.NestedScrollActivity;
 import com.zhou.android.main.PhotoPickerActivity;
 import com.zhou.android.main.PointZoomActivity;
@@ -96,6 +97,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         if (list.size() == 0) {
+            list.add(new GridViewItem(NestedBehaviorActivity.class, "Behavior"));
             list.add(new GridViewItem(NestedScrollActivity.class, "嵌套滑动"));
             list.add(new GridViewItem(StorageCleanActivity.class, "内存查询kt"));
             list.add(new GridViewItem(StorageActivity.class, "存储空间"));
