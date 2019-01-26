@@ -195,7 +195,11 @@
             android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustResize|stateAlwaysHidden" />
         <activity
+<<<<<<< HEAD
             android:name="com.zhou.android.kotlin.album.AsViewPagerActivity"
+=======
+            android:name="com.zhou.android.main.NestedBehaviorActivity"
+>>>>>>> d9bd72784363afc42149e23579c6aac6fe16355f
             android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustResize|stateAlwaysHidden" />
 
