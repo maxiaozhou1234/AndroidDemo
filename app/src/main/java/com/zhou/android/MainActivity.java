@@ -18,6 +18,7 @@ import com.zhou.android.bluetooth.BluetoothActivity;
 import com.zhou.android.item.GridViewItem;
 import com.zhou.android.kotlin.SimpleListKotlinActivity;
 import com.zhou.android.kotlin.StorageCleanActivity;
+import com.zhou.android.kotlin.album.AsViewPagerActivity;
 import com.zhou.android.main.AppSizeActivity;
 import com.zhou.android.main.BroadcastReceiverActivity;
 import com.zhou.android.main.CallLogActivity;
@@ -96,6 +97,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         if (list.size() == 0) {
+            list.add(new GridViewItem(AsViewPagerActivity.class, "相册"));
             list.add(new GridViewItem(NestedScrollActivity.class, "嵌套滑动"));
             list.add(new GridViewItem(StorageCleanActivity.class, "内存查询kt"));
             list.add(new GridViewItem(StorageActivity.class, "存储空间"));

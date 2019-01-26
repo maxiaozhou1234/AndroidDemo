@@ -15,7 +15,7 @@ public class NestedListView extends ListView {
     }
 
     public NestedListView(Context context, AttributeSet attrs, int defStyleAttr) {
-        super(context, attrs, defStyleAttr, 0);
+        super(context, attrs, defStyleAttr);
     }
 
     @Override
