@@ -21,6 +21,7 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
     <uses-permission android:name="android.permission.GET_PACKAGE_SIZE" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
     <uses-permission
         android:name="android.permission.PACKAGE_USAGE_STATS"
         tools:ignore="ProtectedPermissions" />
@@ -195,12 +196,16 @@
             android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustResize|stateAlwaysHidden" />
         <activity
-<<<<<<< HEAD
             android:name="com.zhou.android.kotlin.album.AsViewPagerActivity"
-=======
-            android:name="com.zhou.android.main.NestedBehaviorActivity"
->>>>>>> d9bd72784363afc42149e23579c6aac6fe16355f
             android:screenOrientation="portrait"
+            android:windowSoftInputMode="adjustResize|stateAlwaysHidden" />
+        <activity
+            android:name="com.zhou.android.main.NestedBehaviorActivity"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="adjustResize|stateAlwaysHidden" />
+
+        <activity
+            android:name="com.zhou.android.main.LocalNetActivity"
             android:windowSoftInputMode="adjustResize|stateAlwaysHidden" />
 
         <service
