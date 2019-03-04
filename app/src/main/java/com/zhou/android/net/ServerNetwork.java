@@ -1,5 +1,7 @@
 package com.zhou.android.net;
 
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.util.Log;
 
 import com.zhou.android.common.Tools;
@@ -19,13 +21,16 @@ public class ServerNetwork extends BaseNetwork {
 
     private Thread tcpThread = null;
     private ServerSocket serverSocket = null;
+    private ServerHandler handler;
 
-    private byte[] reply = "{\"statusCode\":200,\"role\":\"server\"}".getBytes();
+    private byte[] defaultReply = "{\"code\":200,\"role\":\"server\"}".getBytes();
     private volatile boolean keepAlive = true;
     private List<Socket> socketList = new ArrayList<>(16);
 
-    public ServerNetwork() {
+    public ServerNetwork(@NonNull ServerHandler handler) {
         super();
+        this.handler = handler;
+        role = SERVER;
         tcpThread = new Thread(() -> {
             try {
                 serverSocket = new ServerSocket(DEFAULT_TCP_PORT);
@@ -36,34 +41,43 @@ public class ServerNetwork extends BaseNetwork {
                     Log.d("net", "wait connect...");
                     Socket socket = serverSocket.accept();
                     socketList.add(socket);
-                    getExecutor().execute(new ServerSocketThread(socket));
+                    execute(new ServerSocketThread(socket));
                 }
             } catch (IOException e) {
                 e.printStackTrace();
             } finally {
-                Log.d("net", "alive = " + keepAlive);
                 if (serverSocket != null) {
                     try {
                         serverSocket.close();
                     } catch (IOException e) {
                         //
                     }
-
                 }
             }
         });
-        getExecutor().execute(tcpThread);
+        execute(tcpThread);
     }
 
     @Override
-    void send(JSONObject json) {
-
+    void send(final JSONObject json, @Nullable Callback callback) {
+        // 客户端没有一直监听，所以发送也收不到
+//        for (Socket socket : socketList) {
+//            if (socket.isConnected() && !socket.isOutputShutdown()) {
+//                try {
+//                    OutputStream out = socket.getOutputStream();
+//                    out.write(json.toString().getBytes());
+//                    out.flush();
+//                } catch (IOException e) {
+//                    e.printStackTrace();
+//                }
+//            }
+//        }
     }
 
     @Override
     void createTcpSocket(String ip, int port) {
         //服务端不需要处理
-        Log.d("net", "server create Tcp ??");
+        Log.d("net", "server TCP has started.");
     }
 
     @Override
@@ -90,13 +104,16 @@ public class ServerNetwork extends BaseNetwork {
         if (tcpThread != null && tcpThread.isAlive()) {
             tcpThread.interrupt();
         }
+
         for (Socket socket : socketList) {
             try {
                 socket.close();
             } catch (IOException e) {
                 e.printStackTrace();
             }
+
         }
+        socketList.clear();
     }
 
     private class ServerSocketThread extends Thread {
@@ -120,18 +137,29 @@ public class ServerNetwork extends BaseNetwork {
                         String data = new String(buf, 0, length);
                         Log.d("net", "来自客户端接收 = " + data);
 
-                        outputStream.write(reply);
-                        outputStream.flush();
-
+                        JSONObject json;
+                        JSONObject reply = null;
                         try {
-                            JSONObject json = new JSONObject(data);
-                            if ("close".equals(json.optString("cmd"))) {
-                                socket.shutdownInput();
+                            json = new JSONObject(data);
+                            reply = handler.handleRequest(json);
+                            if (reply != null) {
+                                reply.put("fromRole", role);
+                                reply.put("code", ResponseCode.SUCCESS);
                             }
                         } catch (JSONException e) {
-                            e.printStackTrace();
+                            json = new JSONObject();
                         }
-
+                        if (Constant.CLOSE.equals(json.optString("cmd"))) {
+                            socket.shutdownInput();
+                            break;
+                        }
+                        if (reply != null) {
+                            outputStream.write(reply.toString().getBytes());
+                            outputStream.flush();
+                        } else {
+                            outputStream.write(defaultReply);
+                            outputStream.flush();
+                        }
                     }
                 }
 

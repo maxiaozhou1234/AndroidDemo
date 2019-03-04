@@ -1,8 +1,7 @@
 package com.zhou.android.net;
 
+import android.support.annotation.Nullable;
 import android.util.Log;
-
-import com.zhou.android.common.Tools;
 
 import org.json.JSONObject;
 
@@ -18,15 +17,19 @@ public abstract class BaseNetwork {
     //默认接收端口
     public final static int DEFAULT_SERVER_UDP_PORT = 9102;
     public final static int DEFAULT_CLIENT_UDP_PORT = 9103;
-    public final static int DEFAULT_TCP_PORT = 9300;
+    public final static int DEFAULT_TCP_PORT = 9500;
+
+    final static String SERVER = "server";
+    final static String CLIENT = "client";
 
     protected String defaultBroadcast = "255.255.255.255";
 
+    public String role;
     private DatagramSocket receiveSocket;
     private ExecutorService executor = Executors.newCachedThreadPool();
     private String ipAddress;
 
-    public BaseNetwork() {
+    BaseNetwork() {
 //        String broadcast = Tools.getBroadcast();
 //        if (broadcast != null) {
 //            defaultBroadcast = broadcast;
@@ -67,8 +70,8 @@ public abstract class BaseNetwork {
                         send.send(reply);
                         send.close();
                     }
-                    if ("search".equals(json.optString("msg_type"))) {
-                        createTcpSocket(receiver.getAddress().getHostAddress(), receiver.getPort());
+                    if (Constant.SEARCH.equals(json.optString("cmd"))) {
+                        createTcpSocket(receiver.getAddress().getHostAddress(), DEFAULT_TCP_PORT);
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -77,11 +80,7 @@ public abstract class BaseNetwork {
         }).start();
     }
 
-    protected ExecutorService getExecutor() {
-        return executor;
-    }
-
-    abstract void send(JSONObject json);
+    abstract void send(JSONObject json, @Nullable Callback callback);
 
     abstract void createTcpSocket(String ip, int port);
 
@@ -92,6 +91,10 @@ public abstract class BaseNetwork {
     abstract int receiverUdpPort();
 
     abstract int sendUdpPort();
+
+    protected void execute(Runnable runnable) {
+        executor.execute(runnable);
+    }
 
     protected void destroy() {
         if (receiveSocket != null) {

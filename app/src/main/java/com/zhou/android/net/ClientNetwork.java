@@ -1,5 +1,6 @@
 package com.zhou.android.net;
 
+import android.support.annotation.Nullable;
 import android.util.Log;
 
 import com.zhou.android.common.Tools;
@@ -15,31 +16,33 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.net.SocketException;
-import java.net.SocketTimeoutException;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 
 public class ClientNetwork extends BaseNetwork {
 
-    private String defaultRole = "app";
-    private String defaultAccount = "12345";
-    private String defaultAppId = "1000000003";
-    private volatile boolean success = false;
+    //    private String defaultAccount = "12345";
+//    private String defaultAppId = "1000000003";
+    private volatile boolean success;
     private DatagramSocket searchSocket = null;
     private Socket tcpSocket = null;
+    private int packageId = 0;
 
     private Thread tcpThread = null;
     private OutputStream outputStream = null;
     private InputStream inputStream = null;
+    private Callback callback = null;
 
-    private BlockingQueue<String> queue = new ArrayBlockingQueue<>(12);
+    private BlockingQueue<Packet> queue = new ArrayBlockingQueue<>(12);
     private Thread consumer = null;
 
     private byte[] buf = new byte[4096];
     private StringBuilder builder = new StringBuilder();
 
-    public ClientNetwork() {
+    public ClientNetwork(Callback callback) {
         super();
+        this.callback = callback;
+        role = CLIENT;
         success = false;
         if (searchSocket == null) {
             try {
@@ -49,11 +52,11 @@ public class ClientNetwork extends BaseNetwork {
                 e.printStackTrace();
             }
         }
-        getExecutor().execute(sendRunnable);
+        execute(sendRunnable);
     }
 
     @Override
-    public void send(JSONObject json) {
+    public void send(JSONObject json, @Nullable final Callback callback) {
         if (json == null)
             return;
         if (tcpSocket != null) {
@@ -61,26 +64,26 @@ public class ClientNetwork extends BaseNetwork {
                 consumer = new Thread(() -> {
                     for (; ; ) {
                         try {
-                            String packet = queue.take();
+                            Packet packet = queue.take();
                             if (outputStream == null) {
                                 outputStream = tcpSocket.getOutputStream();
                             }
-                            Log.d("net", "write  = " + packet);
+                            Log.d("net", "write  = " + packet.getContent());
                             outputStream.write(packet.getBytes());
                             outputStream.flush();
 
-                            readInput();
+                            readInput(packet);
 
                         } catch (InterruptedException e) {
                             break;
-                        } catch (IOException e) {
+                        } catch (NullPointerException | IOException e) {
                             e.printStackTrace();
                         }
                     }
                 });
                 consumer.start();
             }
-            queue.offer(json.toString());
+            queue.offer(new Packet(packageId++, json, callback));
         } else {
             Log.e("net", "TCP 连接已经断开");
         }
@@ -97,7 +100,7 @@ public class ClientNetwork extends BaseNetwork {
             return;
         }
         try {
-            tcpSocket = new Socket(ip, DEFAULT_TCP_PORT, null, 0);
+            tcpSocket = new Socket(ip, port, null, 0);
             tcpSocket.setSoTimeout(120000);
             tcpSocket.setKeepAlive(true);
             tcpSocket.setTcpNoDelay(true);
@@ -105,11 +108,11 @@ public class ClientNetwork extends BaseNetwork {
             inputStream = tcpSocket.getInputStream();
             JSONObject json = new JSONObject();
             try {
-                json.put("message", "connect");
+                json.put("cmd", Constant.CONNECT);
             } catch (JSONException e) {
                 e.printStackTrace();
             }
-            send(json);
+            send(json, null);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -130,11 +133,8 @@ public class ClientNetwork extends BaseNetwork {
         public void run() {
             JSONObject json = new JSONObject();
             try {
-                json.put("from_role", defaultRole);
-                json.put("from_account", defaultAccount);
-                json.put("command", "query");
-                json.put("app_id", defaultAppId);
-                json.put("msg_type", "search");
+                json.put("from_role", role);
+                json.put("cmd", Constant.SEARCH);
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -170,7 +170,23 @@ public class ClientNetwork extends BaseNetwork {
         if (queue.size() > 0) {
             queue.clear();
         }
-        send(json);
+        send(json, callback -> {
+            if (tcpSocket != null) {
+                try {
+                    tcpSocket.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+            if (tcpThread != null) {
+                tcpThread.interrupt();
+            }
+            if (consumer != null) {
+                consumer.interrupt();
+            }
+            Tools.closeIO(outputStream, inputStream);
+            return true;
+        });
         if (tcpSocket != null) {
             try {
                 tcpSocket.close();
@@ -187,7 +203,7 @@ public class ClientNetwork extends BaseNetwork {
         Tools.closeIO(outputStream, inputStream);
     }
 
-    private void readInput() {
+    private void readInput(Packet packet) {
         if (inputStream == null && tcpSocket != null && tcpSocket.isConnected()) {
             try {
                 inputStream = tcpSocket.getInputStream();
@@ -200,18 +216,32 @@ public class ClientNetwork extends BaseNetwork {
         }
         try {
             int length = inputStream.read(buf);
-            builder.append(new String(buf, 0, length));
-            if (builder.length() > 0) {
-                Log.i("net", "来自服务端接收 = " + builder.toString());
-                builder.setLength(0);
+            if (length > 0) {
+                builder.append(new String(buf, 0, length));
+                if (builder.length() > 0) {
+                    String data = builder.toString();
+                    Log.i("net", "来自服务端接收 = " + data);
+                    JSONObject json = new JSONObject(data);
+                    if (packet.callback == null || !packet.callback.handleMessage(json)) {
+                        if (callback != null) {
+                            callback.handleMessage(json);
+                        }
+                    }
+                    builder.setLength(0);
+                }
             }
-        } catch (SocketTimeoutException e) {
-            e.printStackTrace();
         } catch (Exception e) {
             try {
-                Thread.sleep(1000);
-            } catch (InterruptedException e1) {
-                e1.printStackTrace();
+                packet.json.put("code", ResponseCode.EXCEPTION);
+                packet.json.put("reason", e.getMessage());
+                JSONObject request = packet.getRequest();
+                if (packet.callback == null || !packet.callback.handleMessage(request)) {
+                    if (callback != null) {
+                        callback.handleMessage(request);
+                    }
+                }
+            } catch (JSONException e1) {
+                //
             }
         }
     }
