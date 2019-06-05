@@ -9,5 +9,7 @@ public class GV {
     
     public final static String Config = "sp_config";
     public final static String HasFingerPrintApi = "has_fingerprint_api";
-    
+
+    public final static String MONITOR_TIMEOUT = "monitor timeout";
+
 }

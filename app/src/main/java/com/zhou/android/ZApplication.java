@@ -1,12 +1,13 @@
 package com.zhou.android;
 
 import android.app.Application;
+import android.content.Context;
 import android.content.SharedPreferences;
 
 import com.zhou.android.common.GV;
+import com.zhou.android.kotlin.ActivityMonitor;
 
 /**
- *
  * Created by ZhOu on 2017/2/9.
  */
 
@@ -26,5 +27,12 @@ public class ZApplication extends Application {
             e.printStackTrace();
             sp.edit().putBoolean(GV.HasFingerPrintApi, false).apply();
         }
+
+    }
+
+    @Override
+    protected void attachBaseContext(Context base) {
+        super.attachBaseContext(base);
+        ActivityMonitor.get().attach(base);
     }
 }
