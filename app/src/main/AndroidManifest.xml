@@ -3,6 +3,16 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="com.zhou.android">
 
+    <supports-screens android:smallScreens="false" />
+    <compatible-screens >
+        <screen
+            android:screenDensity="hdpi"
+            android:screenSize="large" />
+        <screen
+            android:screenDensity="xhdpi"
+            android:screenSize="xlarge"/>
+    </compatible-screens>
+
     <uses-permission android:name="android.permission.USE_FINGERPRINT" />
     <uses-permission android:name="android.permission.MOUNT_UNMOUNT_FILESYSTEMS" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
@@ -195,11 +205,7 @@
             android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustResize|stateAlwaysHidden" />
         <activity
-<<<<<<< HEAD
             android:name="com.zhou.android.kotlin.album.AsViewPagerActivity"
-=======
-            android:name="com.zhou.android.main.NestedBehaviorActivity"
->>>>>>> d9bd72784363afc42149e23579c6aac6fe16355f
             android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustResize|stateAlwaysHidden" />
 
