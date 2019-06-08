@@ -17,9 +17,12 @@ import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Field;
+import java.net.InterfaceAddress;
+import java.net.NetworkInterface;
 import java.security.GeneralSecurityException;
 import java.security.MessageDigest;
 import java.util.Calendar;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -140,11 +143,34 @@ public class Tools {
 
     public static void closeIO(Closeable... closeable) {
         for (Closeable c : closeable) {
+            if (c == null)
+                continue;
             try {
                 c.close();
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }
+    }
+
+    public static String getBroadcast() {
+        System.setProperty("java.net.preferIPv4Stack", "true");
+        try {
+            for (Enumeration<NetworkInterface> niEnum = NetworkInterface.getNetworkInterfaces(); niEnum.hasMoreElements(); ) {
+                NetworkInterface ni = niEnum.nextElement();
+                if (ni.getName().toLowerCase().equals("wlan0")) {
+                    if (!ni.isLoopback()) {
+                        for (InterfaceAddress interfaceAddress : ni.getInterfaceAddresses()) {
+                            if (interfaceAddress.getBroadcast() != null) {
+                                return interfaceAddress.getBroadcast().toString().substring(1);
+                            }
+                        }
+                    }
+                }
+            }
+        } catch (Exception e) {
+            //
+        }
+        return null;
     }
 }

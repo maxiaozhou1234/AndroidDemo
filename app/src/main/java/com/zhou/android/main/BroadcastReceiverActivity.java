@@ -124,7 +124,7 @@ public class BroadcastReceiverActivity extends BaseActivity {
 //                NetworkInfo info = cm.getActiveNetworkInfo();
 //                if (info != null && info.isAvailable()) {
 //                    String name = info.getTypeName();
-//                    Toast.makeText(BroadcastReceiverActivity.this, name + "", Toast.LENGTH_LONG).show();
+//                    Toast.string(BroadcastReceiverActivity.this, name + "", Toast.LENGTH_LONG).show();
 //                }
             }
         }

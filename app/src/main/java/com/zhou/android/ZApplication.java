@@ -1,12 +1,16 @@
 package com.zhou.android;
 
 import android.app.Application;
+import android.content.Context;
 import android.content.SharedPreferences;
 
 import com.zhou.android.common.GV;
+import com.zhou.android.kotlin.ActivityMonitor;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
- *
  * Created by ZhOu on 2017/2/9.
  */
 
@@ -26,5 +30,14 @@ public class ZApplication extends Application {
             e.printStackTrace();
             sp.edit().putBoolean(GV.HasFingerPrintApi, false).apply();
         }
+
+    }
+
+    @Override
+    protected void attachBaseContext(Context base) {
+        super.attachBaseContext(base);
+        ArrayList uncheck = new ArrayList<Class>();
+        uncheck.add(MainActivity.class);
+        ActivityMonitor.get().attach(base,uncheck);
     }
 }

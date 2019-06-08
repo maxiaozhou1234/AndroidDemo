@@ -10,4 +10,16 @@
     <string name="cover">music cover</string>
     <string name="picture">picture</string>
     <string name="card_stack_behavior">com.zhou.android.common.CardStackBehavior</string>
+    <string name="local_net_tip">局域网通信，一个作为服务端，一个作为客户端，最好使用真机调试，因为模拟器或者虚拟机均需要重新设置映射关系，具体解决方案自查\n
+        流程：\n
+        1、双方启动后（一般先开启服务端），服务端/客户端会开始监听特定端口\n
+        2、客户端启动会发出广播，服务端接收后也发出一个消息广播到客户端监听的端口\n
+        3、客户端接收广播后，根据 ip 和 端口 建立 TCP 连接，关闭 UDP 监听\n
+        4、两者开始局域网内通信\n
+        5、退出调用 destroy()，关闭后也可重新开启
+    </string>
+    <string name="text_dialog">显示 Dialog</string>
+    <string name="text_alert">显示 Alert</string>
+    <string name="text_next">下一个 Activity</string>
+
 </resources>

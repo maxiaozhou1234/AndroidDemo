@@ -30,6 +30,7 @@ import com.zhou.android.main.DoubleNewCameraActivity;
 import com.zhou.android.main.FingerPrintActivity;
 import com.zhou.android.main.FloatBallActivity;
 import com.zhou.android.main.ForbidScreenshotActivity;
+import com.zhou.android.main.LocalNetActivity;
 import com.zhou.android.main.NestedBehaviorActivity;
 import com.zhou.android.main.NestedScrollActivity;
 import com.zhou.android.main.PhotoPickerActivity;
@@ -42,6 +43,7 @@ import com.zhou.android.main.UdpReceiverActivity;
 import com.zhou.android.main.VideoActivity;
 import com.zhou.android.model.ui.OkHttpActivity;
 import com.zhou.android.model.ui.PicassoActivity;
+import com.zhou.android.kotlin.UndoTestActivity;
 import com.zhou.android.model.ui.WeatherActivity;
 import com.zhou.android.retrofit.RetrofitActivity;
 
@@ -98,11 +100,11 @@ public class MainActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         if (list.size() == 0) {
-<<<<<<< HEAD
+
+            list.add(new GridViewItem(UndoTestActivity.class, "无操作"));
+            list.add(new GridViewItem(LocalNetActivity.class, "局域网"));
             list.add(new GridViewItem(AsViewPagerActivity.class, "相册"));
-=======
             list.add(new GridViewItem(NestedBehaviorActivity.class, "Behavior"));
->>>>>>> d9bd72784363afc42149e23579c6aac6fe16355f
             list.add(new GridViewItem(NestedScrollActivity.class, "嵌套滑动"));
             list.add(new GridViewItem(StorageCleanActivity.class, "内存查询kt"));
             list.add(new GridViewItem(StorageActivity.class, "存储空间"));

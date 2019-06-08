@@ -13,4 +13,4 @@ gradle/
 app/src/test/
 app/src/androidTest/
 /.idea/
-
+/app/build.gradle
