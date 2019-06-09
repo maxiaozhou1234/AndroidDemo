@@ -18,8 +18,9 @@
         4、两者开始局域网内通信\n
         5、退出调用 destroy()，关闭后也可重新开启
     </string>
-    <string name="text_dialog">显示 Dialog</string>
-    <string name="text_alert">显示 Alert</string>
-    <string name="text_next">下一个 Activity</string>
+    <string name="text_dialog">Dialog</string>
+    <string name="text_alert">Alert</string>
+    <string name="text_popup">显示 Popup</string>
+    <string name="text_next">跳转</string>
 
 </resources>

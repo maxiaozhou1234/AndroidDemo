@@ -3,9 +3,14 @@ package com.zhou.android.kotlin
 import android.app.ActivityManager
 import android.app.Dialog
 import android.content.*
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.support.v7.app.AlertDialog
 import android.util.Log
+import android.view.LayoutInflater
 import android.view.View
+import android.widget.Button
+import android.widget.PopupWindow
 import android.widget.TextView
 import com.zhou.android.R
 import com.zhou.android.common.BaseActivity
@@ -18,6 +23,7 @@ import com.zhou.android.common.ToastUtils
 class UndoTestActivity : BaseActivity() {
 
     lateinit var text: TextView
+    lateinit var btn: Button
 
     override fun setContentView() {
         setContentView(R.layout.activity_undo)
@@ -25,6 +31,7 @@ class UndoTestActivity : BaseActivity() {
 
     override fun init() {
         text = findViewById(R.id.text)
+        btn = findViewById(R.id.popup)
 //        Log.d("zhou", window.callback.toString())
 //        window.callback = Callback(window.callback)//替换原先的 PhoneWindow Callback，缺点做一个默认callback代理
 
@@ -39,7 +46,7 @@ class UndoTestActivity : BaseActivity() {
             addAction(GV.MONITOR_TIMEOUT)
             addAction(GV.MONITOR_TIME_COUNT)
         })
-        ActivityMonitor.get().inject(this, window)
+        ActivityMonitor.get().inject(this.javaClass, window)
     }
 
     override fun addListener() {
@@ -68,6 +75,14 @@ class UndoTestActivity : BaseActivity() {
         findViewById<View>(R.id.next).setOnClickListener {
             startActivity(Intent(this@UndoTestActivity, SimpleListKotlinActivity::class.java))
         }
+
+        btn.setOnClickListener {
+            val popup = PopupWindow(this@UndoTestActivity).apply {
+                setBackgroundDrawable(ColorDrawable(Color.parseColor("#C3C3C3")))
+                contentView = LayoutInflater.from(this@UndoTestActivity).inflate(R.layout.layout_undo_pop, null)
+            }
+            popup.showAsDropDown(btn)
+        }
     }
 
 //    override fun onCreate(savedInstanceState: Bundle?) {
@@ -78,7 +93,7 @@ class UndoTestActivity : BaseActivity() {
     override fun onDestroy() {
         super.onDestroy()
         unregisterReceiver(receiver)
-        ActivityMonitor.get().onDestroy(this)
+        ActivityMonitor.get().onDestroy(this.javaClass)
     }
 
     private val receiver = object : BroadcastReceiver() {

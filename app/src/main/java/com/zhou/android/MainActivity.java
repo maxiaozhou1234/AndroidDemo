@@ -16,6 +16,7 @@ import android.widget.Toast;
 import com.zhou.android.adapter.GridViewAdapter;
 import com.zhou.android.bluetooth.BluetoothActivity;
 import com.zhou.android.item.GridViewItem;
+import com.zhou.android.kotlin.AnalysisDecorActivity;
 import com.zhou.android.kotlin.SimpleListKotlinActivity;
 import com.zhou.android.kotlin.StorageCleanActivity;
 import com.zhou.android.kotlin.album.AsViewPagerActivity;
@@ -101,6 +102,7 @@ public class MainActivity extends AppCompatActivity {
         super.onResume();
         if (list.size() == 0) {
 
+            list.add(new GridViewItem(AnalysisDecorActivity.class, "视图分析"));
             list.add(new GridViewItem(UndoTestActivity.class, "无操作"));
             list.add(new GridViewItem(LocalNetActivity.class, "局域网"));
             list.add(new GridViewItem(AsViewPagerActivity.class, "相册"));

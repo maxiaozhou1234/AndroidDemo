@@ -68,8 +68,8 @@ class ActivityMonitor {
                 }
     }
 
-    fun inject(activity: Activity, window: Window) {
-        if (uncheckList.contains(activity::class)) {
+    fun inject(clz: Class<Any>, window: Window) {
+        if (uncheckList.contains(clz)) {
             cancel()
         } else {
             //代理模式
@@ -107,12 +107,11 @@ class ActivityMonitor {
         }
     }
 
-    fun onDestroy(activity:Activity){
-        if(uncheckList.contains(activity::class)){
+    fun onDestroy(clz: Class<Any>) {
+        if (uncheckList.contains(clz)) {
             update()
-        }else{
+        } else {
             cancel()
         }
     }
-
 }
