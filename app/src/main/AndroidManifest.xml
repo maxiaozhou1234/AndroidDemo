@@ -214,6 +214,9 @@
         <activity
             android:name="com.zhou.android.kotlin.AnalysisDecorActivity"
             android:windowSoftInputMode="adjustResize|stateAlwaysHidden" />
+        <activity
+            android:name="com.zhou.android.kotlin.ThrowExceptionActivity"
+            android:windowSoftInputMode="adjustResize|stateAlwaysHidden" />
 
         <service
             android:name=".service.FloatBallService"

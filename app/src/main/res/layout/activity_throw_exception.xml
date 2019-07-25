@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="300dp"
+    android:layout_height="match_parent"
+    android:layout_gravity="center"
+    android:orientation="vertical">
+
+    <Button
+        android:id="@+id/btnCopy"
+        android:layout_width="300dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:text="open_more_window" />
+
+    <Button
+        android:id="@+id/btnException"
+        android:layout_width="300dp"
+        android:layout_height="wrap_content"
+        android:text="Null_Point_Exception" />
+
+    <Button
+        android:id="@+id/btnError"
+        android:layout_width="300dp"
+        android:layout_height="wrap_content"
+        android:text="Error" />
+
+    <Button
+        android:id="@+id/btnOther"
+        android:layout_width="300dp"
+        android:layout_height="wrap_content"
+        android:text="to_other" />
+
+    <Button
+        android:id="@+id/btnPlay"
+        android:layout_width="300dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:text="send_broadcast" />
+
+    <FrameLayout
+        android:id="@+id/fragment1"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1" />
+    <FrameLayout
+        android:id="@+id/fragment2"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1" />
+
+</LinearLayout>

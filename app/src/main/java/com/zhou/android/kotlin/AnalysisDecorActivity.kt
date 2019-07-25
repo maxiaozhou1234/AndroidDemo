@@ -24,6 +24,10 @@ class AnalysisDecorActivity : BaseActivity() {
         findViewById<View>(R.id.jump).setOnClickListener {
             startActivity(Intent(this@AnalysisDecorActivity, AnalysisDecorActivity::class.java))
         }
+
+        findViewById<View>(R.id.btnThrow).setOnClickListener {
+            startActivity(Intent(this@AnalysisDecorActivity, ThrowExceptionActivity::class.java))
+        }
     }
 
     override fun onResume() {

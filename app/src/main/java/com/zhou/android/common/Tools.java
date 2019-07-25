@@ -173,4 +173,16 @@ public class Tools {
         }
         return null;
     }
+
+    public static void printActivityStack(Context context) {
+        ActivityManager am = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
+        ActivityManager.RunningTaskInfo runningTaskInfo = am.getRunningTasks(1).get(0);
+        String packageName = runningTaskInfo.topActivity.getPackageName();
+        String activityName = runningTaskInfo.topActivity.getClassName();
+        StringBuilder sb = new StringBuilder();
+        sb.append("package name: ").append(packageName)
+                .append(" ,activity number: ").append(runningTaskInfo.numActivities)
+                .append(" ,top activity: ").append(activityName);
+        Log.i("zhou", sb.toString());
+    }
 }

@@ -19,6 +19,8 @@ import com.zhou.android.item.GridViewItem;
 import com.zhou.android.kotlin.AnalysisDecorActivity;
 import com.zhou.android.kotlin.SimpleListKotlinActivity;
 import com.zhou.android.kotlin.StorageCleanActivity;
+import com.zhou.android.kotlin.ThrowExceptionActivity;
+import com.zhou.android.kotlin.UndoTestActivity;
 import com.zhou.android.kotlin.album.AsViewPagerActivity;
 import com.zhou.android.main.AppSizeActivity;
 import com.zhou.android.main.BroadcastReceiverActivity;
@@ -44,7 +46,6 @@ import com.zhou.android.main.UdpReceiverActivity;
 import com.zhou.android.main.VideoActivity;
 import com.zhou.android.model.ui.OkHttpActivity;
 import com.zhou.android.model.ui.PicassoActivity;
-import com.zhou.android.kotlin.UndoTestActivity;
 import com.zhou.android.model.ui.WeatherActivity;
 import com.zhou.android.retrofit.RetrofitActivity;
 
@@ -102,6 +103,7 @@ public class MainActivity extends AppCompatActivity {
         super.onResume();
         if (list.size() == 0) {
 
+            list.add(new GridViewItem(ThrowExceptionActivity.class, "崩溃重启"));
             list.add(new GridViewItem(AnalysisDecorActivity.class, "视图分析"));
             list.add(new GridViewItem(UndoTestActivity.class, "无操作"));
             list.add(new GridViewItem(LocalNetActivity.class, "局域网"));
