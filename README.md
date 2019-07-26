@@ -4,14 +4,14 @@
 
 android 涉及知识很多，自己也在不断学习，如果你也在学习过程希望与人交流，欢迎加入下面群组:point_down:
 
-## QQ群
+## :clap::clap::clap:QQ群
 
 ![QQ Group](https://github.com/maxiaozhou1234/AndroidDemo/blob/master/group_qr_code.png)
 
 ## 如何在 github 使用 emoji
 
-在提交中加入 'emoji' 对应的符号即可，如 ':smile:' -> :smile:
+在提交中加入 'emoji' 对应的符号即可，如 '\:smile\:' -> :smile:
 
 [emoji 对照表](https://www.webfx.com/tools/emoji-cheat-sheet/)
 
-[gemoji 官方地址:point_right:](https://github.com/github/gemoji)
+:point_right:[gemoji 官方地址](https://github.com/github/gemoji)
