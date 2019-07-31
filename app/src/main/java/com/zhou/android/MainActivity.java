@@ -17,6 +17,7 @@ import com.zhou.android.adapter.GridViewAdapter;
 import com.zhou.android.bluetooth.BluetoothActivity;
 import com.zhou.android.item.GridViewItem;
 import com.zhou.android.kotlin.AnalysisDecorActivity;
+import com.zhou.android.kotlin.NtpTimeActivity;
 import com.zhou.android.kotlin.SimpleListKotlinActivity;
 import com.zhou.android.kotlin.StorageCleanActivity;
 import com.zhou.android.kotlin.ThrowExceptionActivity;
@@ -103,6 +104,7 @@ public class MainActivity extends AppCompatActivity {
         super.onResume();
         if (list.size() == 0) {
 
+            list.add(new GridViewItem(NtpTimeActivity.class, "同步时间获取"));
             list.add(new GridViewItem(ThrowExceptionActivity.class, "崩溃重启"));
             list.add(new GridViewItem(AnalysisDecorActivity.class, "视图分析"));
             list.add(new GridViewItem(UndoTestActivity.class, "无操作"));

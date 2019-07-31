@@ -1,5 +1,6 @@
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-android-extensions'//用来解析布局id，不用再写findViewById
 
 android {
     compileSdkVersion 26
