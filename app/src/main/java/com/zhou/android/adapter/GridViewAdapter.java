@@ -1,7 +1,6 @@
 package com.zhou.android.adapter;
 
 import android.content.Context;
-import android.graphics.Color;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -28,11 +27,7 @@ public class GridViewAdapter extends BaseAdapter {
             0xFF9575CD, 0xFF7E57C2, 0xFF5E35B1,
             0xFF42A5F5, 0xFF2196F3, 0xFF1E88E5,
             0xFF66BB6A, 0xFF4CAF50, 0xFF43A047};
-    //0xFFFF7043, 0xffd45f5f, 0xff669cf7,
-//            0xFF009688, 0xff6c9f56, 0xffB8B8B8};
-//    private int[] color = {0xFFAED581, 0xFF81C784, 0xFF4DB6AC,
-//            0xFF80D8FF, 0xFF82B1FF, 0xFF8C9EFF};
-
+    
     public GridViewAdapter(Context context, List<GridViewItem> list) {
         inflater = LayoutInflater.from(context);
         if (list != null)
