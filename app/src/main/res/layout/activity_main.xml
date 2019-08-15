@@ -4,7 +4,6 @@
     android:id="@+id/activity_main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="1px"
     tools:context="com.zhou.android.MainActivity">
 
     <GridView
@@ -12,10 +11,11 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:cacheColorHint="@android:color/transparent"
+        android:elevation="2dp"
         android:horizontalSpacing="1px"
         android:numColumns="3"
+        android:padding="1dp"
         android:scrollbars="none"
         android:stretchMode="columnWidth"
-        android:elevation="2dp"
         android:verticalSpacing="1dp" />
 </LinearLayout>

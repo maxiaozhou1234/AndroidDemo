@@ -33,11 +33,14 @@ import android.view.TextureView;
 
 import com.zhou.android.R;
 import com.zhou.android.common.BaseActivity;
+import com.zhou.android.common.Utils;
 
 import java.nio.ByteBuffer;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
+
+import io.reactivex.disposables.Disposable;
 
 /**
  * 获取预览数据
@@ -61,6 +64,8 @@ public class CameraImageActivity extends BaseActivity {
     private CameraDevice cameraDevice;
     private CameraCaptureSession cameraCaptureSession;
     private CaptureRequest.Builder captureRequestBuilder;
+
+    private Disposable disposable;
 
     @Override
     protected void setContentView() {
@@ -108,6 +113,9 @@ public class CameraImageActivity extends BaseActivity {
         } catch (CameraAccessException e) {
             e.printStackTrace();
         }
+
+        disposable = Utils.checkPermission(this, Manifest.permission.CAMERA, "相机");
+
     }
 
     @Override
@@ -309,6 +317,10 @@ public class CameraImageActivity extends BaseActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        if (disposable != null && !disposable.isDisposed()) {
+            disposable.dispose();
+            disposable = null;
+        }
         closeCamera();
         handlerThread.quitSafely();
         try {

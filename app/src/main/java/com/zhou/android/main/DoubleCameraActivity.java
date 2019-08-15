@@ -1,5 +1,6 @@
 package com.zhou.android.main;
 
+import android.Manifest;
 import android.graphics.ImageFormat;
 import android.hardware.Camera;
 import android.util.Log;
@@ -11,6 +12,7 @@ import com.zhou.android.R;
 import com.zhou.android.common.BaseActivity;
 import com.zhou.android.common.ToastUtils;
 import com.zhou.android.common.Tools;
+import com.zhou.android.common.Utils;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -18,6 +20,8 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
+
+import io.reactivex.disposables.Disposable;
 
 /**
  * 双摄同时显示（使用 Camera API）
@@ -51,6 +55,7 @@ public class DoubleCameraActivity extends BaseActivity {
     private List<Camera> cameras = new ArrayList<>();
 
     private boolean isBack = true;
+    private Disposable disposable;
 
     @Override
     protected void setContentView() {
@@ -78,6 +83,7 @@ public class DoubleCameraActivity extends BaseActivity {
                 map.put(BACK, new CameraConfig(info.facing, displayRotation, 0, 0));
             }
         }
+        disposable = Utils.checkPermission(this, Manifest.permission.CAMERA, "相机");
     }
 
     @Override
@@ -256,6 +262,10 @@ public class DoubleCameraActivity extends BaseActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        if (disposable != null && !disposable.isDisposed()) {
+            disposable.dispose();
+            disposable = null;
+        }
         if (cameras.size() > 0) {
             for (Camera camera : cameras) {
                 camera.release();

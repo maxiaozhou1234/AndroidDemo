@@ -55,7 +55,7 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
-    private List<GridViewItem> list = new ArrayList<>();
+    private volatile List<GridViewItem> list = new ArrayList<>();
     private GridViewAdapter gridViewAdapter;
 
     @Override
@@ -104,49 +104,51 @@ public class MainActivity extends AppCompatActivity {
         super.onResume();
         if (list.size() == 0) {
 
-            list.add(new GridViewItem(NtpTimeActivity.class, "同步时间获取"));
-            list.add(new GridViewItem(ThrowExceptionActivity.class, "崩溃重启"));
-            list.add(new GridViewItem(AnalysisDecorActivity.class, "视图分析"));
-            list.add(new GridViewItem(UndoTestActivity.class, "无操作"));
-            list.add(new GridViewItem(LocalNetActivity.class, "局域网"));
-            list.add(new GridViewItem(AsViewPagerActivity.class, "相册"));
-            list.add(new GridViewItem(NestedBehaviorActivity.class, "Behavior"));
-            list.add(new GridViewItem(NestedScrollActivity.class, "嵌套滑动"));
-            list.add(new GridViewItem(StorageCleanActivity.class, "内存查询kt"));
-            list.add(new GridViewItem(StorageActivity.class, "存储空间"));
-            list.add(new GridViewItem(AppSizeActivity.class, "App空间"));
-            list.add(new GridViewItem(SurfaceActivity.class, "界面绘制"));
-            list.add(new GridViewItem(FingerPrintActivity.class, "指纹解锁"));
-            list.add(new GridViewItem(ScrollTestActivity.class, "滑动测试"));
-            list.add(new GridViewItem(ForbidScreenshotActivity.class, "禁止截屏"));
-            list.add(new GridViewItem(FloatBallActivity.class, "悬浮球"));
-            list.add(new GridViewItem(BroadcastReceiverActivity.class, "App广播"));
-            list.add(new GridViewItem(ContactActivity.class, "通讯录"));
-            list.add(new GridViewItem(CallLogActivity.class, "通话记录"));
+            new Thread(() -> {
+                list.add(new GridViewItem(NtpTimeActivity.class, "同步时间获取"));
+                list.add(new GridViewItem(ThrowExceptionActivity.class, "崩溃重启"));
+                list.add(new GridViewItem(AnalysisDecorActivity.class, "视图分析"));
+                list.add(new GridViewItem(UndoTestActivity.class, "无操作"));
+                list.add(new GridViewItem(LocalNetActivity.class, "局域网"));
+                list.add(new GridViewItem(AsViewPagerActivity.class, "相册"));
+                list.add(new GridViewItem(NestedBehaviorActivity.class, "Behavior"));
+                list.add(new GridViewItem(NestedScrollActivity.class, "嵌套滑动"));
+                list.add(new GridViewItem(StorageCleanActivity.class, "内存查询kt"));
+                list.add(new GridViewItem(StorageActivity.class, "存储空间"));
+                list.add(new GridViewItem(AppSizeActivity.class, "App空间"));
+                list.add(new GridViewItem(SurfaceActivity.class, "界面绘制"));
+                list.add(new GridViewItem(FingerPrintActivity.class, "指纹解锁"));
+                list.add(new GridViewItem(ScrollTestActivity.class, "滑动测试"));
+                list.add(new GridViewItem(ForbidScreenshotActivity.class, "禁止截屏"));
+                list.add(new GridViewItem(FloatBallActivity.class, "悬浮球"));
+                list.add(new GridViewItem(BroadcastReceiverActivity.class, "App广播"));
+                list.add(new GridViewItem(ContactActivity.class, "通讯录"));
+                list.add(new GridViewItem(CallLogActivity.class, "通话记录"));
 //        list.add(new GridViewItem(BluetoothMainActivity.class, "蓝牙通信"));
-            list.add(new GridViewItem(BluetoothActivity.class, "蓝牙通信"));
-            list.add(new GridViewItem(SimpleListKotlinActivity.class, "Kotlin"));
-            list.add(new GridViewItem(PointZoomActivity.class, "Point Zoom"));
-            list.add(new GridViewItem(PhotoPickerActivity.class, "图片选择"));
-            list.add(new GridViewItem(RetrofitActivity.class, "Retrofit"));
-            list.add(new GridViewItem(RecyclerViewScrollActivity.class, "RecyclerScroll"));
-            list.add(new GridViewItem(PicassoActivity.class, "Picasso 显示"));
-            list.add(new GridViewItem(VideoActivity.class, "视频播放"));
-            list.add(new GridViewItem(OkHttpActivity.class, "OkHttp"));
-            list.add(new GridViewItem(UdpReceiverActivity.class, "Udp 监听"));
-            list.add(new GridViewItem(WeatherActivity.class, "和风天气"));
-            list.add(new GridViewItem(DoubleCameraActivity.class, "前后摄像"));
-            list.add(new GridViewItem(DoubleNewCameraActivity.class, "前后摄像2"));
-            list.add(new GridViewItem(CameraImageActivity.class, "摄像预览"));
-            list.add(new GridViewItem(CameraUtilTestActivity.class, "CameraUtil"));
+                list.add(new GridViewItem(BluetoothActivity.class, "蓝牙通信"));
+                list.add(new GridViewItem(SimpleListKotlinActivity.class, "Kotlin"));
+                list.add(new GridViewItem(PointZoomActivity.class, "Point Zoom"));
+                list.add(new GridViewItem(PhotoPickerActivity.class, "图片选择"));
+                list.add(new GridViewItem(RetrofitActivity.class, "Retrofit"));
+                list.add(new GridViewItem(RecyclerViewScrollActivity.class, "RecyclerScroll"));
+                list.add(new GridViewItem(PicassoActivity.class, "Picasso"));
+                list.add(new GridViewItem(VideoActivity.class, "视频循环"));
+                list.add(new GridViewItem(OkHttpActivity.class, "OkHttp"));
+//            list.add(new GridViewItem(UdpReceiverActivity.class, "Udp 监听"));
+                list.add(new GridViewItem(WeatherActivity.class, "和风天气"));
+                list.add(new GridViewItem(DoubleCameraActivity.class, "前后摄像"));
+                list.add(new GridViewItem(DoubleNewCameraActivity.class, "前后摄像2"));
+                list.add(new GridViewItem(CameraImageActivity.class, "摄像预览"));
+                list.add(new GridViewItem(CameraUtilTestActivity.class, "CameraUtil"));
 
-            list.add(new GridViewItem("Test", "测试"));
-            list.add(new GridViewItem("Apple", "苹果"));
-            list.add(new GridViewItem("Banana", "香蕉"));
-            list.add(new GridViewItem("camera", "相机"));
-            list.add(new GridViewItem("roma", null));
+                list.add(new GridViewItem("Test", "测试"));
+                list.add(new GridViewItem("Apple", "苹果"));
+                list.add(new GridViewItem("Banana", "香蕉"));
+                list.add(new GridViewItem("camera", "相机"));
+                list.add(new GridViewItem("roma", null));
 
-            gridViewAdapter.notifyDataSetChanged();
+                runOnUiThread(() -> gridViewAdapter.notifyDataSetChanged());
+            }).start();
 
         }
     }

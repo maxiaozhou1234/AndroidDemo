@@ -1,7 +1,5 @@
 package com.zhou.android.share;
 
-import android.view.Window;
-
 import com.zhou.android.R;
 import com.zhou.android.common.BaseActivity;
 

@@ -56,7 +56,7 @@ public class CameraConfig {
     private OnImageAvailableListener imageAvailableListener;
     private Size largest;
 
-    public CameraConfig(String cameraId, Size size, @Nullable View view, OnImageAvailableListener listener, Handler handler) {
+    public CameraConfig(String cameraId, StreamConfigurationMap map, @Nullable View view, OnImageAvailableListener listener, Handler handler) {
         if (view != null) {
             this.view = view;
             if (view instanceof TextureView) {
@@ -74,8 +74,8 @@ public class CameraConfig {
 
 //        StreamConfigurationMap size = characteristics.get(
 //                CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP);
-        if (size != null) {
-            //暂定使用最大的尺寸 最小尺寸
+//        if (size != null) {
+        //暂定使用最大的尺寸 最小尺寸
 //            largest = Collections.max(Arrays.asList(size.getOutputSizes(ImageFormat.JPEG)),
 //                    new Comparator<Size>() {
 //                        @Override
@@ -86,12 +86,20 @@ public class CameraConfig {
 ////                                    (long) rhs.getWidth() * rhs.getHeight());
 //                        }
 //                    });
-            largest = size;
-            Log.d(TAG, "width = " + largest.getWidth() + " height = " + largest.getHeight());
-            //三通道 YUV  YV12,YUV_420_888,NV21 但 NV21 不支持
-            imageReader = ImageReader.newInstance(largest.getWidth(), largest.getHeight(), ImageFormat.YV12, 1);
-            imageReader.setOnImageAvailableListener(imageAvailableListener, handler);
+//            largest = size;
+        int format = ImageFormat.JPEG;
+        boolean supportNV21 = map.isOutputSupportedFor(ImageFormat.NV21);
+        if (supportNV21) {
+            format = ImageFormat.NV21;
         }
+        //有些设备不支持NV21，如三星 edge6，使用不支持格式会导致闪退, createCaptureSession => IllegalArgumentException
+        Log.e(TAG, "isOutputSupportedFor ImageFormat.NV21  >> " + supportNV21 + " ,current ImageFormat = " + format);
+        largest = calculationSize(map);
+        Log.d(TAG, "width = " + largest.getWidth() + " height = " + largest.getHeight());
+        //三通道 YUV  YV12,YUV_420_888,NV21 但 NV21 不支持
+        imageReader = ImageReader.newInstance(largest.getWidth(), largest.getHeight(), format, 1);
+        imageReader.setOnImageAvailableListener(imageAvailableListener, handler);
+//        }
 
         this.cameraStateCallback = new CameraDevice.StateCallback() {
             @Override
@@ -125,7 +133,7 @@ public class CameraConfig {
             captureRequestBuilder.addTarget(imageReader.getSurface());
 
             Surface surface = getSurface();
-            if (surface != null) {
+            if (surface != null && surface.isValid()) {
                 output.add(surface);
                 captureRequestBuilder.addTarget(surface);
             }
@@ -150,7 +158,7 @@ public class CameraConfig {
                     Log.d(TAG, "capture session failed.");
                 }
             }, null);
-        } catch (CameraAccessException e) {
+        } catch (CameraAccessException | IllegalArgumentException e) {
             e.printStackTrace();
         }
     }
@@ -285,6 +293,22 @@ public class CameraConfig {
     public interface SurfaceCallback {
 
         void onSurfaceTextureAvailable(CameraConfig config);
+    }
+
+    private Size calculationSize(StreamConfigurationMap map) {
+        if (map != null) {
+            return Collections.max(Arrays.asList(map.getOutputSizes(ImageFormat.JPEG)),
+                    new Comparator<Size>() {
+                        @Override
+                        public int compare(Size lhs, Size rhs) {
+                            return Long.signum((long) rhs.getWidth() * rhs.getHeight() -
+                                    (long) lhs.getWidth() * lhs.getHeight());
+//                            return Long.signum((long) lhs.getWidth() * lhs.getHeight() -
+//                                    (long) rhs.getWidth() * rhs.getHeight());
+                        }
+                    });
+        }
+        return null;
     }
 
 }

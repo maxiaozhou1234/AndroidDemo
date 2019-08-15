@@ -105,15 +105,15 @@ public class CameraUtil {
                 Log.e(TAG, "SensorOrientation = " + sensorOrientation);
                 if (cameraOrientation == null)
                     continue;
-                StreamConfigurationMap size = characteristics.get(
+                StreamConfigurationMap map = characteristics.get(
                         CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP);
                 if (cameraOrientation == CameraCharacteristics.LENS_FACING_FRONT) {
-                    CameraConfig config = new CameraConfig(id, calculationSize(size), frontTextureView, frontAvailableListener, handler);
+                    CameraConfig config = new CameraConfig(id, map, frontTextureView, frontAvailableListener, handler);
                     config.setSurfaceCallback(surfaceCallback);
                     frontAvailableListener.setOrientation(sensorOrientation);
                     cameraConfig.put(FRONT, config);
                 } else if (cameraOrientation == CameraCharacteristics.LENS_FACING_BACK) {
-                    CameraConfig config = new CameraConfig(id, calculationSize(size), backTextureView, backAvailableListener, handler);
+                    CameraConfig config = new CameraConfig(id, map, backTextureView, backAvailableListener, handler);
                     config.setSurfaceCallback(surfaceCallback);
                     backAvailableListener.setOrientation(sensorOrientation);
                     cameraConfig.put(BACK, config);
@@ -211,21 +211,21 @@ public class CameraUtil {
         return size;
     }
 
-    private Size calculationSize(StreamConfigurationMap map) {
-        if (map != null) {
-            return Collections.max(Arrays.asList(map.getOutputSizes(ImageFormat.JPEG)),
-                    new Comparator<Size>() {
-                        @Override
-                        public int compare(Size lhs, Size rhs) {
-                            return Long.signum((long) rhs.getWidth() * rhs.getHeight() -
-                                    (long) lhs.getWidth() * lhs.getHeight());
-//                            return Long.signum((long) lhs.getWidth() * lhs.getHeight() -
-//                                    (long) rhs.getWidth() * rhs.getHeight());
-                        }
-                    });
-        }
-        return null;
-    }
+//    private Size calculationSize(StreamConfigurationMap map) {
+//        if (map != null) {
+//            return Collections.max(Arrays.asList(map.getOutputSizes(ImageFormat.JPEG)),
+//                    new Comparator<Size>() {
+//                        @Override
+//                        public int compare(Size lhs, Size rhs) {
+//                            return Long.signum((long) rhs.getWidth() * rhs.getHeight() -
+//                                    (long) lhs.getWidth() * lhs.getHeight());
+////                            return Long.signum((long) lhs.getWidth() * lhs.getHeight() -
+////                                    (long) rhs.getWidth() * rhs.getHeight());
+//                        }
+//                    });
+//        }
+//        return null;
+//    }
 
     private Size size = null;
 
@@ -272,12 +272,12 @@ public class CameraUtil {
             byte[] dest = new byte[src.length];
             int len = src.length;
 //            if (orientation == 90) {
-                for (int i = 0; i < len; i++) {
-                    // x = i % raw; y = i/raw;  index = x + raw * y;
-                    // x` = column - i / raw; y` = i % raw;
-                    index = (column - i / row) + (i % row) * column - 1;
-                    dest[i] = src[index];
-                }
+            for (int i = 0; i < len; i++) {
+                // x = i % raw; y = i/raw;  index = x + raw * y;
+                // x` = column - i / raw; y` = i % raw;
+                index = (column - i / row) + (i % row) * column - 1;
+                dest[i] = src[index];
+            }
 //            } else {
 //
 //            }

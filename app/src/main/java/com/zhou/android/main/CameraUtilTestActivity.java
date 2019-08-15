@@ -1,5 +1,6 @@
 package com.zhou.android.main;
 
+import android.Manifest;
 import android.opengl.GLSurfaceView;
 import android.os.Build;
 import android.support.annotation.RequiresApi;
@@ -13,9 +14,12 @@ import android.widget.Toast;
 import com.zhou.android.R;
 import com.zhou.android.camera2.CameraUtil;
 import com.zhou.android.common.BaseActivity;
+import com.zhou.android.common.Utils;
 import com.zhou.android.opengl.GLFrameRenderer;
 
 import java.nio.ByteBuffer;
+
+import io.reactivex.disposables.Disposable;
 
 /**
  * CameraUtil Test
@@ -33,6 +37,8 @@ public class CameraUtilTestActivity extends BaseActivity {
     private GLSurfaceView glSurface;
     private GLFrameRenderer renderer;
 
+    private Disposable disposable;
+
     @Override
     protected void setContentView() {
         setContentView(R.layout.activity_camera_util);
@@ -46,6 +52,9 @@ public class CameraUtilTestActivity extends BaseActivity {
             Toast.makeText(this, msg, Toast.LENGTH_LONG).show();
             return;
         }
+
+        disposable = Utils.checkPermission(this, Manifest.permission.CAMERA, "相机");
+
         TextureView textureView = findViewById(R.id.textureView);
         surface = findViewById(R.id.surface);
         cameraUtil = new CameraUtil(this, textureView, surface);
@@ -161,4 +170,12 @@ public class CameraUtilTestActivity extends BaseActivity {
         super.onPause();
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (disposable != null && !disposable.isDisposed()) {
+            disposable.dispose();
+            disposable = null;
+        }
+    }
 }

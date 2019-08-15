@@ -30,11 +30,14 @@ import android.view.View;
 import com.zhou.android.R;
 import com.zhou.android.common.BaseActivity;
 import com.zhou.android.common.ToastUtils;
+import com.zhou.android.common.Utils;
 
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+
+import io.reactivex.disposables.Disposable;
 
 /**
  * 双摄（Camera2 API）
@@ -49,6 +52,8 @@ public class DoubleNewCameraActivity extends BaseActivity {
     private CameraManager cameraManager;
     private TextureView textureBack, textureFront;
 //    private Handler backgroundHandler, frontHandler;
+
+    private Disposable disposable;
 
     private HashMap<String, CameraConfig> map = new HashMap<>();
     private boolean isBackCamera = true;
@@ -110,6 +115,9 @@ public class DoubleNewCameraActivity extends BaseActivity {
         } catch (CameraAccessException e) {
             e.printStackTrace();
         }
+
+        disposable = Utils.checkPermission(this, Manifest.permission.CAMERA, "相机");
+
     }
 
     @Override
@@ -344,6 +352,10 @@ public class DoubleNewCameraActivity extends BaseActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        if (disposable != null && !disposable.isDisposed()) {
+            disposable.dispose();
+            disposable = null;
+        }
         closeCamera(map.get(isBackCamera ? BACK : FRONT));
         if (imageReader != null) {
             imageReader.close();

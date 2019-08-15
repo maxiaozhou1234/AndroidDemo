@@ -1,5 +1,6 @@
 package com.zhou.android.model.ui;
 
+import android.Manifest;
 import android.app.ProgressDialog;
 import android.os.Looper;
 import android.view.View;
@@ -8,8 +9,11 @@ import android.widget.Toast;
 
 import com.zhou.android.R;
 import com.zhou.android.common.BaseActivity;
+import com.zhou.android.common.Utils;
 import com.zhou.android.model.presenter.WeatherPresenter;
 import com.zhou.android.model.view.IWeatherView;
+
+import io.reactivex.disposables.Disposable;
 
 /**
  * 天气
@@ -22,6 +26,7 @@ public class WeatherActivity extends BaseActivity implements IWeatherView {
     private ProgressDialog progressDialog;
 
     private WeatherPresenter presenter;
+    private Disposable disposable;
 
     @Override
     protected void setContentView() {
@@ -34,6 +39,8 @@ public class WeatherActivity extends BaseActivity implements IWeatherView {
         weather = (TextView) findViewById(R.id.text);
 
         presenter = new WeatherPresenter(this, this);
+
+        disposable = Utils.checkPermission(this, Manifest.permission.ACCESS_FINE_LOCATION, "定位");
     }
 
     @Override
@@ -118,6 +125,10 @@ public class WeatherActivity extends BaseActivity implements IWeatherView {
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        if (disposable != null && !disposable.isDisposed()) {
+            disposable.dispose();
+            disposable = null;
+        }
         presenter.onDestroy();
     }
 }

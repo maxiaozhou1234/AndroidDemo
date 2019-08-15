@@ -1,19 +1,22 @@
 package com.zhou.android.ui;
 
+import android.Manifest;
 import android.app.Activity;
-import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.net.Uri;
+import android.os.Build;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
 import android.widget.LinearLayout;
+import android.widget.Toast;
 
+import com.tbruyelle.rxpermissions2.RxPermissions;
 import com.zhihu.matisse.Matisse;
 import com.zhihu.matisse.MimeType;
 import com.zhihu.matisse.engine.impl.GlideEngine;
@@ -38,9 +41,11 @@ public class PhotoPicker extends LinearLayout {
     private RecyclerAdapter recyclerAdapter;
     private int spanCount = 4;
 
-//    private Dialog dialog;
+    //    private Dialog dialog;
     private AlertDialog ad;
     private int removeIndex = -1, showIndex = -1;
+
+    private RxPermissions rxPermissions;
 
     public PhotoPicker(Context context) {
         this(context, null);
@@ -54,6 +59,9 @@ public class PhotoPicker extends LinearLayout {
         super(context, attrs, defStyleAttr);
         inflate(context, R.layout.listformat_photo_picker, this);
         this.context = context;
+
+        rxPermissions = new RxPermissions((Activity) context);
+
         recyclerView = (RecyclerView) findViewById(R.id.recyclerView);
         recyclerView.setLayoutManager(new GridLayoutManager(context, spanCount));
 
@@ -74,6 +82,13 @@ public class PhotoPicker extends LinearLayout {
 
             @Override
             public void onItemAdd() {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+                    if (!rxPermissions.isGranted(Manifest.permission.READ_EXTERNAL_STORAGE)) {
+                        Toast.makeText(context, "没有存储读取权限，请在设置中开启", Toast.LENGTH_LONG).show();
+                        return;
+                    }
+                }
+
                 Matisse.from((Activity) context)
                         .choose(MimeType.allOf())
                         .countable(true)
