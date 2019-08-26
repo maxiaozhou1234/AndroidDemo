@@ -27,7 +27,7 @@ public class GridViewAdapter extends BaseAdapter {
             0xFF9575CD, 0xFF7E57C2, 0xFF5E35B1,
             0xFF42A5F5, 0xFF2196F3, 0xFF1E88E5,
             0xFF66BB6A, 0xFF4CAF50, 0xFF43A047};
-    
+
     public GridViewAdapter(Context context, List<GridViewItem> list) {
         inflater = LayoutInflater.from(context);
         if (list != null)

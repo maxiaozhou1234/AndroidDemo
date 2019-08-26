@@ -33,6 +33,7 @@ import com.zhou.android.main.DoubleCameraActivity;
 import com.zhou.android.main.DoubleNewCameraActivity;
 import com.zhou.android.main.FingerPrintActivity;
 import com.zhou.android.main.FloatBallActivity;
+import com.zhou.android.main.FocusAnimActivity;
 import com.zhou.android.main.ForbidScreenshotActivity;
 import com.zhou.android.main.LocalNetActivity;
 import com.zhou.android.main.NestedBehaviorActivity;
@@ -105,6 +106,7 @@ public class MainActivity extends AppCompatActivity {
         if (list.size() == 0) {
 
             new Thread(() -> {
+                list.add(new GridViewItem(FocusAnimActivity.class, "识别框动画"));
                 list.add(new GridViewItem(NtpTimeActivity.class, "同步时间获取"));
                 list.add(new GridViewItem(ThrowExceptionActivity.class, "崩溃重启"));
                 list.add(new GridViewItem(AnalysisDecorActivity.class, "视图分析"));

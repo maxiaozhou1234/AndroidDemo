@@ -220,6 +220,9 @@
         <activity
             android:name="com.zhou.android.kotlin.NtpTimeActivity"
             android:windowSoftInputMode="adjustResize|stateAlwaysHidden" />
+        <activity
+            android:name="com.zhou.android.main.FocusAnimActivity"
+            android:windowSoftInputMode="adjustResize|stateAlwaysHidden" />
 
         <service
             android:name=".service.FloatBallService"
