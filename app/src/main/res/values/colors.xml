@@ -8,10 +8,10 @@
     <color name="light_gray">#d9d9d9</color>
     <color name="black">#000000</color>
     <color name="white">#ffffff</color>
-    <color name="blue">#009ACD</color>
+    <color name="blue">#F8BBD0</color>
     <color name="red">#ff0000</color>
-    <color name="ss">#1E88E5</color>
+    <color name="ss">#EF5350</color>
 
     <color name="gray">#407D7979</color>
-    <color name="MediumTurquoise">#48D1CC</color>
+    <color name="MediumTurquoise">#26A69A</color>
 </resources>

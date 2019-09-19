@@ -223,6 +223,12 @@
         <activity
             android:name="com.zhou.android.main.FocusAnimActivity"
             android:windowSoftInputMode="adjustResize|stateAlwaysHidden" />
+        <activity
+            android:name="com.zhou.android.main.FocusDrawActivity"
+            android:windowSoftInputMode="adjustResize|stateAlwaysHidden" />
+        <activity
+            android:name="com.zhou.android.main.RoundViewActivity"
+            android:windowSoftInputMode="adjustResize|stateAlwaysHidden" />
 
         <service
             android:name=".service.FloatBallService"
