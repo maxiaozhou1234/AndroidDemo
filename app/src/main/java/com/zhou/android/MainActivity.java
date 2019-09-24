@@ -36,6 +36,7 @@ import com.zhou.android.main.FloatBallActivity;
 import com.zhou.android.main.FocusAnimActivity;
 import com.zhou.android.main.FocusDrawActivity;
 import com.zhou.android.main.ForbidScreenshotActivity;
+import com.zhou.android.main.FunctionGuideActivity;
 import com.zhou.android.main.LocalNetActivity;
 import com.zhou.android.main.NestedBehaviorActivity;
 import com.zhou.android.main.NestedScrollActivity;
@@ -97,6 +98,7 @@ public class MainActivity extends AppCompatActivity {
                         startActivity(new Intent(MainActivity.this, item.clz));
                     }
                 } catch (Exception e) {
+                    //
                 }
         }
     }
@@ -107,6 +109,7 @@ public class MainActivity extends AppCompatActivity {
         if (list.size() == 0) {
 
             new Thread(() -> {
+                list.add(new GridViewItem(FunctionGuideActivity.class, "功能引导"));
                 list.add(new GridViewItem(RoundViewActivity.class, "圆形图片"));
                 list.add(new GridViewItem(FocusDrawActivity.class, "图片动画"));
                 list.add(new GridViewItem(FocusAnimActivity.class, "识别框动画"));

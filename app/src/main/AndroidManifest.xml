@@ -229,6 +229,9 @@
         <activity
             android:name="com.zhou.android.main.RoundViewActivity"
             android:windowSoftInputMode="adjustResize|stateAlwaysHidden" />
+        <activity
+            android:name="com.zhou.android.main.FunctionGuideActivity"
+            android:windowSoftInputMode="adjustResize|stateAlwaysHidden" />
 
         <service
             android:name=".service.FloatBallService"
