@@ -70,6 +70,10 @@ class FunctionGuideActivity : BaseActivity() {
     }
 
     override fun addListener() {
+
+        btnSwitch.setOnClickListener {
+            etPwd.visibility = if (etPwd.visibility == View.VISIBLE) View.GONE else View.VISIBLE
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {

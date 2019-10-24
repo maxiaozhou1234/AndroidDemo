@@ -47,6 +47,7 @@ import com.zhou.android.main.RoundViewActivity;
 import com.zhou.android.main.ScrollTestActivity;
 import com.zhou.android.main.StorageActivity;
 import com.zhou.android.main.SurfaceActivity;
+import com.zhou.android.main.TimeLineActivity;
 import com.zhou.android.main.VideoActivity;
 import com.zhou.android.model.ui.OkHttpActivity;
 import com.zhou.android.model.ui.PicassoActivity;
@@ -64,6 +65,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setTheme(R.style.AppTheme);
         setContentView(R.layout.activity_main);
 
         GridView gridView = (GridView) findViewById(R.id.gridView);
@@ -109,6 +111,7 @@ public class MainActivity extends AppCompatActivity {
         if (list.size() == 0) {
 
             new Thread(() -> {
+                list.add(new GridViewItem(TimeLineActivity.class, "时间线"));
                 list.add(new GridViewItem(FunctionGuideActivity.class, "功能引导"));
                 list.add(new GridViewItem(RoundViewActivity.class, "圆形图片"));
                 list.add(new GridViewItem(FocusDrawActivity.class, "图片动画"));
