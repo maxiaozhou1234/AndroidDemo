@@ -24,6 +24,8 @@ import android.util.Log;
 import android.util.Size;
 import android.view.View;
 
+import com.zhou.android.common.ToastUtils;
+
 import java.nio.ByteBuffer;
 import java.util.Arrays;
 import java.util.Collection;
@@ -68,7 +70,7 @@ public class CameraUtil {
 
         //检查权限
         if (PackageManager.PERMISSION_GRANTED != ActivityCompat.checkSelfPermission(context, Manifest.permission.CAMERA)) {
-            throw new SecurityException("without camera permission!");
+            ToastUtils.show(context, "without camera permission!");
         }
 
         initHandlerThread();

@@ -1,9 +1,11 @@
 package com.zhou.android.main;
 
 import android.Manifest;
+import android.content.pm.PackageManager;
 import android.opengl.GLSurfaceView;
 import android.os.Build;
 import android.support.annotation.RequiresApi;
+import android.support.v4.app.ActivityCompat;
 import android.util.Log;
 import android.util.Size;
 import android.view.SurfaceView;
@@ -36,6 +38,7 @@ public class CameraUtilTestActivity extends BaseActivity {
     private SurfaceView surface;
     private GLSurfaceView glSurface;
     private GLFrameRenderer renderer;
+    private TextureView textureView;
 
     private Disposable disposable;
 
@@ -55,15 +58,16 @@ public class CameraUtilTestActivity extends BaseActivity {
 
         disposable = Utils.checkPermission(this, Manifest.permission.CAMERA, "相机");
 
-        TextureView textureView = findViewById(R.id.textureView);
+        textureView = findViewById(R.id.textureView);
         surface = findViewById(R.id.surface);
-        cameraUtil = new CameraUtil(this, textureView, surface);
+//        cameraUtil = new CameraUtil(this, textureView, surface);
 
         glSurface = findViewById(R.id.glSurface);
         glSurface.setEGLContextClientVersion(2);
         renderer = new GLFrameRenderer(glSurface);
         glSurface.setRenderer(renderer);
         glSurface.setRenderMode(GLSurfaceView.RENDERMODE_WHEN_DIRTY);
+
     }
 
     @Override
@@ -142,7 +146,12 @@ public class CameraUtilTestActivity extends BaseActivity {
     protected void onResume() {
         super.onResume();
 
-        if (!renderer.isInit()) {
+        int r = ActivityCompat.checkSelfPermission(this, Manifest.permission.CAMERA);
+        if (PackageManager.PERMISSION_GRANTED == r && cameraUtil == null) {
+            cameraUtil = new CameraUtil(this, textureView, surface);
+        }
+
+        if (cameraUtil != null && !renderer.isInit()) {
 
             glSurface.post(new Runnable() {
                 @Override
