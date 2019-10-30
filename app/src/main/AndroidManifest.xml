@@ -32,7 +32,8 @@
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme">
+        android:theme="@style/AppTheme"
+        tools:replace="android:allowBackup">
         <provider
             android:name="android.support.v4.content.FileProvider"
             android:authorities="com.zhihu.matisse.sample.fileprovider"
@@ -47,7 +48,9 @@
             android:name="com.baidu.lbsapi.API_KEY"
             android:value="mAW37ScE39xe15GYG6L9kBbxq97glKLp" />
 
-        <activity android:name=".MainActivity">
+        <activity
+            android:name=".MainActivity"
+            android:theme="@style/AppWelcomeTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -219,6 +222,21 @@
             android:windowSoftInputMode="adjustResize|stateAlwaysHidden" />
         <activity
             android:name="com.zhou.android.kotlin.NtpTimeActivity"
+            android:windowSoftInputMode="adjustResize|stateAlwaysHidden" />
+        <activity
+            android:name="com.zhou.android.main.FocusAnimActivity"
+            android:windowSoftInputMode="adjustResize|stateAlwaysHidden" />
+        <activity
+            android:name="com.zhou.android.main.FocusDrawActivity"
+            android:windowSoftInputMode="adjustResize|stateAlwaysHidden" />
+        <activity
+            android:name="com.zhou.android.main.RoundViewActivity"
+            android:windowSoftInputMode="adjustResize|stateAlwaysHidden" />
+        <activity
+            android:name="com.zhou.android.main.FunctionGuideActivity"
+            android:windowSoftInputMode="adjustPan|stateAlwaysHidden" />
+        <activity
+            android:name="com.zhou.android.main.TimeLineActivity"
             android:windowSoftInputMode="adjustResize|stateAlwaysHidden" />
 
         <service

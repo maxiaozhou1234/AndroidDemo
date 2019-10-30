@@ -48,6 +48,8 @@ dependencies {
     implementation 'com.squareup.okhttp3:okhttp:3.10.0'
     implementation 'io.reactivex.rxjava2:rxjava:2.1.16'
     implementation 'com.tbruyelle.rxpermissions2:rxpermissions:0.9.5'
+    implementation 'com.github.worker8:tourguide:2.0.0-SNAPSHOT'
+    implementation 'com.vivian.widgets:TimeLineItemDecoration:1.5'
 
     implementation(name: 'libyuv-release', ext: 'aar')
 }

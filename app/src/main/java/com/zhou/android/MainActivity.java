@@ -33,17 +33,21 @@ import com.zhou.android.main.DoubleCameraActivity;
 import com.zhou.android.main.DoubleNewCameraActivity;
 import com.zhou.android.main.FingerPrintActivity;
 import com.zhou.android.main.FloatBallActivity;
+import com.zhou.android.main.FocusAnimActivity;
+import com.zhou.android.main.FocusDrawActivity;
 import com.zhou.android.main.ForbidScreenshotActivity;
+import com.zhou.android.main.FunctionGuideActivity;
 import com.zhou.android.main.LocalNetActivity;
 import com.zhou.android.main.NestedBehaviorActivity;
 import com.zhou.android.main.NestedScrollActivity;
 import com.zhou.android.main.PhotoPickerActivity;
 import com.zhou.android.main.PointZoomActivity;
 import com.zhou.android.main.RecyclerViewScrollActivity;
+import com.zhou.android.main.RoundViewActivity;
 import com.zhou.android.main.ScrollTestActivity;
 import com.zhou.android.main.StorageActivity;
 import com.zhou.android.main.SurfaceActivity;
-import com.zhou.android.main.UdpReceiverActivity;
+import com.zhou.android.main.TimeLineActivity;
 import com.zhou.android.main.VideoActivity;
 import com.zhou.android.model.ui.OkHttpActivity;
 import com.zhou.android.model.ui.PicassoActivity;
@@ -61,6 +65,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setTheme(R.style.AppTheme);
         setContentView(R.layout.activity_main);
 
         GridView gridView = (GridView) findViewById(R.id.gridView);
@@ -95,6 +100,7 @@ public class MainActivity extends AppCompatActivity {
                         startActivity(new Intent(MainActivity.this, item.clz));
                     }
                 } catch (Exception e) {
+                    //
                 }
         }
     }
@@ -105,6 +111,11 @@ public class MainActivity extends AppCompatActivity {
         if (list.size() == 0) {
 
             new Thread(() -> {
+                list.add(new GridViewItem(TimeLineActivity.class, "时间线"));
+                list.add(new GridViewItem(FunctionGuideActivity.class, "功能引导"));
+                list.add(new GridViewItem(RoundViewActivity.class, "圆形图片"));
+                list.add(new GridViewItem(FocusDrawActivity.class, "图片动画"));
+                list.add(new GridViewItem(FocusAnimActivity.class, "识别框动画"));
                 list.add(new GridViewItem(NtpTimeActivity.class, "同步时间获取"));
                 list.add(new GridViewItem(ThrowExceptionActivity.class, "崩溃重启"));
                 list.add(new GridViewItem(AnalysisDecorActivity.class, "视图分析"));

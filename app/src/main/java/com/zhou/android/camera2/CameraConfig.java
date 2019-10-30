@@ -89,7 +89,10 @@ public class CameraConfig {
 //            largest = size;
         int format = ImageFormat.JPEG;
         boolean supportNV21 = map.isOutputSupportedFor(ImageFormat.NV21);
-        if (supportNV21) {
+        if (map.isOutputSupportedFor(ImageFormat.YV12)) {
+            format = ImageFormat.YV12;
+            Log.i(TAG, "support yv12");
+        } else if (supportNV21) {
             format = ImageFormat.NV21;
         }
         //有些设备不支持NV21，如三星 edge6，使用不支持格式会导致闪退, createCaptureSession => IllegalArgumentException

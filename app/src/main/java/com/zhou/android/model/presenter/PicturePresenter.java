@@ -102,8 +102,6 @@ public class PicturePresenter {
 
     /**
      * 绝对路径
-     *
-     * @return
      */
     private List<String> load() {
         List<String> data = new ArrayList<>();
@@ -125,8 +123,6 @@ public class PicturePresenter {
 
     /**
      * 图片的 Uri
-     *
-     * @return
      */
     private List<Uri> loadContent() {
         List<Uri> data = new ArrayList<>();
