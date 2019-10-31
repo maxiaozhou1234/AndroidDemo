@@ -11,6 +11,7 @@ import android.util.Size;
 import android.view.SurfaceView;
 import android.view.TextureView;
 import android.view.View;
+import android.widget.Button;
 import android.widget.Toast;
 
 import com.zhou.android.R;
@@ -39,6 +40,7 @@ public class CameraUtilTestActivity extends BaseActivity {
     private GLSurfaceView glSurface;
     private GLFrameRenderer renderer;
     private TextureView textureView;
+    private Button btnControl, btnSwitch;
 
     private Disposable disposable;
 
@@ -68,15 +70,36 @@ public class CameraUtilTestActivity extends BaseActivity {
         glSurface.setRenderer(renderer);
         glSurface.setRenderMode(GLSurfaceView.RENDERMODE_WHEN_DIRTY);
 
+        btnControl = findViewById(R.id.btnControl);
+        btnControl.setSelected(false);
+        btnSwitch = findViewById(R.id.btnSwitch);
+
     }
 
     @Override
     protected void addListener() {
-        findViewById(R.id.button).setOnClickListener(new View.OnClickListener() {
+        btnSwitch.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (cameraUtil != null) {
                     cameraUtil.switchCamera();
+                }
+            }
+        });
+        btnControl.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                boolean cur = btnControl.isSelected();
+                if (cameraUtil != null) {
+                    if (!cur) {
+                        cameraUtil.startPreview(CameraUtilTestActivity.this);
+                        btnSwitch.setEnabled(true);
+                    } else {
+                        cameraUtil.stopPreview();
+                        btnSwitch.setEnabled(false);
+                    }
+                    btnControl.setText(!cur ? "关闭" : "启动");
+                    btnControl.setSelected(!cur);
                 }
             }
         });
@@ -88,57 +111,57 @@ public class CameraUtilTestActivity extends BaseActivity {
             doubleBuffer = ByteBuffer.allocate(size.getWidth() * size.getHeight() * 3);
             tmpCopy = new byte[(int) (size.getWidth() * size.getHeight() * 1.5)];
 
-            cameraUtil.setPreviewFrameCallback(new CameraUtil.OnPreviewFrameCallback() {
-                @Override
-                public void onCameraFront(byte[][] bytes, int orientation) {
-                    if (renderer != null && bytes.length == 3) {
-                        renderer.update(bytes[0], bytes[1], bytes[2]);
-                    }
-                }
-
-                @Override
-                public void onCameraBack(byte[][] bytes, int orientation) {
-                    if (renderer != null && bytes.length == 3) {
-                        renderer.update(bytes[0], bytes[1], bytes[2]);
-                    }
-                }
-
-                @Override
-                public void onCameraFront(byte[] bytes, int orientation) {
-
-//                    if (semaphore.tryAcquire()) {
-//                        try {
-//                            doubleBuffer.put(bytes, 0, capacity);
-//                            doubleBuffer.put(tmpCopy, 0, capacity);
-//                            doubleBuffer.put(bytes, capacity, capacity / 4);
-//                            doubleBuffer.put(tmpCopy, capacity, capacity / 4);
-//                            doubleBuffer.put(bytes, capacity * 5 / 4, capacity / 4);
-//                            doubleBuffer.put(tmpCopy, capacity * 5 / 4, capacity / 4);
+//            cameraUtil.setPreviewFrameCallback(new CameraUtil.OnPreviewFrameCallback() {
+//                @Override
+//                public void onCameraFront(byte[][] bytes, int orientation) {
+//                    if (renderer != null && bytes.length == 3) {
+//                        renderer.update(bytes[0], bytes[1], bytes[2]);
+//                    }
+//                }
 //
-//                            doubleBuffer.flip();
-//                            byte[] data = doubleBuffer.array();
-//                            doubleBuffer.flip();
-//                            doubleBuffer.clear();
-//                        } finally {
-//                            semaphore.release();
-//                        }
+//                @Override
+//                public void onCameraBack(byte[][] bytes, int orientation) {
+//                    if (renderer != null && bytes.length == 3) {
+//                        renderer.update(bytes[0], bytes[1], bytes[2]);
 //                    }
-
-                    //发送
-                }
-
-                @Override
-                public void onCameraBack(byte[] bytes, int orientation) {
-//                    try {
-//                        if (semaphore.tryAcquire(100, TimeUnit.MILLISECONDS)) {
-//                            tmpCopy = bytes;
-//                            semaphore.release();
-//                        }
-//                    } catch (InterruptedException e) {
-//                        e.printStackTrace();
-//                    }
-                }
-            });
+//                }
+//
+//                @Override
+//                public void onCameraFront(byte[] bytes, int orientation) {
+//
+////                    if (semaphore.tryAcquire()) {
+////                        try {
+////                            doubleBuffer.put(bytes, 0, capacity);
+////                            doubleBuffer.put(tmpCopy, 0, capacity);
+////                            doubleBuffer.put(bytes, capacity, capacity / 4);
+////                            doubleBuffer.put(tmpCopy, capacity, capacity / 4);
+////                            doubleBuffer.put(bytes, capacity * 5 / 4, capacity / 4);
+////                            doubleBuffer.put(tmpCopy, capacity * 5 / 4, capacity / 4);
+////
+////                            doubleBuffer.flip();
+////                            byte[] data = doubleBuffer.array();
+////                            doubleBuffer.flip();
+////                            doubleBuffer.clear();
+////                        } finally {
+////                            semaphore.release();
+////                        }
+////                    }
+//
+//                    //发送
+//                }
+//
+//                @Override
+//                public void onCameraBack(byte[] bytes, int orientation) {
+////                    try {
+////                        if (semaphore.tryAcquire(100, TimeUnit.MILLISECONDS)) {
+////                            tmpCopy = bytes;
+////                            semaphore.release();
+////                        }
+////                    } catch (InterruptedException e) {
+////                        e.printStackTrace();
+////                    }
+//                }
+//            });
         }
     }
 
@@ -166,9 +189,9 @@ public class CameraUtilTestActivity extends BaseActivity {
             });
         }
 
-        if (cameraUtil != null) {
-            cameraUtil.startPreview(this);
-        }
+//        if (cameraUtil != null) {
+//            cameraUtil.startPreview(this);
+//        }
     }
 
     @Override

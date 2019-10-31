@@ -38,7 +38,7 @@ class AvcEncoder(private val width: Int, private val height: Int, private val fr
     init {
 
         val mediaFormat = MediaFormat.createVideoFormat("video/avc", width, height)
-        mediaFormat.setInteger(MediaFormat.KEY_COLOR_FORMAT, MediaCodecInfo.CodecCapabilities.COLOR_FormatYUV420SemiPlanar)//yuv420sp
+        mediaFormat.setInteger(MediaFormat.KEY_COLOR_FORMAT, MediaCodecInfo.CodecCapabilities.COLOR_FormatYUV420SemiPlanar)//yuv420sp  yyyy uv uv
         mediaFormat.setInteger(MediaFormat.KEY_BIT_RATE, width * height * 5)
         mediaFormat.setInteger(MediaFormat.KEY_FRAME_RATE, frameRate)
         mediaFormat.setInteger(MediaFormat.KEY_I_FRAME_INTERVAL, 1)

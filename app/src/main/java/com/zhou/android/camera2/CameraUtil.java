@@ -14,7 +14,6 @@ import android.media.ImageReader;
 import android.os.Build;
 import android.os.Handler;
 import android.os.HandlerThread;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
 import android.support.annotation.RequiresPermission;
@@ -27,10 +26,7 @@ import android.view.View;
 import com.zhou.android.common.ToastUtils;
 
 import java.nio.ByteBuffer;
-import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
 
 /**
  * Camera2 工具类
@@ -40,8 +36,8 @@ import java.util.Comparator;
 public class CameraUtil {
 
     private final static String TAG = "camera_util";
-    public final static String FRONT = "CAMERA_FRONT";
-    public final static String BACK = "CAMERA_BACK";
+    private final static String FRONT = "CAMERA_FRONT";
+    private final static String BACK = "CAMERA_BACK";
     private boolean isCameraBack = true;
 
     private CameraManager cameraManager;
@@ -145,6 +141,8 @@ public class CameraUtil {
 
     /**
      * 设置预览编码
+     * <p>
+     * NV21 format is not supported
      */
     public void setPreviewImageFormat(int imageFormat) {
         if (imageFormat == ImageFormat.JPEG) {
@@ -162,7 +160,8 @@ public class CameraUtil {
      */
     public void release() {
         Log.d(TAG, "camera release.");
-        previewFrameCallback = null;
+//        previewFrameCallback = null;
+        onImageAvailableListener = null;
         CameraConfig config = cameraConfig.get(isCameraBack ? BACK : FRONT);
         if (cameraConfig != null)
             config.release();
@@ -178,6 +177,13 @@ public class CameraUtil {
         CameraConfig config = cameraConfig.get(isCameraBack ? BACK : FRONT);
         if (config != null) {
             config.startPreview();
+        }
+    }
+
+    public void stopPreview() {
+        CameraConfig config = cameraConfig.get(isCameraBack ? BACK : FRONT);
+        if (cameraConfig != null) {
+            config.onPause();
         }
     }
 
@@ -200,7 +206,7 @@ public class CameraUtil {
         startPreview(null);
     }
 
-    public void setDefauleCamera(boolean useBackCamera) {
+    public void setDefaultCamera(boolean useBackCamera) {
         isCameraBack = useBackCamera;
     }
 
@@ -213,35 +219,19 @@ public class CameraUtil {
         return size;
     }
 
-//    private Size calculationSize(StreamConfigurationMap map) {
-//        if (map != null) {
-//            return Collections.max(Arrays.asList(map.getOutputSizes(ImageFormat.JPEG)),
-//                    new Comparator<Size>() {
-//                        @Override
-//                        public int compare(Size lhs, Size rhs) {
-//                            return Long.signum((long) rhs.getWidth() * rhs.getHeight() -
-//                                    (long) lhs.getWidth() * lhs.getHeight());
-////                            return Long.signum((long) lhs.getWidth() * lhs.getHeight() -
-////                                    (long) rhs.getWidth() * rhs.getHeight());
-//                        }
-//                    });
-//        }
-//        return null;
-//    }
-
     private Size size = null;
 
     /**
      * 获取流
      *
-     * @param image
+     * @param image       预览帧
      * @param orientation 旋转方向
      */
     private byte[][] getBytes(Image image, int orientation) {
-        if (capacity == -1) {
-            size = getSize();//Size
-            capacity = (int) (size.getWidth() * size.getHeight() * 1.5);
-        }
+//        if (capacity == -1) {
+//            size = getSize();//Size
+//            capacity = (int) (size.getWidth() * size.getHeight() * 1.5);
+//        }
         int len = image.getPlanes().length;
         byte[][] bytes = new byte[len][];
         int count = 0;
@@ -255,6 +245,9 @@ public class CameraUtil {
             count += remaining;
         }
         Log.d(TAG, "bytes = " + count);
+        if (capacity == -1) {
+            capacity = count;
+        }
         return bytes;
     }
 
@@ -296,51 +289,44 @@ public class CameraUtil {
     private OnImageAvailableListener frontAvailableListener = new OnImageAvailableListener() {
         @Override
         public void onImageAvailable(ImageReader reader) {
-            Image image = reader.acquireLatestImage();
-            if (previewFrameCallback != null) {
-                byte[][] bytes = getBytes(image, getOrientation());
-                byte[] _bytes = new byte[capacity];
-                int count = 0;
-                for (byte[] b : bytes) {
-                    System.arraycopy(b, 0, _bytes, count, b.length);
-                    count += b.length;
-                }
-//                int orientation = getOrientation();
-//                if (orientation == 90 || orientation == 270) {
-//                    byte[][] tmp = new byte[3][];
-//                    tmp[0] = new byte[bytes[0].length];
-//                    tmp[1] = new byte[bytes[1].length];
-//                    tmp[2] = new byte[bytes[2].length];
-//
-//                    YuvUtil.i420RotatePlane(bytes[0], bytes[1], bytes[2], tmp[0], tmp[1], tmp[2],
-//                            getSize().getHeight(), getSize().getWidth(), orientation);
-//                    previewFrameCallback.onCameraFront(tmp, getOrientation());
-//                } else {
-//
+//            Image image = reader.acquireLatestImage();
+//            if (previewFrameCallback != null) {
+//                byte[][] bytes = getBytes(image, getOrientation());
+//                byte[] _bytes = new byte[capacity];
+//                int count = 0;
+//                for (byte[] b : bytes) {
+//                    System.arraycopy(b, 0, _bytes, count, b.length);
+//                    count += b.length;
 //                }
-                previewFrameCallback.onCameraFront(bytes, getOrientation());
-                previewFrameCallback.onCameraFront(_bytes, getOrientation());
+//                previewFrameCallback.onCameraFront(bytes, getOrientation());
+//                previewFrameCallback.onCameraFront(_bytes, getOrientation());
+//            }
+            if (onImageAvailableListener != null) {
+                onImageAvailableListener.onImageAvailable(reader);
             }
-            image.close();
+//            image.close();
         }
     };
 
     private OnImageAvailableListener backAvailableListener = new OnImageAvailableListener() {
         @Override
         public void onImageAvailable(ImageReader reader) {
-            Image image = reader.acquireLatestImage();
-            if (previewFrameCallback != null) {
-                byte[][] bytes = getBytes(image, getOrientation());
-                byte[] _bytes = new byte[capacity];
-                int count = 0;
-                for (byte[] b : bytes) {
-                    System.arraycopy(b, 0, _bytes, count, b.length);
-                    count += b.length;
-                }
-                previewFrameCallback.onCameraBack(bytes, getOrientation());
-                previewFrameCallback.onCameraBack(_bytes, getOrientation());
+//            Image image = reader.acquireLatestImage();
+//            if (previewFrameCallback != null) {
+//                byte[][] bytes = getBytes(image, getOrientation());
+//                byte[] _bytes = new byte[capacity];
+//                int count = 0;
+//                for (byte[] b : bytes) {
+//                    System.arraycopy(b, 0, _bytes, count, b.length);
+//                    count += b.length;
+//                }
+//                previewFrameCallback.onCameraBack(bytes, getOrientation());
+//                previewFrameCallback.onCameraBack(_bytes, getOrientation());
+//            }
+            if (onImageAvailableListener != null) {
+                onImageAvailableListener.onImageAvailable(reader);
             }
-            image.close();
+//            image.close();
         }
     };
 
@@ -352,23 +338,28 @@ public class CameraUtil {
         }
     };
 
-    private OnPreviewFrameCallback previewFrameCallback = null;
+//    private OnPreviewFrameCallback previewFrameCallback = null;
+//
+//    /**
+//     * 设置预览回调，均在子线程
+//     */
+//    public void setPreviewFrameCallback(OnPreviewFrameCallback previewFrameCallback) {
+//        this.previewFrameCallback = previewFrameCallback;
+//    }
+//
+//    public interface OnPreviewFrameCallback {
+//        void onCameraFront(byte[][] bytes, int orientation);
+//
+//        void onCameraBack(byte[][] bytes, int orientation);
+//
+//        void onCameraFront(byte[] bytes, int orientation);
+//
+//        void onCameraBack(byte[] bytes, int orientation);
+//    }
 
-    /**
-     * 设置预览回调，均在子线程
-     */
-    public void setPreviewFrameCallback(OnPreviewFrameCallback previewFrameCallback) {
-        this.previewFrameCallback = previewFrameCallback;
+    private OnImageAvailableListener onImageAvailableListener = new OnImageAvailableListener();
+
+    public void setOnImageAvailableListener(OnImageAvailableListener listener) {
+        this.onImageAvailableListener = listener;
     }
-
-    public interface OnPreviewFrameCallback {
-        void onCameraFront(byte[][] bytes, int orientation);
-
-        void onCameraBack(byte[][] bytes, int orientation);
-
-        void onCameraFront(byte[] bytes, int orientation);
-
-        void onCameraBack(byte[] bytes, int orientation);
-    }
-
 }

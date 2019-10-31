@@ -214,29 +214,43 @@
         <activity
             android:name="com.zhou.android.kotlin.UndoTestActivity"
             android:windowSoftInputMode="adjustResize|stateAlwaysHidden" />
+
         <activity
             android:name="com.zhou.android.kotlin.AnalysisDecorActivity"
             android:windowSoftInputMode="adjustResize|stateAlwaysHidden" />
+
         <activity
             android:name="com.zhou.android.kotlin.ThrowExceptionActivity"
             android:windowSoftInputMode="adjustResize|stateAlwaysHidden" />
+
         <activity
             android:name="com.zhou.android.kotlin.NtpTimeActivity"
             android:windowSoftInputMode="adjustResize|stateAlwaysHidden" />
+
         <activity
             android:name="com.zhou.android.main.FocusAnimActivity"
             android:windowSoftInputMode="adjustResize|stateAlwaysHidden" />
+
         <activity
             android:name="com.zhou.android.main.FocusDrawActivity"
             android:windowSoftInputMode="adjustResize|stateAlwaysHidden" />
+
         <activity
             android:name="com.zhou.android.main.RoundViewActivity"
             android:windowSoftInputMode="adjustResize|stateAlwaysHidden" />
+
         <activity
             android:name="com.zhou.android.main.FunctionGuideActivity"
             android:windowSoftInputMode="adjustPan|stateAlwaysHidden" />
+
         <activity
             android:name="com.zhou.android.main.TimeLineActivity"
+            android:windowSoftInputMode="adjustResize|stateAlwaysHidden" />
+
+        <activity
+            android:name="com.zhou.android.main.CameraH264Activity"
+            android:screenOrientation="portrait"
+            android:theme="@style/NoActionBarTheme"
             android:windowSoftInputMode="adjustResize|stateAlwaysHidden" />
 
         <service

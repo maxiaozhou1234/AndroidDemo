@@ -56,6 +56,8 @@ public class CameraConfig {
     private OnImageAvailableListener imageAvailableListener;
     private Size largest;
 
+    private StreamConfigurationMap streamConfigurationMap;
+
     public CameraConfig(String cameraId, StreamConfigurationMap map, @Nullable View view, OnImageAvailableListener listener, Handler handler) {
         if (view != null) {
             this.view = view;
@@ -68,6 +70,7 @@ public class CameraConfig {
             }
         }
 
+        this.streamConfigurationMap = map;
         this.cameraId = cameraId;
         this.imageAvailableListener = listener;
         this.handler = handler;
@@ -167,8 +170,13 @@ public class CameraConfig {
     }
 
     public void setImageFormat(int imageFormat) {
-        imageReader = ImageReader.newInstance(largest.getWidth(), largest.getHeight(), imageFormat, 1);
-        imageReader.setOnImageAvailableListener(imageAvailableListener, handler);
+        if (streamConfigurationMap.isOutputSupportedFor(imageFormat)) {
+
+            imageReader = ImageReader.newInstance(largest.getWidth(), largest.getHeight(), imageFormat, 1);
+            imageReader.setOnImageAvailableListener(imageAvailableListener, handler);
+        } else {
+            Log.w(TAG, "ImageFormat <" + imageFormat + "> is not support.");
+        }
     }
 
     //最好在 onPause 中调用，如果在 onDestroy 中调用，CameraDevice 会优先被系统关闭
@@ -199,6 +207,7 @@ public class CameraConfig {
             try {
                 cameraCaptureSession.stopRepeating();
                 cameraCaptureSession.close();
+                cameraCaptureSession = null;
             } catch (CameraAccessException e) {
                 e.printStackTrace();
             }
@@ -304,10 +313,10 @@ public class CameraConfig {
                     new Comparator<Size>() {
                         @Override
                         public int compare(Size lhs, Size rhs) {
-                            return Long.signum((long) rhs.getWidth() * rhs.getHeight() -
-                                    (long) lhs.getWidth() * lhs.getHeight());
-//                            return Long.signum((long) lhs.getWidth() * lhs.getHeight() -
-//                                    (long) rhs.getWidth() * rhs.getHeight());
+//                            return Long.signum((long) rhs.getWidth() * rhs.getHeight() -
+//                                    (long) lhs.getWidth() * lhs.getHeight());
+                            return Long.signum((long) lhs.getWidth() * lhs.getHeight() -
+                                    (long) rhs.getWidth() * rhs.getHeight());
                         }
                     });
         }
