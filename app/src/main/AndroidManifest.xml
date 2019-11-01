@@ -249,6 +249,7 @@
 
         <activity
             android:name="com.zhou.android.main.CameraH264Activity"
+            android:hardwareAccelerated="true"
             android:screenOrientation="portrait"
             android:theme="@style/NoActionBarTheme"
             android:windowSoftInputMode="adjustResize|stateAlwaysHidden" />

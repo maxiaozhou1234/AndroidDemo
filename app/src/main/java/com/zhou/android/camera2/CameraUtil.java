@@ -22,6 +22,7 @@ import android.util.ArrayMap;
 import android.util.Log;
 import android.util.Size;
 import android.view.View;
+import android.view.ViewGroup;
 
 import com.zhou.android.common.ToastUtils;
 
@@ -39,6 +40,7 @@ public class CameraUtil {
     private final static String FRONT = "CAMERA_FRONT";
     private final static String BACK = "CAMERA_BACK";
     private boolean isCameraBack = true;
+    private boolean autoFixSurface = true;
 
     private CameraManager cameraManager;
     private Handler handler;
@@ -251,82 +253,22 @@ public class CameraUtil {
         return bytes;
     }
 
-    boolean error = false;
-
-    private byte[] fixOrientation(byte[] src, Size size, int orientation) {
-        if (error)
-            return src;
-        if (size == null)
-            return src;
-        if (orientation == 0 || orientation == 180)
-            return src;
-        int index = 0;
-        int column = size.getWidth();
-        int row = size.getWidth() * size.getHeight() > src.length ? size.getHeight() / 4 : size.getHeight();
-        try {
-            byte[] dest = new byte[src.length];
-            int len = src.length;
-//            if (orientation == 90) {
-            for (int i = 0; i < len; i++) {
-                // x = i % raw; y = i/raw;  index = x + raw * y;
-                // x` = column - i / raw; y` = i % raw;
-                index = (column - i / row) + (i % row) * column - 1;
-                dest[i] = src[index];
-            }
-//            } else {
-//
-//            }
-            return dest;
-        } catch (Exception e) {
-            e.printStackTrace();
-            Log.e(TAG, "index = " + index + " < " + row + " , " + column + " >");
-            error = true;
-            return src;
-        }
-    }
-
     //预览处理
     private OnImageAvailableListener frontAvailableListener = new OnImageAvailableListener() {
         @Override
         public void onImageAvailable(ImageReader reader) {
-//            Image image = reader.acquireLatestImage();
-//            if (previewFrameCallback != null) {
-//                byte[][] bytes = getBytes(image, getOrientation());
-//                byte[] _bytes = new byte[capacity];
-//                int count = 0;
-//                for (byte[] b : bytes) {
-//                    System.arraycopy(b, 0, _bytes, count, b.length);
-//                    count += b.length;
-//                }
-//                previewFrameCallback.onCameraFront(bytes, getOrientation());
-//                previewFrameCallback.onCameraFront(_bytes, getOrientation());
-//            }
             if (onImageAvailableListener != null) {
                 onImageAvailableListener.onImageAvailable(reader);
             }
-//            image.close();
         }
     };
 
     private OnImageAvailableListener backAvailableListener = new OnImageAvailableListener() {
         @Override
         public void onImageAvailable(ImageReader reader) {
-//            Image image = reader.acquireLatestImage();
-//            if (previewFrameCallback != null) {
-//                byte[][] bytes = getBytes(image, getOrientation());
-//                byte[] _bytes = new byte[capacity];
-//                int count = 0;
-//                for (byte[] b : bytes) {
-//                    System.arraycopy(b, 0, _bytes, count, b.length);
-//                    count += b.length;
-//                }
-//                previewFrameCallback.onCameraBack(bytes, getOrientation());
-//                previewFrameCallback.onCameraBack(_bytes, getOrientation());
-//            }
             if (onImageAvailableListener != null) {
                 onImageAvailableListener.onImageAvailable(reader);
             }
-//            image.close();
         }
     };
 
@@ -334,32 +276,40 @@ public class CameraUtil {
         @SuppressLint("MissingPermission")
         @Override
         public void onSurfaceTextureAvailable(CameraConfig config) {
+            if (autoFixSurface && config.getPreviewView() != null) {
+                //宽高要反过来算
+                Size size = config.getSize();
+                View view = config.getPreviewView();
+                ViewGroup.LayoutParams lp = view.getLayoutParams();
+                lp.height = (int) (view.getWidth() * 1.0f * size.getWidth() / size.getHeight());
+                view.setLayoutParams(lp);
+                view.requestLayout();
+            }
+            if (callback != null) {
+                callback.onSurfaceTextureAvailable(config);
+            }
             openCamera(cameraManager, config);
         }
     };
-
-//    private OnPreviewFrameCallback previewFrameCallback = null;
-//
-//    /**
-//     * 设置预览回调，均在子线程
-//     */
-//    public void setPreviewFrameCallback(OnPreviewFrameCallback previewFrameCallback) {
-//        this.previewFrameCallback = previewFrameCallback;
-//    }
-//
-//    public interface OnPreviewFrameCallback {
-//        void onCameraFront(byte[][] bytes, int orientation);
-//
-//        void onCameraBack(byte[][] bytes, int orientation);
-//
-//        void onCameraFront(byte[] bytes, int orientation);
-//
-//        void onCameraBack(byte[] bytes, int orientation);
-//    }
 
     private OnImageAvailableListener onImageAvailableListener = new OnImageAvailableListener();
 
     public void setOnImageAvailableListener(OnImageAvailableListener listener) {
         this.onImageAvailableListener = listener;
+    }
+
+    private CameraConfig.SurfaceCallback callback = null;
+
+    public void setSurfaceCallback(CameraConfig.SurfaceCallback callback) {
+        this.callback = callback;
+    }
+
+    public void setAutoFixSurface(boolean enable) {
+        autoFixSurface = enable;
+    }
+
+    //旋转角度
+    public int getSensorOrientation() {
+        return isCameraBack ? backAvailableListener.getOrientation() : frontAvailableListener.getOrientation();
     }
 }

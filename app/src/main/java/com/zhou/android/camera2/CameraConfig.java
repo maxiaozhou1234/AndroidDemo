@@ -4,7 +4,6 @@ import android.graphics.ImageFormat;
 import android.graphics.SurfaceTexture;
 import android.hardware.camera2.CameraAccessException;
 import android.hardware.camera2.CameraCaptureSession;
-import android.hardware.camera2.CameraCharacteristics;
 import android.hardware.camera2.CameraDevice;
 import android.hardware.camera2.CaptureRequest;
 import android.hardware.camera2.params.StreamConfigurationMap;
@@ -75,37 +74,19 @@ public class CameraConfig {
         this.imageAvailableListener = listener;
         this.handler = handler;
 
-//        StreamConfigurationMap size = characteristics.get(
-//                CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP);
-//        if (size != null) {
-        //暂定使用最大的尺寸 最小尺寸
-//            largest = Collections.max(Arrays.asList(size.getOutputSizes(ImageFormat.JPEG)),
-//                    new Comparator<Size>() {
-//                        @Override
-//                        public int compare(Size lhs, Size rhs) {
-//                            return Long.signum((long) rhs.getWidth() * rhs.getHeight() -
-//                                    (long) lhs.getWidth() * lhs.getHeight());
-////                            return Long.signum((long) lhs.getWidth() * lhs.getHeight() -
-////                                    (long) rhs.getWidth() * rhs.getHeight());
-//                        }
-//                    });
-//            largest = size;
         int format = ImageFormat.JPEG;
-        boolean supportNV21 = map.isOutputSupportedFor(ImageFormat.NV21);
-        if (map.isOutputSupportedFor(ImageFormat.YV12)) {
+        if (map.isOutputSupportedFor(ImageFormat.YUV_420_888)) {
+            format = ImageFormat.YUV_420_888;
+            Log.i(TAG, "support YUV_420_888");
+        } else if (map.isOutputSupportedFor(ImageFormat.YV12)) {
             format = ImageFormat.YV12;
-            Log.i(TAG, "support yv12");
-        } else if (supportNV21) {
-            format = ImageFormat.NV21;
         }
-        //有些设备不支持NV21，如三星 edge6，使用不支持格式会导致闪退, createCaptureSession => IllegalArgumentException
-        Log.e(TAG, "isOutputSupportedFor ImageFormat.NV21  >> " + supportNV21 + " ,current ImageFormat = " + format);
+        Log.e(TAG, "current ImageFormat = " + format);
         largest = calculationSize(map);
         Log.d(TAG, "width = " + largest.getWidth() + " height = " + largest.getHeight());
-        //三通道 YUV  YV12,YUV_420_888,NV21 但 NV21 不支持
+        //三通道 YUV  YV12,YUV_420_888,不支持 NV21
         imageReader = ImageReader.newInstance(largest.getWidth(), largest.getHeight(), format, 1);
         imageReader.setOnImageAvailableListener(imageAvailableListener, handler);
-//        }
 
         this.cameraStateCallback = new CameraDevice.StateCallback() {
             @Override
@@ -219,10 +200,6 @@ public class CameraConfig {
         }
     }
 
-    public long getFrameSize() {
-        return largest.getWidth() * largest.getHeight();
-    }
-
     public Size getSize() {
         return largest;
     }
@@ -243,7 +220,7 @@ public class CameraConfig {
             return;
         if (view != null) {
             if (type == TYPE_TEXTURE_VIEW) {
-                TextureView textureView = (TextureView) view;
+                final TextureView textureView = (TextureView) view;
                 if (textureView.isAvailable()) {
                     callback.onSurfaceTextureAvailable(this);
                 } else {
@@ -255,7 +232,6 @@ public class CameraConfig {
 
                         @Override
                         public void onSurfaceTextureSizeChanged(SurfaceTexture surface, int width, int height) {
-
                         }
 
                         @Override
@@ -321,6 +297,10 @@ public class CameraConfig {
                     });
         }
         return null;
+    }
+
+    public View getPreviewView() {
+        return view;
     }
 
 }

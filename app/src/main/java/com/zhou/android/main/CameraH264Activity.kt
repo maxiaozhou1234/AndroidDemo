@@ -3,7 +3,7 @@ package com.zhou.android.main
 import android.Manifest
 import android.annotation.SuppressLint
 import android.content.pm.PackageManager
-import android.graphics.BitmapFactory
+import android.graphics.Bitmap
 import android.graphics.ImageFormat
 import android.graphics.Rect
 import android.graphics.YuvImage
@@ -13,7 +13,11 @@ import android.support.annotation.RequiresApi
 import android.support.v4.app.ActivityCompat
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
+import com.squareup.picasso.MemoryPolicy
+import com.squareup.picasso.Picasso
 import com.tbruyelle.rxpermissions2.RxPermissions
+import com.wuwang.libyuv.Key
+import com.wuwang.libyuv.YuvUtils
 import com.zhou.android.R
 import com.zhou.android.camera2.CameraUtil
 import com.zhou.android.camera2.OnImageAvailableListener
@@ -27,10 +31,7 @@ import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_camera_h264.*
 import okhttp3.internal.Util
-import java.io.ByteArrayOutputStream
-import java.io.File
-import java.io.FileOutputStream
-import java.io.IOException
+import java.io.*
 
 /**
  * Created by mxz on 2019/10/31.
@@ -58,14 +59,7 @@ class CameraH264Activity : AppCompatActivity() {
 
         if (PackageManager.PERMISSION_GRANTED == ActivityCompat.checkSelfPermission(this, Manifest.permission.CAMERA)) {
             try {
-                if (cameraUtil == null) {
-                    cameraUtil = CameraUtil(this, null, texture).apply {
-                        setDefaultCamera(true)
-                        setPreviewImageFormat(ImageFormat.YUV_420_888)
-                        setOnImageAvailableListener(onImageAvailableListener)
-                    }
-                }
-
+                initCameraUtil()
             } catch (e: IllegalArgumentException) {
                 toast("不支持的编码格式")
             }
@@ -74,16 +68,22 @@ class CameraH264Activity : AppCompatActivity() {
     }
 
     private fun addListener() {
-        ibAction.setOnClickListener {
-            val state = !ibAction.isSelected
+        ibRecord.setOnClickListener {
+            val state = !ibRecord.isSelected
             if (state) {
+                toast("开始录屏")
             } else {
+                toast("停止录屏")
             }
 
-            ibAction.isSelected = state
+            ibRecord.isSelected = state
         }
 
         ibVideo.setOnClickListener {
+            toast("视频列表")
+        }
+
+        btnShot.setOnClickListener {
             if (PackageManager.PERMISSION_GRANTED == ActivityCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
                 takePic = true
             } else {
@@ -122,13 +122,7 @@ class CameraH264Activity : AppCompatActivity() {
                         if (!result) {
                             Utils.showPermissionRequestAlertDialog(this@CameraH264Activity, "相机")
                         } else {
-                            if (cameraUtil == null) {
-                                cameraUtil = CameraUtil(this, null, texture).apply {
-                                    setDefaultCamera(true)
-                                    setPreviewImageFormat(ImageFormat.YV12)
-                                    setOnImageAvailableListener(onImageAvailableListener)
-                                }
-                            }
+                            initCameraUtil()
                         }
                     }.addToComposite(composite)
         }
@@ -144,6 +138,25 @@ class CameraH264Activity : AppCompatActivity() {
     override fun onDestroy() {
         super.onDestroy()
         composite.dispose()
+    }
+
+    private fun initCameraUtil() {
+        if (cameraUtil == null) {
+            cameraUtil = CameraUtil(this, null, texture).apply {
+                setDefaultCamera(true)
+                setPreviewImageFormat(ImageFormat.YUV_420_888)
+                setOnImageAvailableListener(onImageAvailableListener)
+//                setSurfaceCallback { config ->
+//                    val size = config.size
+//                    Log.d("zhou1234", "SurfaceCallback >> w:${size.width} ,h:${size.height}")
+////                    宽高要反过来算
+//                    val lp = texture.layoutParams
+//                    lp.height = (texture.width * 1.0f * size.width / size.height).toInt()
+//                    texture.layoutParams = lp
+//                    texture.requestLayout()
+//                }
+            }
+        }
     }
 
     private val sb = StringBuilder()
@@ -177,14 +190,8 @@ class CameraH264Activity : AppCompatActivity() {
 //                            .append(Arrays.toString(smallBuf)).append("\n")
                 }
                 Log.d("zhou1234", sb.append("=========================\n").toString())
-                val msg = handler.obtainMessage()
-                val bundle = Bundle().apply {
-                    putInt("width", image.width)
-                    putInt("height", image.height)
-                    putByteArray("data", data)
-                }
-                msg.data = bundle
-                msg.sendToTarget()
+
+                createBitmap(data, image.width, image.height)
 
                 takePic = false
             }
@@ -195,33 +202,73 @@ class CameraH264Activity : AppCompatActivity() {
     private fun createBitmap(yuv: ByteArray, width: Int, height: Int) {
 
         Single.fromCallable {
-            val image = YuvImage(yuv, ImageFormat.NV21, width, height, null)
+
+            //原数据是NV21 yuv420sp，如果有角度需旋转
+            //使用的库是 https://github.com/doggycoder/AndroidLibyuv.git 在这基础上做了修改
+            //也可以用自带的 NV21ToI420 旋转为i420，再将i420转NV21 I420ToNV21
+            //注：i420 的编码是 yyyy uu vv ，NV21是 yyyy vuvu ，后面参数需要传true，宽高需调换
+            // I420ToNV21(src,dst,h,w,true)
+            var w = width
+            var h = height
+
+            val degree = cameraUtil?.sensorOrientation ?: 0
+            val dest = if (degree == 0) {
+                yuv
+            } else {
+                val time = System.currentTimeMillis()
+                val trans = ByteArray(yuv.size)
+                val de = when (degree) {
+                    90 -> {
+                        w = height
+                        h = width
+                        Key.ROTATE_90
+                    }
+                    180 -> Key.ROTATE_180
+                    270 -> {
+                        w = height
+                        h = width
+                        Key.ROTATE_270
+                    }
+                    else -> Key.ROTATE_90
+                }
+                YuvUtils.NV21Rotate(yuv, width, height, trans, de, false)
+                Log.d("zhou1234", "NV21Rotate time = ${System.currentTimeMillis() - time}ms")
+                trans
+            }
+
+            val image = YuvImage(dest, ImageFormat.NV21, w, h, null)
             val bos = ByteArrayOutputStream()
-            image.compressToJpeg(Rect(0, 0, width, height), 100, bos)
+            image.compressToJpeg(Rect(0, 0, w, h), 100, bos)
             val array = bos.toByteArray()
-            val bitmap = BitmapFactory.decodeByteArray(array, 0, array.size)
-            var fos: FileOutputStream? = null
+
+            val file = File("$path${System.currentTimeMillis()}.jpg")
+            var fos: BufferedOutputStream? = null
             try {
-                val file = File("$path${System.currentTimeMillis()}.jpg")
                 if (!file.parentFile.exists()) {
                     file.parentFile.mkdirs()
                 }
                 file.createNewFile()
-                fos = FileOutputStream(file)
+                fos = BufferedOutputStream(FileOutputStream(file))
                 fos.write(array, 0, array.size)
                 fos.flush()
                 fos.close()
             } catch (e: IOException) {
                 e.printStackTrace()
+                Log.e("zhou1234", "error > ${e.message}")
             } finally {
                 Util.closeQuietly(fos)
+                Util.closeQuietly(bos)
             }
-            bos.close()
-            bitmap
+            file
         }.subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe { bitmap ->
-                    image.setImageBitmap(bitmap)
+                .subscribe { file ->
+                    Picasso.with(this@CameraH264Activity)
+                            .load(file)
+                            .config(Bitmap.Config.RGB_565)
+                            .priority(Picasso.Priority.LOW)
+                            .memoryPolicy(MemoryPolicy.NO_CACHE)
+                            .into(image)
                 }.addToComposite(composite)
 
     }
