@@ -5,11 +5,13 @@ import android.content.ContentResolver;
 import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.IBinder;
 import android.provider.MediaStore;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.WindowManager;
+import android.view.inputmethod.InputMethodManager;
 
 import java.io.Closeable;
 import java.io.IOException;
@@ -173,4 +175,10 @@ public class Tools {
                 .append(" ,top activity: ").append(activityName);
         Log.i("zhou", sb.toString());
     }
+
+    public static void hideSoftInput(Context context, IBinder windowToken) {
+        InputMethodManager manager = (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
+        manager.hideSoftInputFromWindow(windowToken, 0);
+    }
+
 }

@@ -49,6 +49,7 @@ import com.zhou.android.main.ScrollTestActivity;
 import com.zhou.android.main.StorageActivity;
 import com.zhou.android.main.SurfaceActivity;
 import com.zhou.android.main.TimeLineActivity;
+import com.zhou.android.main.VerifyCodeActivity;
 import com.zhou.android.main.VideoActivity;
 import com.zhou.android.model.ui.OkHttpActivity;
 import com.zhou.android.model.ui.PicassoActivity;
@@ -112,6 +113,7 @@ public class MainActivity extends AppCompatActivity {
         if (list.size() == 0) {
 
             new Thread(() -> {
+                list.add(new GridViewItem(VerifyCodeActivity.class, "短信验证码"));
                 list.add(new GridViewItem(CameraH264Activity.class, "硬编码"));
                 list.add(new GridViewItem(TimeLineActivity.class, "时间线"));
                 list.add(new GridViewItem(FunctionGuideActivity.class, "功能引导"));
