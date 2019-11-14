@@ -27,11 +27,8 @@ import com.zhou.android.main.AppSizeActivity;
 import com.zhou.android.main.BroadcastReceiverActivity;
 import com.zhou.android.main.CallLogActivity;
 import com.zhou.android.main.CameraH264Activity;
-import com.zhou.android.main.CameraImageActivity;
 import com.zhou.android.main.CameraUtilTestActivity;
 import com.zhou.android.main.ContactActivity;
-import com.zhou.android.main.DoubleCameraActivity;
-import com.zhou.android.main.DoubleNewCameraActivity;
 import com.zhou.android.main.FingerPrintActivity;
 import com.zhou.android.main.FloatBallActivity;
 import com.zhou.android.main.FocusAnimActivity;
@@ -43,6 +40,7 @@ import com.zhou.android.main.NestedBehaviorActivity;
 import com.zhou.android.main.NestedScrollActivity;
 import com.zhou.android.main.PhotoPickerActivity;
 import com.zhou.android.main.PointZoomActivity;
+import com.zhou.android.main.PreviewWithCamera2Activity;
 import com.zhou.android.main.RecyclerViewScrollActivity;
 import com.zhou.android.main.RoundViewActivity;
 import com.zhou.android.main.ScrollTestActivity;
@@ -113,8 +111,10 @@ public class MainActivity extends AppCompatActivity {
         if (list.size() == 0) {
 
             new Thread(() -> {
+
                 list.add(new GridViewItem(VerifyCodeActivity.class, "短信验证码"));
-                list.add(new GridViewItem(CameraH264Activity.class, "硬编码"));
+                list.add(new GridViewItem(CameraH264Activity.class, "h264硬编码"));
+                list.add(new GridViewItem(PreviewWithCamera2Activity.class, "预览帧拍照"));
                 list.add(new GridViewItem(TimeLineActivity.class, "时间线"));
                 list.add(new GridViewItem(FunctionGuideActivity.class, "功能引导"));
                 list.add(new GridViewItem(RoundViewActivity.class, "圆形图片"));
@@ -152,7 +152,6 @@ public class MainActivity extends AppCompatActivity {
 //            list.add(new GridViewItem(UdpReceiverActivity.class, "Udp 监听"));
                 list.add(new GridViewItem(WeatherActivity.class, "和风天气"));
 //                list.add(new GridViewItem(DoubleCameraActivity.class, "前后摄像"));
-//                list.add(new GridViewItem(DoubleNewCameraActivity.class, "前后摄像2"));
 //                list.add(new GridViewItem(CameraImageActivity.class, "摄像预览"));
                 list.add(new GridViewItem(CameraUtilTestActivity.class, "CameraUtil"));
 

@@ -278,10 +278,18 @@ public class CameraUtil {
         public void onSurfaceTextureAvailable(CameraConfig config) {
             if (autoFixSurface && config.getPreviewView() != null) {
                 //宽高要反过来算
+                int w, h;
                 Size size = config.getSize();
+                if (getSensorOrientation() == 0 || getSensorOrientation() == 180) {
+                    w = size.getHeight();
+                    h = size.getWidth();
+                } else {
+                    w = size.getWidth();
+                    h = size.getHeight();
+                }
                 View view = config.getPreviewView();
                 ViewGroup.LayoutParams lp = view.getLayoutParams();
-                lp.height = (int) (view.getWidth() * 1.0f * size.getWidth() / size.getHeight());
+                lp.height = (int) (view.getWidth() * 1.0f * w / h);
                 view.setLayoutParams(lp);
                 view.requestLayout();
             }

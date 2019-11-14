@@ -31,6 +31,7 @@ class AvcEncoder(private val width: Int, private val height: Int, private val fr
 
     private var configByte: ByteArray? = null
     private val bufferInfo = MediaCodec.BufferInfo()
+    private var thread: Thread? = null
 
     private val cache = ArrayBlockingQueue<ByteArray>(CACHE_SIZE)
     var frameListener: ((data: ByteArray, isFrame: Boolean) -> Unit)? = null
@@ -38,7 +39,8 @@ class AvcEncoder(private val width: Int, private val height: Int, private val fr
     init {
 
         val mediaFormat = MediaFormat.createVideoFormat("video/avc", width, height)
-        mediaFormat.setInteger(MediaFormat.KEY_COLOR_FORMAT, MediaCodecInfo.CodecCapabilities.COLOR_FormatYUV420SemiPlanar)//yuv420sp  yyyy uv uv
+
+        mediaFormat.setInteger(MediaFormat.KEY_COLOR_FORMAT, MediaCodecInfo.CodecCapabilities.COLOR_FormatYUV420SemiPlanar)// yuv420sp  yyyy uv uv
         mediaFormat.setInteger(MediaFormat.KEY_BIT_RATE, width * height * 5)
         mediaFormat.setInteger(MediaFormat.KEY_FRAME_RATE, frameRate)
         mediaFormat.setInteger(MediaFormat.KEY_I_FRAME_INTERVAL, 1)
@@ -69,13 +71,13 @@ class AvcEncoder(private val width: Int, private val height: Int, private val fr
 
     }
 
-    fun clearCache() {
+    private fun clearCache() {
         cache.clear()
     }
 
     fun startEncoderThread() {
 
-        Thread(Runnable {
+        thread = Thread(Runnable {
             var input: ByteArray
             var pts: Long
             var generateIndex: Long = 0
@@ -94,9 +96,9 @@ class AvcEncoder(private val width: Int, private val height: Int, private val fr
 //                    NV21ToNV12(input, yuv420sp, width, height)//不调用颜色值不对
 //                    input = yuv420sp
 
-                    YV12ToNV12_2(input, buf, width, height)//不调用颜色值不对
-                    buf.flip()
-                    input = buf.array()
+//                    YV12ToNV12_2(input, buf, width, height)//不调用颜色值不对
+//                    buf.flip()
+//                    input = buf.array()
 
                     val inputBuffers = mediaCodec!!.inputBuffers
                     val outputBuffers = mediaCodec!!.outputBuffers
@@ -140,12 +142,24 @@ class AvcEncoder(private val width: Int, private val height: Int, private val fr
                     e.printStackTrace()
                 }
             }
-        }).start()
+        })
+        thread?.start()
     }
 
     fun addFrame(data: ByteArray) {
         cache.offer(data)
         Log.i("video", "addFrame ---------------------->")
+    }
+
+    fun release() {
+        clearCache()
+        if (thread?.isInterrupted == true) {
+            thread = thread!!.run {
+                interrupt()
+                join(800)
+                null
+            }
+        }
     }
 
     private fun NV21ToNV12(nv21: ByteArray?, nv12: ByteArray?, width: Int, height: Int) {

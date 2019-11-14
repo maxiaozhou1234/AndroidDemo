@@ -171,7 +171,7 @@
             android:windowSoftInputMode="adjustResize|stateAlwaysHidden" />
 
         <activity
-            android:name="com.zhou.android.main.DoubleNewCameraActivity"
+            android:name="com.zhou.android.main.CameraH264Activity"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustResize|stateAlwaysHidden" />
         <activity
@@ -248,10 +248,15 @@
             android:windowSoftInputMode="adjustResize|stateAlwaysHidden" />
 
         <activity
-            android:name="com.zhou.android.main.CameraH264Activity"
+            android:name="com.zhou.android.main.PreviewWithCamera2Activity"
             android:hardwareAccelerated="true"
             android:screenOrientation="portrait"
             android:theme="@style/NoActionBarTheme"
+            android:windowSoftInputMode="adjustResize|stateAlwaysHidden" />
+        <activity
+            android:name="com.zhou.android.main.ImageActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppFullscreen"
             android:windowSoftInputMode="adjustResize|stateAlwaysHidden" />
 
         <activity

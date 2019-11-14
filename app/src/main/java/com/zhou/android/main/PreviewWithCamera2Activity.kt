@@ -1,19 +1,22 @@
 package com.zhou.android.main
 
 import android.Manifest
-import android.annotation.SuppressLint
+import android.app.ActivityOptions
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.ImageFormat
 import android.graphics.Rect
 import android.graphics.YuvImage
 import android.media.ImageReader
-import android.os.*
+import android.os.Build
+import android.os.Bundle
+import android.os.Environment
 import android.support.annotation.RequiresApi
 import android.support.v4.app.ActivityCompat
 import android.support.v7.app.AppCompatActivity
+import android.transition.Fade
 import android.util.Log
-import com.squareup.picasso.MemoryPolicy
 import com.squareup.picasso.Picasso
 import com.tbruyelle.rxpermissions2.RxPermissions
 import com.wuwang.libyuv.Key
@@ -29,7 +32,7 @@ import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
-import kotlinx.android.synthetic.main.activity_camera_h264.*
+import kotlinx.android.synthetic.main.activity_camera_preview.*
 import okhttp3.internal.Util
 import java.io.*
 
@@ -37,20 +40,38 @@ import java.io.*
  * Created by mxz on 2019/10/31.
  */
 @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
-class CameraH264Activity : AppCompatActivity() {
+class PreviewWithCamera2Activity : AppCompatActivity() {
 
     private val composite = CompositeDisposable()
     private var cameraUtil: CameraUtil? = null
 
     private var hasCameraPermission = false
 
-    private val path = "${Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES).path}/android/"
+    private val picturePath = "${Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES).path}/android/"
+    //    private val videoPath = "${Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MOVIES).path}/android/"
     @Volatile
     private var takePic = false
+    //    private var videoRecord = false
+    private var curPic = ""
+
+//    private var avcEncoder: AvcEncoder? = null
+//    private var bos: BufferedOutputStream? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_camera_h264)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            window.apply {
+                enterTransition = Fade().apply {
+                    duration = 500
+                }
+                exitTransition = Fade().apply {
+                    duration = 500
+                }
+                allowEnterTransitionOverlap = false
+                allowReturnTransitionOverlap = false
+            }
+        }
+        setContentView(R.layout.activity_camera_preview)
         init()
         addListener()
     }
@@ -68,15 +89,51 @@ class CameraH264Activity : AppCompatActivity() {
     }
 
     private fun addListener() {
-        ibRecord.setOnClickListener {
-            val state = !ibRecord.isSelected
+        btnRecord.setOnClickListener {
+            val state = !btnRecord.isSelected
             if (state) {
                 toast("开始录屏")
+//                if (cameraUtil != null) {
+//                    avcEncoder?.release()
+//                    val size = cameraUtil!!.size
+//                    val file = File("$videoPath${System.currentTimeMillis()}.h264")
+//                    if (!file.parentFile.exists()) {
+//                        file.parentFile.mkdirs()
+//                    }
+//                    file.createNewFile()
+//                    bos = BufferedOutputStream(FileOutputStream(file))
+//                    avcEncoder = AvcEncoder(size.width, size.height, 30).apply {
+//                        frameListener = { data, isIFrame ->
+//                            bos?.apply {
+//                                write(data, 0, data.size)
+//                                flush()
+//                            }
+//                        }
+//                        startEncoderThread()
+//                    }
+//                    videoRecord = true
+//                }
             } else {
                 toast("停止录屏")
+//                videoRecord = false
+//                avcEncoder?.run {
+//                    release()
+//                    frameListener = null
+//                    bos?.run {
+//                        flush()
+//                        try {
+//                            close()
+//                        } catch (e: IOException) {
+//                            e.printStackTrace()
+//                        }
+//                        null
+//                    }
+//
+//                    null
+//                }
             }
 
-            ibRecord.isSelected = state
+            btnRecord.isSelected = state
         }
 
         ibVideo.setOnClickListener {
@@ -87,7 +144,7 @@ class CameraH264Activity : AppCompatActivity() {
             if (PackageManager.PERMISSION_GRANTED == ActivityCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
                 takePic = true
             } else {
-                val context = this@CameraH264Activity
+                val context = this@PreviewWithCamera2Activity
                 val rxPermissions = RxPermissions(context)
                 rxPermissions.shouldShowRequestPermissionRationale(context, Manifest.permission.WRITE_EXTERNAL_STORAGE)
                         .flatMap { b ->
@@ -101,6 +158,16 @@ class CameraH264Activity : AppCompatActivity() {
                                 Utils.showPermissionRequestAlertDialog(context, "存储")
                             }
                         }.addToComposite(composite)
+            }
+        }
+
+        image.setOnClickListener { view ->
+
+            if (curPic.isNotEmpty()) {
+                val options = ActivityOptions.makeSceneTransitionAnimation(this, view, "image")
+                startActivity(Intent(this, ImageActivity::class.java).apply {
+                    putExtra("image", curPic)
+                }, options.toBundle())
             }
         }
 
@@ -120,7 +187,7 @@ class CameraH264Activity : AppCompatActivity() {
                         }
                     }.subscribe { result ->
                         if (!result) {
-                            Utils.showPermissionRequestAlertDialog(this@CameraH264Activity, "相机")
+                            Utils.showPermissionRequestAlertDialog(this@PreviewWithCamera2Activity, "相机")
                         } else {
                             initCameraUtil()
                         }
@@ -148,7 +215,7 @@ class CameraH264Activity : AppCompatActivity() {
                 setOnImageAvailableListener(onImageAvailableListener)
 //                setSurfaceCallback { config ->
 //                    val size = config.size
-//                    Log.d("zhou1234", "SurfaceCallback >> w:${size.width} ,h:${size.height}")
+//                    Log.d("zhou", "SurfaceCallback >> w:${size.width} ,h:${size.height}")
 ////                    宽高要反过来算
 //                    val lp = texture.layoutParams
 //                    lp.height = (texture.width * 1.0f * size.width / size.height).toInt()
@@ -160,7 +227,6 @@ class CameraH264Activity : AppCompatActivity() {
     }
 
     private val sb = StringBuilder()
-    private val smallBuf = ByteArray(10)
     private val onImageAvailableListener = object : OnImageAvailableListener() {
 
         override fun onImageAvailable(reader: ImageReader) {
@@ -169,8 +235,7 @@ class CameraH264Activity : AppCompatActivity() {
 
             if (takePic) {
                 //这里是 YUV420SemiPlanar yyyyuvuv 通道二三数据一致，只是二通道是 uv 间隔，三通道是 vu 间隔
-                sb.setLength(0)
-                sb.append("width:${image.width}, height:${image.height} ,format:${image.format} \n")
+
                 val data = ByteArray(image.width * image.height * 3 / 2)
                 var count = 0
                 for (i in 0 until image.planes.size - 1) {
@@ -182,18 +247,17 @@ class CameraH264Activity : AppCompatActivity() {
                     buf.get(b)
 
                     System.arraycopy(b, 0, data, count, b.size)
-
                     count += remaining - 1
 
-//                    System.arraycopy(b, 0, smallBuf, 0, 10)
-//                    sb.append("plane[$i], size:$remaining ,stride:${plane.pixelStride} ,10 byte >> ")
-//                            .append(Arrays.toString(smallBuf)).append("\n")
                 }
-                Log.d("zhou1234", sb.append("=========================\n").toString())
-
-                createBitmap(data, image.width, image.height)
-
-                takePic = false
+                if (takePic) {
+                    sb.setLength(0)
+                    sb.append("width:${image.width}, height:${image.height} ,format:${image.format} \n")
+                    Log.d("zhou", sb.append("=========================\n").toString())
+                    createBitmap(data, image.width, image.height)
+                    takePic = false
+                }
+//                avcEncoder?.addFrame(data)
             }
             image.close()
         }
@@ -232,7 +296,7 @@ class CameraH264Activity : AppCompatActivity() {
                     else -> Key.ROTATE_90
                 }
                 YuvUtils.NV21Rotate(yuv, width, height, trans, de, false)
-                Log.d("zhou1234", "NV21Rotate time = ${System.currentTimeMillis() - time}ms")
+                Log.d("zhou", "NV21Rotate time = ${System.currentTimeMillis() - time}ms")
                 trans
             }
 
@@ -241,7 +305,7 @@ class CameraH264Activity : AppCompatActivity() {
             image.compressToJpeg(Rect(0, 0, w, h), 100, bos)
             val array = bos.toByteArray()
 
-            val file = File("$path${System.currentTimeMillis()}.jpg")
+            val file = File("$picturePath${System.currentTimeMillis()}.jpg")
             var fos: BufferedOutputStream? = null
             try {
                 if (!file.parentFile.exists()) {
@@ -252,9 +316,11 @@ class CameraH264Activity : AppCompatActivity() {
                 fos.write(array, 0, array.size)
                 fos.flush()
                 fos.close()
+
+                curPic = file.absolutePath
             } catch (e: IOException) {
                 e.printStackTrace()
-                Log.e("zhou1234", "error > ${e.message}")
+                Log.e("zhou", "error > ${e.message}")
             } finally {
                 Util.closeQuietly(fos)
                 Util.closeQuietly(bos)
@@ -263,25 +329,11 @@ class CameraH264Activity : AppCompatActivity() {
         }.subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe { file ->
-                    Picasso.with(this@CameraH264Activity)
+                    Picasso.with(this@PreviewWithCamera2Activity)
                             .load(file)
                             .config(Bitmap.Config.RGB_565)
-                            .priority(Picasso.Priority.LOW)
-                            .memoryPolicy(MemoryPolicy.NO_CACHE)
                             .into(image)
                 }.addToComposite(composite)
 
-    }
-
-    private val handler = @SuppressLint("HandlerLeak")
-    object : Handler() {
-        override fun handleMessage(msg: Message) {
-            super.handleMessage(msg)
-            val bundle = msg.data
-            val buf = bundle.getByteArray("data")
-            val width = bundle.getInt("width")
-            val height = bundle.getInt("height")
-            createBitmap(buf, width, height)
-        }
     }
 }
