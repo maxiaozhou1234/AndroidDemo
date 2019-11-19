@@ -29,4 +29,9 @@
         <item name="windowNoTitle">true</item>
     </style>
 
+    <style name="sharedPopStyle">
+        <item name="android:windowEnterAnimation">@anim/slide_bottom_in</item>
+        <item name="android:windowExitAnimation">@anim/slide_bottom_out</item>
+    </style>
+
 </resources>

@@ -51,6 +51,9 @@ dependencies {
     implementation 'com.tbruyelle.rxpermissions2:rxpermissions:0.9.5'
     implementation 'com.github.worker8:tourguide:2.0.0-SNAPSHOT'
     implementation 'com.vivian.widgets:TimeLineItemDecoration:1.5'
+    // https://mvnrepository.com/artifact/com.tencent.mm.opensdk/wechat-sdk-android-without-mta
+    implementation group: 'com.tencent.mm.opensdk', name: 'wechat-sdk-android-without-mta', version: '5.5.4'
+
 
     implementation(name: 'libyuv-release', ext: 'aar')
 }

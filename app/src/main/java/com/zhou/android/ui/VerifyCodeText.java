@@ -5,6 +5,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.support.v7.widget.AppCompatEditText;
+import android.text.InputFilter;
 import android.text.InputType;
 import android.text.TextPaint;
 import android.util.AttributeSet;
@@ -28,7 +29,7 @@ public class VerifyCodeText extends AppCompatEditText {
     private int inputCount = 0;
     private float frameWidth;
     private float horizontalSpace = DEFAULT_HORIZONTAL_SPACE;
-    private float textHeight = 0f;
+    private float textHeight = 0f, textDif = 0f;
     private float textY = 0f;
     private float[] textWidths;
 
@@ -51,14 +52,16 @@ public class VerifyCodeText extends AppCompatEditText {
         framePaint.setStyle(Paint.Style.FILL);
 
         textPaint = new TextPaint(Paint.ANTI_ALIAS_FLAG);
-        textPaint.setColor(Color.BLACK);
+        textPaint.setColor(Color.WHITE);
         textPaint.setStyle(Paint.Style.FILL);
         textPaint.setTextSize(18f * density);
 
-        textHeight = Math.abs(textPaint.getFontMetrics().ascent);
+        textHeight = Math.abs(textPaint.getFontMetrics().ascent) + textPaint.getFontMetrics().descent;
+        textDif = textHeight / 2 - textPaint.getFontMetrics().descent;
 
         textWidths = new float[frameCount];
 
+        setFilters(new InputFilter[]{new InputFilter.LengthFilter(frameCount)});
         setCursorVisible(false);
         setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_SIGNED);
         setImeOptions(EditorInfo.IME_ACTION_DONE);
@@ -96,7 +99,8 @@ public class VerifyCodeText extends AppCompatEditText {
         int width = MeasureSpec.getSize(widthMeasureSpec);
         frameWidth = (width - getPaddingLeft() - getPaddingRight() - (frameCount - 1) * horizontalSpace) / frameCount;
         int height = (int) (frameWidth + getPaddingTop() + getPaddingBottom());
-        textY = (height + textHeight) / 2;
+//        textY = (height + textHeight) / 2;
+        textY = height / 2f + textDif;
         setMeasuredDimension(width, height);
     }
 
