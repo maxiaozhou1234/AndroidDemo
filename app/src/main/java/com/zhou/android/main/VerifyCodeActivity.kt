@@ -10,10 +10,6 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.PopupWindow
-import com.tencent.mm.opensdk.modelmsg.SendMessageToWX
-import com.tencent.mm.opensdk.modelmsg.WXMediaMessage
-import com.tencent.mm.opensdk.modelmsg.WXTextObject
-import com.tencent.mm.opensdk.openapi.WXAPIFactory
 import com.zhou.android.R
 import com.zhou.android.common.BaseActivity
 import com.zhou.android.common.toast
@@ -48,33 +44,33 @@ class VerifyCodeActivity : BaseActivity() {
                 toast("朋友圈")
                 //https://developers.weixin.qq.com/doc/oplatform/Mobile_App/Share_and_Favorites/Android.html
                 //文字
-                val req = SendMessageToWX.Req().apply {
-                    transaction = "acb"
-                    message = WXMediaMessage().apply {
-                        mediaObject = WXTextObject().apply {
-                            text = "分享微信文字测试"
-                        }
-                        description = "测试"
-                    }
-                    scene = SendMessageToWX.Req.WXSceneTimeline
-                }
-                WXAPIFactory.createWXAPI(this@VerifyCodeActivity, "123456").sendReq(req)
+//                val req = SendMessageToWX.Req().apply {
+//                    transaction = "acb"
+//                    message = WXMediaMessage().apply {
+//                        mediaObject = WXTextObject().apply {
+//                            text = "分享微信文字测试"
+//                        }
+//                        description = "测试"
+//                    }
+//                    scene = SendMessageToWX.Req.WXSceneTimeline
+//                }
+//                WXAPIFactory.createWXAPI(this@VerifyCodeActivity, "123456").sendReq(req)
             }
             layout.findViewById<Button>(R.id.btnWx).setOnClickListener {
 
                 toast("微信")
-                val req = SendMessageToWX.Req().apply {
-                    transaction = "acb"
-                    message = WXMediaMessage().apply {
-                        mediaObject = WXTextObject().apply {
-                            text = "分享微信文字测试"
-                        }
-                        description = "测试"
-                    }
-                    scene = SendMessageToWX.Req.WXSceneSession
-                }
-
-                WXAPIFactory.createWXAPI(this@VerifyCodeActivity, "123456").sendReq(req)
+//                val req = SendMessageToWX.Req().apply {
+//                    transaction = "acb"
+//                    message = WXMediaMessage().apply {
+//                        mediaObject = WXTextObject().apply {
+//                            text = "分享微信文字测试"
+//                        }
+//                        description = "测试"
+//                    }
+//                    scene = SendMessageToWX.Req.WXSceneSession
+//                }
+//
+//                WXAPIFactory.createWXAPI(this@VerifyCodeActivity, "123456").sendReq(req)
 
             }
             layout.findViewById<Button>(R.id.btnLink).setOnClickListener {

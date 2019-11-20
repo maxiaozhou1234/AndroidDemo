@@ -46,6 +46,7 @@ import com.zhou.android.main.RoundViewActivity;
 import com.zhou.android.main.ScrollTestActivity;
 import com.zhou.android.main.StorageActivity;
 import com.zhou.android.main.SurfaceActivity;
+import com.zhou.android.main.TestRvActivity;
 import com.zhou.android.main.TimeLineActivity;
 import com.zhou.android.main.VerifyCodeActivity;
 import com.zhou.android.main.VideoActivity;
@@ -112,7 +113,8 @@ public class MainActivity extends AppCompatActivity {
 
             new Thread(() -> {
 
-                list.add(new GridViewItem(VerifyCodeActivity.class, "短信验证码"));
+                list.add(new GridViewItem(TestRvActivity.class, "刷新加载RV"));
+                list.add(new GridViewItem(VerifyCodeActivity.class, "短信验证码控件"));
                 list.add(new GridViewItem(CameraH264Activity.class, "h264硬编码"));
                 list.add(new GridViewItem(PreviewWithCamera2Activity.class, "预览帧拍照"));
                 list.add(new GridViewItem(TimeLineActivity.class, "时间线"));
