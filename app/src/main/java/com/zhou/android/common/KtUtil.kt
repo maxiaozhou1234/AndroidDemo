@@ -1,6 +1,7 @@
 package com.zhou.android.common
 
 import android.app.Activity
+import android.text.Editable
 import android.widget.Toast
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
@@ -12,3 +13,5 @@ import io.reactivex.disposables.Disposable
 fun Disposable.addToComposite(composite: CompositeDisposable) = composite.add(this)
 
 fun Activity.toast(text: CharSequence, duration: Int = Toast.LENGTH_LONG) = Toast.makeText(this, text, duration).show()
+
+fun String.text() = Editable.Factory.getInstance().newEditable(this)!!

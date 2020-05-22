@@ -22,7 +22,7 @@ import com.zhihu.matisse.MimeType;
 import com.zhihu.matisse.engine.impl.GlideEngine;
 import com.zhihu.matisse.internal.entity.CaptureStrategy;
 import com.zhou.android.R;
-import com.zhou.android.adapter.RecyclerAdapter;
+import com.zhou.android.adapter.PhotoRecyclerAdapter;
 import com.zhou.android.adapter.RecyclerListener;
 
 import java.util.List;
@@ -38,7 +38,7 @@ public class PhotoPicker extends LinearLayout {
 
     private Context context;
     private RecyclerView recyclerView;
-    private RecyclerAdapter recyclerAdapter;
+    private PhotoRecyclerAdapter recyclerAdapter;
     private int spanCount = 4;
 
     //    private Dialog dialog;
@@ -65,7 +65,7 @@ public class PhotoPicker extends LinearLayout {
         recyclerView = (RecyclerView) findViewById(R.id.recyclerView);
         recyclerView.setLayoutManager(new GridLayoutManager(context, spanCount));
 
-        recyclerAdapter = new RecyclerAdapter(context, null);
+        recyclerAdapter = new PhotoRecyclerAdapter(context, null);
         recyclerView.setAdapter(recyclerAdapter);
 
         recyclerAdapter.setListener(new RecyclerListener() {

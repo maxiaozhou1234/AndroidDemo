@@ -7,7 +7,6 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 
 import com.squareup.picasso.Picasso;
 import com.zhou.android.R;
@@ -21,12 +20,12 @@ import java.util.List;
  * Created by ZhOu on 2017/8/4.
  */
 
-public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHolder> {
+public class PhotoRecyclerAdapter extends RecyclerView.Adapter<PhotoRecyclerAdapter.ViewHolder> {
 
     private List<Uri> path = new ArrayList<>();
     private Context context;
 
-    public RecyclerAdapter(Context context, List<Uri> path) {
+    public PhotoRecyclerAdapter(Context context, List<Uri> path) {
         this.context = context;
         if (path != null) {
             this.path.clear();

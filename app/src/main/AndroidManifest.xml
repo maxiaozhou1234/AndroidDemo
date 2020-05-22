@@ -271,6 +271,19 @@
             android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustResize|stateAlwaysHidden" />
 
+        <activity
+            android:name=".livedata.ArticleActivity"
+            android:hardwareAccelerated="true"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="adjustResize|stateAlwaysHidden" />
+
+        <activity
+            android:name=".livedata.ArticleDetailActivity"
+            android:hardwareAccelerated="true"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="adjustResize|stateAlwaysHidden" />
+
+
         <service
             android:name=".service.FloatBallService"
             android:exported="false" />

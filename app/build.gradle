@@ -60,6 +60,13 @@ dependencies {
     implementation 'com.scwang.smartrefresh:SmartRefreshLayout:1.1.0'
 
     implementation(name: 'libyuv-release', ext: 'aar')
+
+    //liveData
+    implementation 'android.arch.lifecycle:livedata:1.1.1'
+    implementation 'android.arch.lifecycle:viewmodel:1.1.1'
+    implementation 'android.arch.lifecycle:extensions:1.1.1'
+    implementation 'android.arch.lifecycle:runtime:1.1.1'
+
 }
 
 //repositories {

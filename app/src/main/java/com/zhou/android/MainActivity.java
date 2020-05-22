@@ -23,6 +23,7 @@ import com.zhou.android.kotlin.StorageCleanActivity;
 import com.zhou.android.kotlin.ThrowExceptionActivity;
 import com.zhou.android.kotlin.UndoTestActivity;
 import com.zhou.android.kotlin.album.AsViewPagerActivity;
+import com.zhou.android.livedata.ArticleActivity;
 import com.zhou.android.main.AppSizeActivity;
 import com.zhou.android.main.BroadcastReceiverActivity;
 import com.zhou.android.main.CallLogActivity;
@@ -65,6 +66,7 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
         setTheme(R.style.AppTheme);
         setContentView(R.layout.activity_main);
@@ -113,6 +115,7 @@ public class MainActivity extends AppCompatActivity {
 
             new Thread(() -> {
 
+                list.add(new GridViewItem(ArticleActivity.class, "文章LiveData"));
                 list.add(new GridViewItem(TestRvActivity.class, "刷新加载RV"));
                 list.add(new GridViewItem(VerifyCodeActivity.class, "短信验证码控件"));
                 list.add(new GridViewItem(CameraH264Activity.class, "h264硬编码"));

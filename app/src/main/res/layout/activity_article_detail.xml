@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:focusable="true"
+        android:focusableInTouchMode="true"
+        android:orientation="vertical"
+        android:padding="12dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="标题："
+            android:textColor="@color/black"
+            android:textSize="14sp" />
+
+        <EditText
+            android:id="@+id/etTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:background="@drawable/shape_round_rect"
+            android:gravity="start"
+            android:maxLines="1"
+            android:minLines="1"
+            android:padding="4dp"
+            android:textColor="@color/black"
+            android:textIsSelectable="true"
+            android:textSize="16sp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="内容："
+            android:textColor="@color/black"
+            android:textSize="14sp" />
+
+        <EditText
+            android:id="@+id/etContent"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:background="@drawable/shape_round_rect"
+            android:gravity="start"
+            android:maxLines="15"
+            android:minLines="15"
+            android:padding="4dp"
+            android:textColor="@color/black"
+            android:textIsSelectable="true"
+            android:textSize="16sp" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="图片："
+                android:textColor="@color/black"
+                android:textSize="14sp" />
+
+            <View
+                android:layout_width="0dp"
+                android:layout_height="1dp"
+                android:layout_weight="1" />
+
+            <Button
+                android:id="@+id/btnClean"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:background="@color/colorPrimary"
+                android:text="X"
+                android:textColor="@color/white" />
+        </LinearLayout>
+
+        <EditText
+            android:id="@+id/etImage"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:background="@drawable/shape_round_rect"
+            android:gravity="start"
+            android:maxLines="3"
+            android:minLines="3"
+            android:padding="4dp"
+            android:textColor="@color/black"
+            android:textIsSelectable="true"
+            android:textSize="16sp" />
+
+        <Button
+            android:id="@+id/btnSave"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="15dp"
+            android:text="保存" />
+
+    </LinearLayout>
+</ScrollView>

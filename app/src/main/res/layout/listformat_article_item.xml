@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/layout"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/shape_round_rect"
+    android:padding="4dp">
+
+    <ImageView
+        android:id="@+id/imageCover"
+        android:layout_width="match_parent"
+        android:layout_height="140dp"
+        android:background="@color/light_gray"
+        android:contentDescription="@string/app_name"
+        android:scaleType="fitCenter"
+        android:src="@drawable/ic_camera"
+        android:visibility="gone"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/tvContent"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="6dp"
+        android:layout_marginRight="6dp"
+        android:layout_marginBottom="6dp"
+        android:ellipsize="end"
+        android:maxLines="2"
+        android:text="This is content"
+        android:textColor="#80CBC4"
+        android:textSize="14sp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent" />
+
+    <TextView
+        android:id="@+id/tvTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="6dp"
+        android:ellipsize="end"
+        android:maxLines="1"
+        android:paddingTop="8dp"
+        android:text="This is title"
+        android:textColor="#00897B"
+        android:textSize="16sp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/tvContent" />
+
+</android.support.constraint.ConstraintLayout>
