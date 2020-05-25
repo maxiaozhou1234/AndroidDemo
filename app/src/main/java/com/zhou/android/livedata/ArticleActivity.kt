@@ -7,6 +7,8 @@ import android.content.Context
 import android.content.Intent
 import android.support.v7.widget.LinearLayoutManager
 import android.util.Log
+import android.view.Menu
+import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
@@ -17,6 +19,7 @@ import com.zhou.android.R.layout.listformat_article_item
 import com.zhou.android.common.BaseActivity
 import com.zhou.android.common.CommonRecyclerAdapter
 import com.zhou.android.common.PaddingItemDecoration
+import com.zhou.android.common.toast
 import kotlinx.android.synthetic.main.activity_article.*
 
 /**
@@ -85,6 +88,25 @@ class ArticleActivity : BaseActivity() {
             layoutManager = LinearLayoutManager(this@ArticleActivity, LinearLayoutManager.VERTICAL, false)
             addItemDecoration(PaddingItemDecoration(this@ArticleActivity, 8, 8, 8, 0))
         }
+
+        LiveEventBus.getChannel("test", String::class.java).observe(this, Observer { value ->
+            toast(value!!)
+        })
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.menu_bluetooth, menu)
+        menu?.findItem(R.id.menu_status)?.title = "测试Bus"
+        return true
+//        return super.onCreateOptionsMenu(menu)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
+        if (item?.itemId == R.id.menu_status) {
+            startActivity(Intent(this, LDBusActivity::class.java))
+            return true
+        }
+        return super.onOptionsItemSelected(item)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
