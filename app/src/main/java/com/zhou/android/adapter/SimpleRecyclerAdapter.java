@@ -43,11 +43,11 @@ public class SimpleRecyclerAdapter extends RecyclerView.Adapter<SimpleRecyclerAd
         return data.size();
     }
 
-    class ViewHolder extends RecyclerView.ViewHolder {
+    static class ViewHolder extends RecyclerView.ViewHolder {
 
         TextView text;
 
-        public ViewHolder(View itemView) {
+        ViewHolder(View itemView) {
             super(itemView);
             text = (TextView) itemView.findViewById(R.id.text);
         }

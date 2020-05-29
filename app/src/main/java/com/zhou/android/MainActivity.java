@@ -17,6 +17,7 @@ import com.zhou.android.adapter.GridViewAdapter;
 import com.zhou.android.bluetooth.BluetoothActivity;
 import com.zhou.android.item.GridViewItem;
 import com.zhou.android.kotlin.AnalysisDecorActivity;
+import com.zhou.android.kotlin.AnimRecyclerActivity;
 import com.zhou.android.kotlin.NtpTimeActivity;
 import com.zhou.android.kotlin.SimpleListKotlinActivity;
 import com.zhou.android.kotlin.StorageCleanActivity;
@@ -115,6 +116,7 @@ public class MainActivity extends AppCompatActivity {
 
             new Thread(() -> {
 
+                list.add(new GridViewItem(AnimRecyclerActivity.class, "拖拽 RV"));
                 list.add(new GridViewItem(ArticleActivity.class, "文章LiveData"));
                 list.add(new GridViewItem(TestRvActivity.class, "刷新加载RV"));
                 list.add(new GridViewItem(VerifyCodeActivity.class, "短信验证码控件"));

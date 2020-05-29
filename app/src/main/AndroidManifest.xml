@@ -289,6 +289,12 @@
             android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustResize|stateAlwaysHidden" />
 
+        <activity
+            android:name=".kotlin.AnimRecyclerActivity"
+            android:hardwareAccelerated="true"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="adjustResize|stateAlwaysHidden" />
+
 
         <service
             android:name=".service.FloatBallService"
