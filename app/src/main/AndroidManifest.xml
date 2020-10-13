@@ -33,6 +33,7 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
+        tools:ignore="LockedOrientationActivity"
         tools:replace="android:allowBackup">
         <provider
             android:name="android.support.v4.content.FileProvider"
@@ -294,7 +295,11 @@
             android:hardwareAccelerated="true"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustResize|stateAlwaysHidden" />
-
+        <activity
+            android:name=".main.RippleActivity"
+            android:hardwareAccelerated="true"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="adjustResize|stateAlwaysHidden" />
 
         <service
             android:name=".service.FloatBallService"

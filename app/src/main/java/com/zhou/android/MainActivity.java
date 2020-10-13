@@ -44,6 +44,7 @@ import com.zhou.android.main.PhotoPickerActivity;
 import com.zhou.android.main.PointZoomActivity;
 import com.zhou.android.main.PreviewWithCamera2Activity;
 import com.zhou.android.main.RecyclerViewScrollActivity;
+import com.zhou.android.main.RippleActivity;
 import com.zhou.android.main.RoundViewActivity;
 import com.zhou.android.main.ScrollTestActivity;
 import com.zhou.android.main.StorageActivity;
@@ -116,6 +117,7 @@ public class MainActivity extends AppCompatActivity {
 
             new Thread(() -> {
 
+                list.add(new GridViewItem(RippleActivity.class, "水波纹"));
                 list.add(new GridViewItem(AnimRecyclerActivity.class, "拖拽 RV"));
                 list.add(new GridViewItem(ArticleActivity.class, "文章LiveData"));
                 list.add(new GridViewItem(TestRvActivity.class, "刷新加载RV"));

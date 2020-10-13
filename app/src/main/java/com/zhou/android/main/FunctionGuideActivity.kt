@@ -9,6 +9,7 @@ import com.zhou.android.R
 import com.zhou.android.common.BaseActivity
 import kotlinx.android.synthetic.main.activity_function_guide.*
 import tourguide.tourguide.Overlay
+import tourguide.tourguide.ToolTip
 import tourguide.tourguide.TourGuide
 
 /**
@@ -33,38 +34,60 @@ class FunctionGuideActivity : BaseActivity() {
     }
 
     override fun init() {
-        firstGuide = TourGuide.create(this) {
-            pointer {}
+        firstGuide = TourGuide.init(this).apply {
 
-            toolTip {
-                title { "界面展示区域" }
-                description { "你的产品会在这里显示" }
+//            pointer {}
+
+            setToolTip(ToolTip().apply {
+                setTitle("界面展示区域")
+                setDescription("你的产品会在这里显示")
                 setOnClickListener(View.OnClickListener {
                     cleanUp()
                     secondGuide.playOn(btnLike)
                 })
-            }
-            overlay {
-                style { Overlay.Style.ROUNDED_RECTANGLE }
-                backgroundColor { Color.parseColor("#ffc3c3c3") }
-            }
+            })
+//            toolTip {
+//                title { "界面展示区域" }
+//                description { "你的产品会在这里显示" }
+//                setOnClickListener(View.OnClickListener {
+//                    cleanUp()
+//                    secondGuide.playOn(btnLike)
+//                })
+//            }
+            setOverlay(Overlay().apply {
+                setStyle(Overlay.Style.ROUNDED_RECTANGLE)
+                setBackgroundColor(Color.parseColor("#ffc3c3c3"))
+            })
+//            overlay {
+//                style { Overlay.Style.ROUNDED_RECTANGLE }
+//                backgroundColor { Color.parseColor("#ffc3c3c3") }
+//            }
         }.with(TourGuide.Technique.HORIZONTAL_LEFT)
                 .motionType(TourGuide.MotionType.ALLOW_ALL)
                 .playOn(tvShow)
 
-        secondGuide = TourGuide.create(this) {
-            pointer {}
+        secondGuide = TourGuide.init(this).apply {
+//            pointer {}
+//
+//            toolTip {
+//                title { "给你喜欢的产品点赞" }
+//                setOnClickListener(View.OnClickListener { cleanUp() })
+//                gravity {
+//                    Gravity.LEFT
+//                }
+//            }
+//            overlay {
+//                backgroundColor { Color.parseColor("#ffc3c3c3") }
+//            }
+            setToolTip(ToolTip().apply {
+                setTitle("给你喜欢的产品点赞")
+                setOnClickListener { cleanUp() }
+                setGravity(Gravity.LEFT)
+            })
+            setOverlay(Overlay().apply {
+                setBackgroundColor(Color.parseColor("#ffc3c3c3"))
+            })
 
-            toolTip {
-                title { "给你喜欢的产品点赞" }
-                setOnClickListener(View.OnClickListener { cleanUp() })
-                gravity {
-                    Gravity.LEFT
-                }
-            }
-            overlay {
-                backgroundColor { Color.parseColor("#ffc3c3c3") }
-            }
         }.with(TourGuide.Technique.CLICK)
                 .motionType(TourGuide.MotionType.ALLOW_ALL)
     }
