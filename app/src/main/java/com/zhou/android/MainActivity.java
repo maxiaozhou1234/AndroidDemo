@@ -47,6 +47,7 @@ import com.zhou.android.main.RecyclerViewScrollActivity;
 import com.zhou.android.main.RippleActivity;
 import com.zhou.android.main.RoundViewActivity;
 import com.zhou.android.main.ScrollTestActivity;
+import com.zhou.android.main.SlideMenuActivity;
 import com.zhou.android.main.StorageActivity;
 import com.zhou.android.main.SurfaceActivity;
 import com.zhou.android.main.TestRvActivity;
@@ -117,6 +118,7 @@ public class MainActivity extends AppCompatActivity {
 
             new Thread(() -> {
 
+                list.add(new GridViewItem(SlideMenuActivity.class, "滑动-更多"));
                 list.add(new GridViewItem(RippleActivity.class, "水波纹"));
                 list.add(new GridViewItem(AnimRecyclerActivity.class, "拖拽 RV"));
                 list.add(new GridViewItem(ArticleActivity.class, "文章LiveData"));
