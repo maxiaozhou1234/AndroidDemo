@@ -15,3 +15,4 @@ fun Disposable.addToComposite(composite: CompositeDisposable) = composite.add(th
 fun Activity.toast(text: CharSequence, duration: Int = Toast.LENGTH_LONG) = Toast.makeText(this, text, duration).show()
 
 fun String.text() = Editable.Factory.getInstance().newEditable(this)!!
+fun String.editable() = Editable.Factory.getInstance().newEditable(this)!!

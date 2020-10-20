@@ -1,64 +1,68 @@
 package com.zhou.android.main
 
-import android.animation.ObjectAnimator
-import android.view.animation.AnticipateInterpolator
-import android.view.animation.AnticipateOvershootInterpolator
-import android.view.animation.OvershootInterpolator
 import com.zhou.android.R
 import com.zhou.android.common.BaseActivity
-import com.zhou.android.common.toast
+import com.zhou.android.common.editable
 import kotlinx.android.synthetic.main.activity_slide_menu.*
 
 /**
- * 滑动显示更多菜单
+ * 滑动显示更多菜单练习
+ * 项目使用，建议 'com.github.mcxtzhang:SwipeDelMenuLayout:V1.3.0'
  * Created by mxz on 2020/10/15.
  */
 class SlideMenuActivity : BaseActivity() {
 
-    private var width = 0f
-
     override fun setContentView() {
         setContentView(R.layout.activity_slide_menu)
-        view.post {
-            width = resources.displayMetrics.widthPixels.toFloat() - view.width - 50f
-        }
     }
 
     override fun addListener() {
-        btnA.setOnClickListener {
-            ObjectAnimator.ofFloat(view, "translationX", 50f, width).apply {
-                duration = 1200
-                interpolator = AnticipateOvershootInterpolator()
-            }.start()
+
+        //----------------------------------------------
+        tv3.setOnClickListener {
+            tvLog.text = "cover 左滑模式".editable()
+        }
+        btn6.setOnClickListener {
+            tvLog.text = "置顶 cover".editable()
+        }
+        btn7.setOnClickListener {
+            tvLog.text = "删除 cover".editable()
         }
 
-        btnB.setOnClickListener {
-            ObjectAnimator.ofFloat(view, "translationX", 50f, width).apply {
-                duration = 1200
-                interpolator = AnticipateInterpolator()
-            }.start()
+        //----------------------------------------------
+        tv4.setOnClickListener {
+            tvLog.text = "cover 右滑模式".editable()
         }
-
-        btnC.setOnClickListener {
-            ObjectAnimator.ofFloat(view, "translationX", 50f, width).apply {
-                duration = 1200
-                interpolator = OvershootInterpolator()
-            }.start()
+        btn8.setOnClickListener {
+            tvLog.text = "取消置顶".editable()
         }
-
-        btnReset.setOnClickListener {
-            view.translationX = 0f
-            view.translationY = 0f
+        btn9.setOnClickListener {
+            tvLog.text = "清空".editable()
         }
-
-        tv1.setOnClickListener {
-            toast("选项 A")
+        //----------------------------------------------
+        tv5.setOnClickListener {
+            tvLog.text = "expand 左滑模式".editable()
         }
-        tv2.setOnClickListener {
-            toast("选项 B")
+        btn10.setOnClickListener {
+            tvLog.text = "expand 打开".editable()
+        }
+        btn11.setOnClickListener {
+            tvLog.text = "expand 关闭".editable()
+        }
+        //----------------------------------------------
+        tv6.setOnClickListener {
+            tvLog.text = "expand 右滑模式".editable()
+        }
+        btn12.setOnClickListener {
+            tvLog.text = "右滑打开".editable()
+        }
+        btn13.setOnClickListener {
+            tvLog.text = "右滑关闭".editable()
         }
     }
 
     override fun init() {
+
+//        ViewDragHelper
     }
 }
