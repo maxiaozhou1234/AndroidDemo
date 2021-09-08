@@ -14,4 +14,13 @@
 
     <color name="gray">#407D7979</color>
     <color name="MediumTurquoise">#26A69A</color>
+
+    <color name="text_color_day">#141313</color>
+    <color name="text_color_night">#A29D9D</color>
+
+    <color name="button_color_day">#A5D6A7</color>
+    <color name="button_color_night">#055C53</color>
+
+    <color name="page_color_day">#9FA8DA</color>
+    <color name="page_color_night">#A5D6A7</color>
 </resources>

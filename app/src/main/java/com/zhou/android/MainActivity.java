@@ -47,6 +47,8 @@ import com.zhou.android.main.RecyclerViewScrollActivity;
 import com.zhou.android.main.RippleActivity;
 import com.zhou.android.main.RoundViewActivity;
 import com.zhou.android.main.ScrollTestActivity;
+import com.zhou.android.main.SkinActivity;
+import com.zhou.android.main.SkinExternalResActivity;
 import com.zhou.android.main.SlideMenuActivity;
 import com.zhou.android.main.StorageActivity;
 import com.zhou.android.main.SurfaceActivity;
@@ -117,6 +119,9 @@ public class MainActivity extends AppCompatActivity {
         if (list.size() == 0) {
 
             new Thread(() -> {
+
+                list.add(new GridViewItem(SkinActivity.class, "白天/黑暗"));
+                list.add(new GridViewItem(SkinExternalResActivity.class, "换肤 Res"));
 
                 list.add(new GridViewItem(SlideMenuActivity.class, "滑动-更多"));
                 list.add(new GridViewItem(RippleActivity.class, "水波纹"));
