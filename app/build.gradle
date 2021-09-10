@@ -66,7 +66,9 @@ dependencies {
     implementation 'android.arch.lifecycle:viewmodel:1.1.1'
     implementation 'android.arch.lifecycle:extensions:1.1.1'
     implementation 'android.arch.lifecycle:runtime:1.1.1'
+    implementation project(path: ':IPay')//插件 apk 只能使用 compileOnly 只参与编译不加入代码
 //    implementation 'com.github.mcxtzhang:SwipeDelMenuLayout:V1.3.0'
+
 
 }
 
