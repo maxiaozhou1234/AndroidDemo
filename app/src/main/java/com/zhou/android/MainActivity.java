@@ -18,7 +18,10 @@ import com.zhou.android.bluetooth.BluetoothActivity;
 import com.zhou.android.item.GridViewItem;
 import com.zhou.android.kotlin.AnalysisDecorActivity;
 import com.zhou.android.kotlin.AnimRecyclerActivity;
+import com.zhou.android.kotlin.OrderFragmentActivity;
+import com.zhou.android.kotlin.LargeImageActivity;
 import com.zhou.android.kotlin.NtpTimeActivity;
+import com.zhou.android.kotlin.RecyclerSwipeActivity;
 import com.zhou.android.kotlin.SimpleListKotlinActivity;
 import com.zhou.android.kotlin.StorageCleanActivity;
 import com.zhou.android.kotlin.ThrowExceptionActivity;
@@ -116,12 +119,15 @@ public class MainActivity extends AppCompatActivity {
 
             new Thread(() -> {
 
+                list.add(new GridViewItem(RecyclerSwipeActivity.class, "侧滑删除"));
+                list.add(new GridViewItem(OrderFragmentActivity.class, "协程测试"));
+                list.add(new GridViewItem(PreviewWithCamera2Activity.class, "预览帧拍照"));
+                list.add(new GridViewItem(LargeImageActivity.class, "大图加载"));
                 list.add(new GridViewItem(AnimRecyclerActivity.class, "拖拽 RV"));
                 list.add(new GridViewItem(ArticleActivity.class, "文章LiveData"));
                 list.add(new GridViewItem(TestRvActivity.class, "刷新加载RV"));
                 list.add(new GridViewItem(VerifyCodeActivity.class, "短信验证码控件"));
                 list.add(new GridViewItem(CameraH264Activity.class, "h264硬编码"));
-                list.add(new GridViewItem(PreviewWithCamera2Activity.class, "预览帧拍照"));
                 list.add(new GridViewItem(TimeLineActivity.class, "时间线"));
                 list.add(new GridViewItem(FunctionGuideActivity.class, "功能引导"));
                 list.add(new GridViewItem(RoundViewActivity.class, "圆形图片"));

@@ -35,7 +35,7 @@ class ActivityMonitor {
         val holder = ActivityMonitor()
     }
 
-    fun attach(context: Context, list: ArrayList<Any>) {
+    fun attach(context: Context, list: ArrayList<*>) {
         Log.d("zhou", "attach $context")
         this@ActivityMonitor.context = context
         if (list.isNotEmpty()) {

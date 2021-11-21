@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <com.zhou.android.ui.RecyclerSwipeDeleteView
+        android:id="@+id/recyclerSwipe"
+        android:layout_width="match_parent"
+        android:layout_height="120dp"
+        android:background="@color/color_asbestos"
+        android:padding="10dp">
+
+        <Button
+            style="@style/Widget.AppCompat.Button.Borderless"
+            android:layout_width="88dp"
+            android:layout_height="match_parent"
+            android:layout_gravity="right"
+            android:text="删除" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/color_green_sea"
+            android:gravity="center_vertical"
+            android:paddingLeft="20dp"
+            android:text="测试显示 Item"
+            android:textColor="@color/white"
+            android:textSize="22sp" />
+
+    </com.zhou.android.ui.RecyclerSwipeDeleteView>
+
+    <Button
+        android:id="@+id/btnReset"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="10dp"
+        android:text="重置" />
+</LinearLayout>

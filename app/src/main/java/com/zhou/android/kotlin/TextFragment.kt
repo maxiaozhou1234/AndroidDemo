@@ -1,6 +1,9 @@
 package com.zhou.android.kotlin
 
+import android.graphics.Color
 import android.os.Bundle
+import android.support.annotation.ColorInt
+import android.support.annotation.ColorRes
 import android.support.v4.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -13,7 +16,11 @@ import com.zhou.android.R
  */
 class TextFragment : Fragment() {
 
-    var text: TextView? = null
+    private var text: TextView? = null
+    private var str = ""
+    private var color = Color.WHITE
+
+    var mark = 0
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
 
@@ -21,7 +28,25 @@ class TextFragment : Fragment() {
         return text
     }
 
-    fun setText(str: String) {
+    override fun onViewCreated(view: View?, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
         text?.text = str
+        text?.setBackgroundColor(color)
+    }
+
+    fun setText(_str: String) {
+        if (text == null) {
+            str = _str
+        } else {
+            text?.text = _str
+        }
+    }
+
+    fun bg(@ColorInt c: Int) {
+        if (text == null) {
+            color = c
+        } else {
+            text?.setBackgroundColor(c)
+        }
     }
 }

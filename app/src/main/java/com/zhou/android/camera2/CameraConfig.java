@@ -5,9 +5,14 @@ import android.graphics.SurfaceTexture;
 import android.hardware.camera2.CameraAccessException;
 import android.hardware.camera2.CameraCaptureSession;
 import android.hardware.camera2.CameraDevice;
+import android.hardware.camera2.CameraMetadata;
+import android.hardware.camera2.CaptureFailure;
 import android.hardware.camera2.CaptureRequest;
+import android.hardware.camera2.TotalCaptureResult;
+import android.hardware.camera2.params.OutputConfiguration;
 import android.hardware.camera2.params.StreamConfigurationMap;
 import android.media.ImageReader;
+import android.media.MediaRecorder;
 import android.os.Build;
 import android.os.Handler;
 import android.support.annotation.NonNull;
@@ -21,6 +26,7 @@ import android.view.SurfaceView;
 import android.view.TextureView;
 import android.view.View;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -43,7 +49,7 @@ public class CameraConfig {
     String cameraId;
     private CameraDevice cameraDevice;
     private CaptureRequest.Builder captureRequestBuilder;
-    private CameraCaptureSession cameraCaptureSession;
+    private CameraCaptureSession cameraCaptureSession, recordSession;
     CameraDevice.StateCallback cameraStateCallback;
 
     private int type = -1;
@@ -53,9 +59,10 @@ public class CameraConfig {
     private ImageReader imageReader;
     private View view;
     private OnImageAvailableListener imageAvailableListener;
-    private Size largest;
+    private Size largest, videoSize;
 
     private StreamConfigurationMap streamConfigurationMap;
+    private MediaRecorder mediaRecorder = null;
 
     public CameraConfig(String cameraId, StreamConfigurationMap map, @Nullable View view, OnImageAvailableListener listener, Handler handler) {
         if (view != null) {
@@ -68,7 +75,6 @@ public class CameraConfig {
                 throw new IllegalArgumentException("不支持类型");
             }
         }
-
         this.streamConfigurationMap = map;
         this.cameraId = cameraId;
         this.imageAvailableListener = listener;
@@ -83,7 +89,9 @@ public class CameraConfig {
         }
         Log.e(TAG, "current ImageFormat = " + format);
         largest = calculationSize(map);
-        Log.d(TAG, "width = " + largest.getWidth() + " height = " + largest.getHeight());
+        videoSize = calculationVideoSize(map, format);
+        Log.d(TAG, "largest >> width = " + largest.getWidth() + " height = " + largest.getHeight());
+        Log.d(TAG, "video >> width = " + videoSize.getWidth() + " height = " + videoSize.getHeight());
         //三通道 YUV  YV12,YUV_420_888,不支持 NV21
         imageReader = ImageReader.newInstance(largest.getWidth(), largest.getHeight(), format, 1);
         imageReader.setOnImageAvailableListener(imageAvailableListener, handler);
@@ -194,9 +202,25 @@ public class CameraConfig {
             }
         }
 
+        if (recordSession != null) {
+            try {
+                recordSession.stopRepeating();
+                recordSession.close();
+                recordSession = null;
+            } catch (CameraAccessException e) {
+                e.printStackTrace();
+            }
+        }
+
         if (cameraDevice != null) {
             cameraDevice.close();
             cameraDevice = null;
+        }
+
+        if (mediaRecorder != null) {
+            stopRecordVideo();
+            mediaRecorder.release();
+            mediaRecorder = null;
         }
     }
 
@@ -299,8 +323,162 @@ public class CameraConfig {
         return null;
     }
 
+    private Size calculationVideoSize(StreamConfigurationMap map, int format) {
+        if (map != null) {
+            return Collections.max(Arrays.asList(map.getOutputSizes(format)),
+                    new Comparator<Size>() {
+                        @Override
+                        public int compare(Size lhs, Size rhs) {
+                            return Long.signum((long) lhs.getWidth() * lhs.getHeight() -
+                                    (long) rhs.getWidth() * rhs.getHeight());
+                        }
+                    });
+        }
+        return null;
+    }
+
     public View getPreviewView() {
         return view;
+    }
+
+    private void resetCapturePreview() {
+        if (cameraCaptureSession != null)
+            try {
+                cameraCaptureSession.setRepeatingRequest(captureRequestBuilder.build(), null, handler);
+            } catch (CameraAccessException e) {
+                e.printStackTrace();
+            }
+    }
+
+    void capturePicture() {
+        if (cameraDevice == null) {
+            return;
+        }
+
+        try {
+            final CaptureRequest.Builder builder = cameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW);
+
+            builder.addTarget(imageReader.getSurface());
+
+            Surface surface = getSurface();
+            if (surface != null && surface.isValid()) {
+                builder.addTarget(surface);
+            }
+
+            cameraCaptureSession.stopRepeating();
+            cameraCaptureSession.abortCaptures();
+
+            cameraCaptureSession.capture(builder.build(), new CameraCaptureSession.CaptureCallback() {
+                @Override
+                public void onCaptureCompleted(@NonNull CameraCaptureSession session, @NonNull CaptureRequest request, @NonNull TotalCaptureResult result) {
+                    resetCapturePreview();
+                    Log.i("zhou", "onCaptureCompleted");
+                }
+
+                @Override
+                public void onCaptureFailed(@NonNull CameraCaptureSession session, @NonNull CaptureRequest request, @NonNull CaptureFailure failure) {
+                    resetCapturePreview();
+                    Log.i("zhou", "onCaptureFailed");
+                }
+            }, handler);
+
+        } catch (CameraAccessException e) {
+            e.printStackTrace();
+        }
+    }
+
+    void startRecordVideo(String outputPath) throws IOException {
+        if (cameraDevice == null) {
+            return;
+        }
+
+        if (mediaRecorder == null) {
+            mediaRecorder = new MediaRecorder();
+            mediaRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
+            mediaRecorder.setVideoSource(MediaRecorder.VideoSource.SURFACE);
+            //先设置源，再设置视频输出，编码
+            mediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4);
+            mediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AAC);
+            mediaRecorder.setVideoEncoder(MediaRecorder.VideoEncoder.H264);
+            mediaRecorder.setVideoFrameRate(30);
+//            mediaRecorder.setVideoEncodingBitRate(10000000);
+        }
+
+        mediaRecorder.setVideoSize(videoSize.getWidth(), videoSize.getHeight());
+        mediaRecorder.setOrientationHint(imageAvailableListener.getOrientation());
+        mediaRecorder.setOutputFile(outputPath);
+        mediaRecorder.prepare();
+
+        try {
+            final CaptureRequest.Builder builder = cameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_RECORD);
+
+            List<Surface> output = new ArrayList<>();
+//            output.add(imageReader.getSurface());
+//            builder.addTarget(imageReader.getSurface());
+
+            output.add(mediaRecorder.getSurface());
+            builder.addTarget(mediaRecorder.getSurface());
+            //用于预览画面显示
+            Surface surface = getSurface();
+            if (surface != null && surface.isValid()) {
+                output.add(surface);
+                builder.addTarget(surface);
+            }
+            builder.set(CaptureRequest.CONTROL_AF_MODE, CaptureRequest.CONTROL_AF_MODE_CONTINUOUS_VIDEO);
+            builder.set(CaptureRequest.CONTROL_MODE, CameraMetadata.CONTROL_MODE_AUTO);
+
+            cameraCaptureSession.stopRepeating();
+            cameraCaptureSession.abortCaptures();
+
+            cameraDevice.createCaptureSession(output, new CameraCaptureSession.StateCallback() {
+                @Override
+                public void onConfigured(@NonNull CameraCaptureSession session) {
+                    try {
+                        recordSession = session;
+
+                        mediaRecorder.start();
+                        session.setRepeatingRequest(builder.build(), null, handler);
+                    } catch (CameraAccessException e) {
+                        e.printStackTrace();
+                    }
+                }
+
+                @Override
+                public void onConfigureFailed(@NonNull CameraCaptureSession session) {
+
+                }
+            }, handler);
+
+        } catch (CameraAccessException e) {
+            e.printStackTrace();
+        }
+    }
+
+    void stopRecordVideo() {
+
+        if (cameraDevice == null) {
+            return;
+        }
+
+        if (mediaRecorder != null) {
+            mediaRecorder.stop();
+            mediaRecorder.reset();
+        }
+
+        try {
+            recordSession.stopRepeating();
+            recordSession.abortCaptures();
+            recordSession.close();
+            recordSession = null;
+        } catch (CameraAccessException e) {
+            e.printStackTrace();
+        }
+
+        createCameraSession();
+    }
+
+    void capturePictureWhileRecord() {
+
     }
 
 }

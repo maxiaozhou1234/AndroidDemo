@@ -9,23 +9,27 @@ import android.hardware.camera2.CameraAccessException;
 import android.hardware.camera2.CameraCharacteristics;
 import android.hardware.camera2.CameraManager;
 import android.hardware.camera2.params.StreamConfigurationMap;
+import android.media.CamcorderProfile;
 import android.media.Image;
 import android.media.ImageReader;
 import android.os.Build;
 import android.os.Handler;
 import android.os.HandlerThread;
+import android.os.Looper;
 import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
 import android.support.annotation.RequiresPermission;
 import android.support.v4.app.ActivityCompat;
 import android.util.ArrayMap;
 import android.util.Log;
+import android.util.Range;
 import android.util.Size;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.zhou.android.common.ToastUtils;
 
+import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.Collection;
 
@@ -37,13 +41,15 @@ import java.util.Collection;
 public class CameraUtil {
 
     private final static String TAG = "camera_util";
+
     private final static String FRONT = "CAMERA_FRONT";
     private final static String BACK = "CAMERA_BACK";
-    private boolean isCameraBack = true;
+
+    private String cameraName = BACK;
     private boolean autoFixSurface = true;
 
     private CameraManager cameraManager;
-    private Handler handler;
+    private Handler workHandler, mainHandler;
     private HandlerThread handlerThread;
 
     private ArrayMap<String, CameraConfig> cameraConfig = new ArrayMap<>();
@@ -108,15 +114,44 @@ public class CameraUtil {
                 StreamConfigurationMap map = characteristics.get(
                         CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP);
                 if (cameraOrientation == CameraCharacteristics.LENS_FACING_FRONT) {
-                    CameraConfig config = new CameraConfig(id, map, frontTextureView, frontAvailableListener, handler);
+                    CameraConfig config = new CameraConfig(id, map, frontTextureView, frontAvailableListener, workHandler);
                     config.setSurfaceCallback(surfaceCallback);
                     frontAvailableListener.setOrientation(sensorOrientation);
                     cameraConfig.put(FRONT, config);
                 } else if (cameraOrientation == CameraCharacteristics.LENS_FACING_BACK) {
-                    CameraConfig config = new CameraConfig(id, map, backTextureView, backAvailableListener, handler);
+                    CameraConfig config = new CameraConfig(id, map, backTextureView, backAvailableListener, workHandler);
                     config.setSurfaceCallback(surfaceCallback);
                     backAvailableListener.setOrientation(sensorOrientation);
                     cameraConfig.put(BACK, config);
+
+                    //日志输出
+                    {
+                        Log.d("zhou","========================================");
+                        Size[] list = map.getOutputSizes(ImageFormat.JPEG);
+                        StringBuilder sb = new StringBuilder();
+                        for (Size size : list) {
+                            sb.append("\nsize: ").append(size.getWidth())
+                                    .append(" x ").append(size.getHeight());
+                        }
+                        Log.d("zhou", sb.toString());
+
+                        for (Range<Integer> fpsRange : map.getHighSpeedVideoFpsRanges()) {
+                            Log.d("zhou", "openCamera: [width, height] = " + fpsRange.toString());
+                        }
+
+                        Log.d("zhou", "LENS_FACING_BACK");
+                        Log.d("zhou", "720 x 480 QUALITY_HIGH_SPEED_480P " + CamcorderProfile.hasProfile(1, CamcorderProfile.QUALITY_HIGH_SPEED_480P));
+                        Log.d("zhou", "1280 x 720 QUALITY_HIGH_SPEED_720P " + CamcorderProfile.hasProfile(1, CamcorderProfile.QUALITY_HIGH_SPEED_720P));
+                        Log.d("zhou", "1920 x 1080 QUALITY_HIGH_SPEED_1080P " + CamcorderProfile.hasProfile(1, CamcorderProfile.QUALITY_HIGH_SPEED_1080P));
+                        Log.d("zhou", "3840 x 2160 QUALITY_HIGH_SPEED_2160P " + CamcorderProfile.hasProfile(1, CamcorderProfile.QUALITY_HIGH_SPEED_2160P));
+
+                        Log.d("zhou", "720 x 480 QUALITY_480P " + CamcorderProfile.hasProfile(1, CamcorderProfile.QUALITY_480P));
+                        Log.d("zhou", "1280 x 720 QUALITY_720P " + CamcorderProfile.hasProfile(1, CamcorderProfile.QUALITY_720P));
+                        Log.d("zhou", "1920 x 1080 QUALITY_1080P " + CamcorderProfile.hasProfile(1, CamcorderProfile.QUALITY_1080P));
+                        Log.d("zhou", "3840 x 2160 QUALITY_2160P " + CamcorderProfile.hasProfile(1, CamcorderProfile.QUALITY_2160P));
+
+                    }
+
                 }
             }
         } catch (CameraAccessException e) {
@@ -127,7 +162,9 @@ public class CameraUtil {
     private void initHandlerThread() {
         handlerThread = new HandlerThread("CameraThread");
         handlerThread.start();
-        handler = new Handler(handlerThread.getLooper());
+        workHandler = new Handler(handlerThread.getLooper());
+
+        mainHandler = new Handler(Looper.getMainLooper());
     }
 
     private void stopHandlerThread() {
@@ -135,10 +172,14 @@ public class CameraUtil {
         try {
             handlerThread.join();
             handlerThread = null;
-            handler = null;
+            workHandler.removeCallbacksAndMessages(null);
+            workHandler = null;
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+
+        mainHandler.removeCallbacksAndMessages(null);
+        mainHandler = null;
     }
 
     /**
@@ -164,7 +205,7 @@ public class CameraUtil {
         Log.d(TAG, "camera release.");
 //        previewFrameCallback = null;
         onImageAvailableListener = null;
-        CameraConfig config = cameraConfig.get(isCameraBack ? BACK : FRONT);
+        CameraConfig config = cameraConfig.get(cameraName);
         if (cameraConfig != null)
             config.release();
         stopHandlerThread();
@@ -176,14 +217,14 @@ public class CameraUtil {
             cameraManager = (CameraManager) context.getSystemService(Context.CAMERA_SERVICE);
         }
         capacity = -1;
-        CameraConfig config = cameraConfig.get(isCameraBack ? BACK : FRONT);
+        CameraConfig config = cameraConfig.get(cameraName);
         if (config != null) {
             config.startPreview();
         }
     }
 
     public void stopPreview() {
-        CameraConfig config = cameraConfig.get(isCameraBack ? BACK : FRONT);
+        CameraConfig config = cameraConfig.get(cameraName);
         if (cameraConfig != null) {
             config.onPause();
         }
@@ -193,28 +234,32 @@ public class CameraUtil {
     @RequiresPermission(android.Manifest.permission.CAMERA)
     private void openCamera(CameraManager cameraManager, CameraConfig config) {
         try {
-            cameraManager.openCamera(config.cameraId, config.cameraStateCallback, handler);
+            cameraManager.openCamera(config.cameraId, config.cameraStateCallback, workHandler);
         } catch (CameraAccessException e) {
             e.printStackTrace();
         }
     }
 
     public void switchCamera() {
-        CameraConfig config = cameraConfig.get(isCameraBack ? BACK : FRONT);
+        CameraConfig config = cameraConfig.get(cameraName);
         if (cameraConfig != null) {
             config.onPause();
         }
-        isCameraBack = !isCameraBack;
+        if (BACK.equals(cameraName)) {
+            cameraName = FRONT;
+        } else {
+            cameraName = BACK;
+        }
         startPreview(null);
     }
 
     public void setDefaultCamera(boolean useBackCamera) {
-        isCameraBack = useBackCamera;
+        cameraName = useBackCamera ? BACK : FRONT;
     }
 
     public Size getSize() {
         Size size = null;
-        CameraConfig config = cameraConfig.get(isCameraBack ? BACK : FRONT);
+        CameraConfig config = cameraConfig.get(cameraName);
         if (config != null) {
             size = config.getSize();
         }
@@ -318,6 +363,22 @@ public class CameraUtil {
 
     //旋转角度
     public int getSensorOrientation() {
-        return isCameraBack ? backAvailableListener.getOrientation() : frontAvailableListener.getOrientation();
+        return BACK.equals(cameraName) ? backAvailableListener.getOrientation() : frontAvailableListener.getOrientation();
+    }
+
+    public void capturePicture() {
+        cameraConfig.get(cameraName).capturePicture();
+    }
+
+    public void startRecordVideo(String outputPath) throws IOException {
+        cameraConfig.get(cameraName).startRecordVideo(outputPath);
+    }
+
+    public void stopRecordVideo() {
+        cameraConfig.get(cameraName).stopRecordVideo();
+    }
+
+    public void capturePictureWhileRecord() {
+        cameraConfig.get(cameraName).capturePictureWhileRecord();
     }
 }

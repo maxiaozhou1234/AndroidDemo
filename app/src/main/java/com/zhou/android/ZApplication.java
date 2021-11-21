@@ -3,6 +3,7 @@ package com.zhou.android;
 import android.app.Application;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.support.multidex.MultiDex;
 
 import com.zhou.android.common.GV;
 import com.zhou.android.kotlin.ActivityMonitor;
@@ -36,8 +37,9 @@ public class ZApplication extends Application {
     @Override
     protected void attachBaseContext(Context base) {
         super.attachBaseContext(base);
+        MultiDex.install(base);
         ArrayList uncheck = new ArrayList<Class>();
         uncheck.add(MainActivity.class);
-        ActivityMonitor.get().attach(base,uncheck);
+        ActivityMonitor.get().attach(base, uncheck);
     }
 }

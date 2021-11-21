@@ -85,14 +85,30 @@ class PreviewWithCamera2Activity : AppCompatActivity() {
                 toast("不支持的编码格式")
             }
         }
-
     }
 
     private fun addListener() {
         btnRecord.setOnClickListener {
+
+            if (PackageManager.PERMISSION_GRANTED != ActivityCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO)) {
+                Log.d("zhou","没有权限")
+                val rxPermissions = RxPermissions(this)
+                composite.add(rxPermissions.request(Manifest.permission.RECORD_AUDIO)
+                        .subscribe { result ->
+                            if (result) {
+                                it.performClick()
+                            } else {
+                                toast("没有权限")
+                            }
+                        })
+
+                return@setOnClickListener
+            }
+
             val state = !btnRecord.isSelected
             if (state) {
                 toast("开始录屏")
+                cameraUtil?.startRecordVideo("$picturePath${System.currentTimeMillis()}.mp4")
 //                if (cameraUtil != null) {
 //                    avcEncoder?.release()
 //                    val size = cameraUtil!!.size
@@ -115,6 +131,7 @@ class PreviewWithCamera2Activity : AppCompatActivity() {
 //                }
             } else {
                 toast("停止录屏")
+                cameraUtil?.stopRecordVideo()
 //                videoRecord = false
 //                avcEncoder?.run {
 //                    release()
@@ -142,7 +159,10 @@ class PreviewWithCamera2Activity : AppCompatActivity() {
 
         btnShot.setOnClickListener {
             if (PackageManager.PERMISSION_GRANTED == ActivityCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
-                takePic = true
+//                takePic = true
+
+                cameraUtil?.capturePicture()
+
             } else {
                 val context = this@PreviewWithCamera2Activity
                 val rxPermissions = RxPermissions(context)
@@ -232,7 +252,7 @@ class PreviewWithCamera2Activity : AppCompatActivity() {
         override fun onImageAvailable(reader: ImageReader) {
 
             val image = reader.acquireLatestImage()
-
+            Log.d("zhou", "================= onImageAvailable =================")
             if (takePic) {
                 //这里是 YUV420SemiPlanar yyyyuvuv 通道二三数据一致，只是二通道是 uv 间隔，三通道是 vu 间隔
 
