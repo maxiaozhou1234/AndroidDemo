@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <declare-styleable name="SlideMenuLayout">
+        <attr name="view_style" format="enum">
+            <enum name="expand" value="0" />
+            <enum name="cover" value="1" />
+        </attr>
+        <attr name="swipe_direction" format="enum">
+            <!--左滑-->
+            <enum name="leftSwipe" value="0" />
+            <!--右滑-->
+            <enum name="rightSwipe" value="1" />
+        </attr>
+    </declare-styleable>
+</resources>

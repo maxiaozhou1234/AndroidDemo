@@ -17,6 +17,8 @@ import java.util.List;
 
 public class ZApplication extends Application {
 
+    public static Context context;
+
     @Override
     public void onCreate() {
         super.onCreate();
@@ -37,9 +39,10 @@ public class ZApplication extends Application {
     @Override
     protected void attachBaseContext(Context base) {
         super.attachBaseContext(base);
+        context = base;
         MultiDex.install(base);
         ArrayList uncheck = new ArrayList<Class>();
         uncheck.add(MainActivity.class);
-        ActivityMonitor.get().attach(base, uncheck);
+        ActivityMonitor.get().attach(base,uncheck);
     }
 }

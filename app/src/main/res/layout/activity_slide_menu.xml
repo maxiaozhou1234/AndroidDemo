@@ -1,0 +1,241 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:overScrollMode="never"
+    android:scrollbars="none">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:layout_marginBottom="6dp"
+                android:text="反馈日志："
+                android:textColor="#2B2B2B"
+                android:textSize="16sp" />
+
+            <TextView
+                android:id="@+id/tvLog"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="6dp"
+                android:textColor="#222222"
+                android:textSize="16sp" />
+        </LinearLayout>
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="70dp"
+            android:layout_marginTop="10dp"
+            android:background="#69F0AE">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="4dp"
+                android:text="FrameLayout"
+                android:textAllCaps="false"
+                android:textColor="@color/black"
+                android:textSize="16sp" />
+
+            <TextView
+                android:layout_width="160dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center|right"
+                android:text="这个说明不重置/覆盖 elevation 会导致后写的 view 被设置的 elevation 遮盖"
+                android:textAllCaps="false"
+                android:textColor="@color/black"
+                android:textSize="14sp" />
+
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_marginTop="15dp"
+                android:elevation="0dp"
+                android:stateListAnimator="@null"
+                android:text="A" />
+
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_marginStart="140dp"
+                android:text="B" />
+
+            <TextView
+                android:layout_width="150dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_marginStart="55dp"
+                android:background="#536DFE"
+                android:gravity="center"
+                android:text="被遮盖文字说明"
+                android:textColor="@color/white"
+                android:textSize="18sp" />
+        </FrameLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1px"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="2dp"
+            android:background="@color/black" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1px"
+            android:layout_marginTop="2dp"
+            android:layout_marginBottom="5dp"
+            android:background="@color/black" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="多菜单隐藏在控件下方测试，仿 SwipeDelMenuLayout"
+            android:textColor="@color/black"
+            android:textSize="15sp" />
+
+        <com.zhou.android.ui.SlideMenuLayout
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:layout_marginTop="10dp"
+            app:view_style="cover"
+            app:swipe_direction="rightSwipe">
+
+            <Button
+                android:id="@+id/btn6"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:text="置顶" />
+
+            <Button
+                android:id="@+id/btn7"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:elevation="0dp"
+                android:stateListAnimator="@null"
+                android:text="删除" />
+
+            <TextView
+                android:id="@+id/tv3"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="#64B5F6"
+                android:gravity="center"
+                android:text="多菜单隐藏在控件下方测试\ncover 模式需要把显示放在最后一个"
+                android:textColor="@color/white"
+                android:textSize="15sp" />
+        </com.zhou.android.ui.SlideMenuLayout>
+
+        <com.zhou.android.ui.SlideMenuLayout
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:layout_marginTop="10dp"
+            app:view_style="cover"
+            app:swipe_direction="leftSwipe">
+
+            <Button
+                android:id="@+id/btn8"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:text="取消置顶" />
+
+            <Button
+                android:id="@+id/btn9"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:elevation="0dp"
+                android:stateListAnimator="@null"
+                android:text="清空" />
+
+            <TextView
+                android:id="@+id/tv4"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="#268DDE"
+                android:gravity="center"
+                android:text="多菜单隐藏在控件下方 cover 模式"
+                android:textColor="@color/white"
+                android:textSize="15sp" />
+        </com.zhou.android.ui.SlideMenuLayout>
+
+        <com.zhou.android.ui.SlideMenuLayout
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:layout_marginTop="10dp"
+            app:view_style="expand"
+            app:swipe_direction="leftSwipe">
+
+            <TextView
+                android:id="@+id/tv5"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="#E57373"
+                android:gravity="center"
+                android:text="多菜单扩展右侧 expand 模式\nexpand 模式需要把显示item放在第一个"
+                android:textColor="@color/white"
+                android:textSize="15sp" />
+
+            <Button
+                android:id="@+id/btn10"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:text="取消置顶" />
+
+            <Button
+                android:id="@+id/btn11"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:elevation="0dp"
+                android:stateListAnimator="@null"
+                android:text="清空" />
+
+        </com.zhou.android.ui.SlideMenuLayout>
+
+
+        <com.zhou.android.ui.SlideMenuLayout
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:layout_marginTop="10dp"
+            app:view_style="expand"
+            app:swipe_direction="rightSwipe">
+
+            <TextView
+                android:id="@+id/tv6"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="#E75656"
+                android:gravity="center"
+                android:text="多菜单扩展在控件 expand 右滑"
+                android:textColor="@color/white"
+                android:textSize="15sp" />
+
+            <Button
+                android:id="@+id/btn12"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:text="打开" />
+
+            <Button
+                android:id="@+id/btn13"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:elevation="0dp"
+                android:stateListAnimator="@null"
+                android:text="关闭" />
+
+        </com.zhou.android.ui.SlideMenuLayout>
+
+    </LinearLayout>
+</ScrollView>
