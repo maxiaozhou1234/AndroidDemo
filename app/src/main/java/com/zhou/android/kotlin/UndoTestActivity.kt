@@ -113,7 +113,7 @@ class UndoTestActivity : BaseActivity() {
                         val am: ActivityManager = getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
                         val list = am.getRunningTasks(1)
                         if (list != null && list.isNotEmpty()) {
-                            if (this@UndoTestActivity.javaClass.name == list[0].topActivity.className) {
+                            if (this@UndoTestActivity.javaClass.name == list[0].topActivity?.className) {
                                 finish()
                             } else {
                                 //这里会重启倒计时，如果在主页其实在白名单中是不会重计时的

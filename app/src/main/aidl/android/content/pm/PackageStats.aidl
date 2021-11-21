@@ -1,5 +1,5 @@
 // PackageStats.aidl
-package com.atsmarthome.robot;
+package android.content.pm;
 
 // Declare any non-default types here with import statements
 

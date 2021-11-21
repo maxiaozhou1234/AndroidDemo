@@ -8,9 +8,9 @@ import android.os.Parcelable
  */
 data class Article(var title: String, var content: String, var image: String? = null) : Parcelable {
     constructor(parcel: Parcel) : this(
-            parcel.readString(),
-            parcel.readString(),
-            parcel.readString()) {
+            parcel.readString()?:"",
+            parcel.readString()?:"",
+            parcel.readString()?:"") {
     }
 
     override fun writeToParcel(parcel: Parcel, flags: Int) {

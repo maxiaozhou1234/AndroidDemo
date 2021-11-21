@@ -44,7 +44,7 @@ import java.util.UUID;
  * 存储查询
  * Created by Administrator on 2018/11/30.
  */
-
+@RequiresApi(api = Build.VERSION_CODES.O)
 public class StorageActivity extends BaseActivity {
 
     private final static String TAG = "storage";
@@ -182,7 +182,7 @@ public class StorageActivity extends BaseActivity {
      * @param fsUuid
      * @return
      */
-
+    @RequiresApi(api = Build.VERSION_CODES.O)
     private UUID getUuid(String fsUuid) {
         UUID id;
         if (fsUuid == null) {
@@ -203,6 +203,7 @@ public class StorageActivity extends BaseActivity {
      * @param fsUuid
      * @param sharedUuid
      */
+    @RequiresApi(api = Build.VERSION_CODES.O)
     private void measure(UUID fsUuid, UUID sharedUuid) {
         StorageStatsManager stats = getSystemService(StorageStatsManager.class);
         try {

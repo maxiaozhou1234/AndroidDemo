@@ -382,7 +382,7 @@ class SlideMenuLayout @JvmOverloads constructor(context: Context, attributeSet: 
         if (isExpandStyle)
             super.scrollBy(x, y)
         else if (contentView != null)
-            ViewCompat.offsetLeftAndRight(contentView, -x)
+            ViewCompat.offsetLeftAndRight(contentView!!, -x)
     }
 
     //扩展模式：把整个 ViewGroup 左移右移

@@ -14,7 +14,6 @@ import java.util.List;
 /**
  * Created by ZhOu on 2017/2/9.
  */
-
 public class ZApplication extends Application {
 
     public static Context context;

@@ -103,7 +103,7 @@ class NtpTimeActivity : BaseActivity() {
             // set mode = 3 (client) and version = 3
             // mode is in low 3 bits of first byte
             // version is in bits 3-5 of first byte
-            buffer[0] = (NTP_MODE_CLIENT or (NTP_VERSION shl 3)).toByte()
+            buffer[0] = (NTP_MODE_CLIENT or (NTP_VERSION shl 3)).toInt().toByte()
 
             // get current time and write it to the request packet
             val requestTime = System.currentTimeMillis()
@@ -119,7 +119,7 @@ class NtpTimeActivity : BaseActivity() {
             val responseTime = requestTime + (responseTicks - requestTicks)
 
             // extract the results
-            val leap = (buffer[0].toInt() shr 6 and 0x3).toByte()
+            val leap = (buffer[0].toInt() shr 6 and 0x3).toInt().toByte()
             val mode = (buffer[0] and 0x7)
             val stratum = (buffer[1].toInt() and 0xff)
             val originateTime = readTimeStamp(buffer, ORIGINATE_TIME_OFFSET)
@@ -132,16 +132,27 @@ class NtpTimeActivity : BaseActivity() {
             val roundTripTime = responseTicks - requestTicks - (transmitTime - receiveTime)
 
             val clockOffset = (receiveTime - originateTime + (transmitTime - responseTime)) / 2
-            Log.d(TAG, "round trip: " + roundTripTime + "ms, " +
-                    "clock offset: " + clockOffset + "ms")
+            Log.d(
+                TAG, "round trip: " + roundTripTime + "ms, " +
+                        "clock offset: " + clockOffset + "ms"
+            )
 
             // save our results - use the times on this side of the network latency
             // (response rather than request time)
             mNtpTime = responseTime + clockOffset
             mNtpTimeReference = responseTicks
             mRoundTripTime = roundTripTime
-            sendMsg("success >> mNtpTime: $mNtpTime, mRoundTripTime: $mRoundTripTime \n格式化 >> ${formatter.format(mNtpTime)}")
-            Log.d("zhou", "success >> mNtpTime: $mNtpTime, mRoundTripTime: $mRoundTripTime, mNtpTimeReference: $mNtpTimeReference")
+            sendMsg(
+                "success >> mNtpTime: $mNtpTime, mRoundTripTime: $mRoundTripTime \n格式化 >> ${
+                    formatter.format(
+                        mNtpTime
+                    )
+                }"
+            )
+            Log.d(
+                "zhou",
+                "success >> mNtpTime: $mNtpTime, mRoundTripTime: $mRoundTripTime, mNtpTimeReference: $mNtpTimeReference"
+            )
         } catch (e: Exception) {
             if (DBG) Log.d(TAG, "request time failed: $e")
             sendMsg("request time failed: $e")
@@ -166,18 +177,18 @@ class NtpTimeActivity : BaseActivity() {
         seconds += OFFSET_1900_TO_1970
 
         // write seconds in big endian format
-        buffer[offset++] = (seconds shr 24).toByte()
-        buffer[offset++] = (seconds shr 16).toByte()
-        buffer[offset++] = (seconds shr 8).toByte()
-        buffer[offset++] = (seconds shr 0).toByte()
+        buffer[offset++] = (seconds shr 24).toInt().toByte()
+        buffer[offset++] = (seconds shr 16).toInt().toByte()
+        buffer[offset++] = (seconds shr 8).toInt().toByte()
+        buffer[offset++] = (seconds shr 0).toInt().toByte()
 
         val fraction = milliseconds * 0x100000000L / 1000L
         // write fraction in big endian format
-        buffer[offset++] = (fraction shr 24).toByte()
-        buffer[offset++] = (fraction shr 16).toByte()
-        buffer[offset++] = (fraction shr 8).toByte()
+        buffer[offset++] = (fraction shr 24).toInt().toByte()
+        buffer[offset++] = (fraction shr 16).toInt().toByte()
+        buffer[offset++] = (fraction shr 8).toInt().toByte()
         // low order bits should be random data
-        buffer[offset++] = (Math.random() * 255.0).toByte()
+        buffer[offset++] = (Math.random() * 255.0).toInt().toByte()
     }
 
     private fun readTimeStamp(buffer: ByteArray, offset: Int): Long {
@@ -206,7 +217,8 @@ class NtpTimeActivity : BaseActivity() {
 
     @Throws(Exception::class)
     private fun checkValidServerReply(
-            leap: Byte, mode: Byte, stratum: Int, transmitTime: Long) {
+        leap: Byte, mode: Byte, stratum: Int, transmitTime: Long
+    ) {
         if (leap.toInt() == NTP_LEAP_NOSYNC) {
             throw Exception("unsynchronized server")
         }

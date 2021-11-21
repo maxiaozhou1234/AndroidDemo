@@ -18,9 +18,9 @@ import com.zhou.android.bluetooth.BluetoothActivity;
 import com.zhou.android.item.GridViewItem;
 import com.zhou.android.kotlin.AnalysisDecorActivity;
 import com.zhou.android.kotlin.AnimRecyclerActivity;
-import com.zhou.android.kotlin.OrderFragmentActivity;
 import com.zhou.android.kotlin.LargeImageActivity;
 import com.zhou.android.kotlin.NtpTimeActivity;
+import com.zhou.android.kotlin.OrderFragmentActivity;
 import com.zhou.android.kotlin.RecyclerSwipeActivity;
 import com.zhou.android.kotlin.SimpleListKotlinActivity;
 import com.zhou.android.kotlin.StorageCleanActivity;
@@ -34,12 +34,12 @@ import com.zhou.android.main.CallLogActivity;
 import com.zhou.android.main.CameraH264Activity;
 import com.zhou.android.main.CameraUtilTestActivity;
 import com.zhou.android.main.ContactActivity;
+import com.zhou.android.main.DexClassLoaderActivity;
 import com.zhou.android.main.FingerPrintActivity;
 import com.zhou.android.main.FloatBallActivity;
 import com.zhou.android.main.FocusAnimActivity;
 import com.zhou.android.main.FocusDrawActivity;
 import com.zhou.android.main.ForbidScreenshotActivity;
-import com.zhou.android.main.FunctionGuideActivity;
 import com.zhou.android.main.LocalNetActivity;
 import com.zhou.android.main.NestedBehaviorActivity;
 import com.zhou.android.main.NestedScrollActivity;
@@ -47,8 +47,12 @@ import com.zhou.android.main.PhotoPickerActivity;
 import com.zhou.android.main.PointZoomActivity;
 import com.zhou.android.main.PreviewWithCamera2Activity;
 import com.zhou.android.main.RecyclerViewScrollActivity;
+import com.zhou.android.main.RippleActivity;
 import com.zhou.android.main.RoundViewActivity;
 import com.zhou.android.main.ScrollTestActivity;
+import com.zhou.android.main.SkinActivity;
+import com.zhou.android.main.SkinExternalResActivity;
+import com.zhou.android.main.SlideMenuActivity;
 import com.zhou.android.main.StorageActivity;
 import com.zhou.android.main.SurfaceActivity;
 import com.zhou.android.main.TestRvActivity;
@@ -118,7 +122,12 @@ public class MainActivity extends AppCompatActivity {
         if (list.size() == 0) {
 
             new Thread(() -> {
+                list.add(new GridViewItem(DexClassLoaderActivity.class, "dex 加载"));
+                list.add(new GridViewItem(SkinActivity.class, "白天/黑暗"));
+                list.add(new GridViewItem(SkinExternalResActivity.class, "换肤 Res"));
 
+                list.add(new GridViewItem(SlideMenuActivity.class, "滑动-更多"));
+                list.add(new GridViewItem(RippleActivity.class, "水波纹"));
                 list.add(new GridViewItem(RecyclerSwipeActivity.class, "侧滑删除"));
                 list.add(new GridViewItem(OrderFragmentActivity.class, "协程测试"));
                 list.add(new GridViewItem(PreviewWithCamera2Activity.class, "预览帧拍照"));
@@ -129,7 +138,7 @@ public class MainActivity extends AppCompatActivity {
                 list.add(new GridViewItem(VerifyCodeActivity.class, "短信验证码控件"));
                 list.add(new GridViewItem(CameraH264Activity.class, "h264硬编码"));
                 list.add(new GridViewItem(TimeLineActivity.class, "时间线"));
-                list.add(new GridViewItem(FunctionGuideActivity.class, "功能引导"));
+//                list.add(new GridViewItem(FunctionGuideActivity.class, "功能引导"));
                 list.add(new GridViewItem(RoundViewActivity.class, "圆形图片"));
                 list.add(new GridViewItem(FocusDrawActivity.class, "图片动画"));
                 list.add(new GridViewItem(FocusAnimActivity.class, "识别框动画"));

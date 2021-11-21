@@ -58,7 +58,7 @@ class ThrowExceptionActivity : BaseActivity() {
         unregisterReceiver(receiver)
     }
 
-    override fun onRestoreInstanceState(savedInstanceState: Bundle?) {
+    override fun onRestoreInstanceState(savedInstanceState: Bundle) {
         super.onRestoreInstanceState(savedInstanceState)
         Log.i("zhou", "onRestoreInstanceState")
         fragment1.setText("onRestoreInstanceState1")

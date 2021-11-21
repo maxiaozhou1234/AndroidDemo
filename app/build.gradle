@@ -3,12 +3,12 @@ apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'//用来解析布局id，不用再写findViewById
 
 android {
-    compileSdkVersion 27
-//    buildToolsVersion '28.0.3'
+    compileSdkVersion 30
+    buildToolsVersion '30.0.2'
     defaultConfig {
         applicationId "com.zhou.android"
         minSdkVersion 19
-        targetSdkVersion 26
+        targetSdkVersion 30
         versionCode 1
         versionName "1.0"
         multiDexEnabled true
@@ -35,8 +35,8 @@ repositories {
 }
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
-    implementation 'com.android.support:appcompat-v7:26.1.0'
-    implementation 'com.android.support:design:26.1.0'
+    implementation 'com.android.support:appcompat-v7:28.0.0'
+    implementation 'com.android.support:design:27.1.1'
     implementation 'com.android.support.constraint:constraint-layout:1.0.2'
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
     implementation 'com.github.bumptech.glide:glide:3.7.0'
@@ -50,13 +50,15 @@ dependencies {
     implementation 'com.squareup.okhttp3:okhttp:3.10.0'
     implementation 'io.reactivex.rxjava2:rxjava:2.1.16'
     implementation 'com.tbruyelle.rxpermissions2:rxpermissions:0.9.5'
-    implementation 'com.github.worker8:tourguide:v1.0.19-SNAPSHOT'
+//    implementation 'com.github.worker8:tourguide:v1.0.19-SNAPSHOT'
+    implementation 'com.dev.hieupt:tourguide:1.0.1'
     implementation 'com.vivian.widgets:TimeLineItemDecoration:1.5'
     //微信分享使用，需要申请id
 //    implementation group: 'com.tencent.mm.opensdk', name: 'wechat-sdk-android-without-mta', version: '5.5.4'
 
     implementation 'com.github.CymChad:BaseRecyclerViewAdapterHelper:2.9.50'
-    implementation 'com.github.lcodecorex:TwinklingRefreshLayout:v1.03'
+//    implementation 'com.github.lcodecorex:TwinklingRefreshLayout:v1.07'
+    implementation 'com.lcodecorex:tkrefreshlayout:1.0.7'
     implementation 'com.scwang.smartrefresh:SmartRefreshHeader:1.1.0'
     implementation 'com.scwang.smartrefresh:SmartRefreshLayout:1.1.0'
 

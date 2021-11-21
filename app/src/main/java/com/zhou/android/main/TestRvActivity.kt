@@ -4,6 +4,7 @@ import android.support.v7.widget.LinearLayoutManager
 import android.widget.TextView
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.BaseViewHolder
+import com.lcodecore.tkrefreshlayout.RefreshListenerAdapter
 import com.lcodecore.tkrefreshlayout.TwinklingRefreshLayout
 import com.zhou.android.R
 import com.zhou.android.common.BaseActivity
@@ -67,45 +68,9 @@ class TestRvActivity : BaseActivity() {
             adapter = DynamicAdapter(data2)
         }
 
-        refreshLayout.setOnRefreshListener(object : TwinklingRefreshLayout.OnRefreshListener() {
+        refreshLayout.setOnRefreshListener(object : RefreshListenerAdapter() {
             override fun onRefresh(refreshLayout: TwinklingRefreshLayout) {
                 composite.add(Observable.timer(3, TimeUnit.SECONDS)
-                        .doOnSubscribe {
-                            toast("开始刷新")
-                        }
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe {
-                            val tmp = ArrayList<String>(20)
-                            for (i in 1.until(20)) {
-                                tmp.add("new item $i")
-                            }
-                            data.addAll(0, tmp)
-                            recyclerView.adapter.notifyDataSetChanged()
-                            refreshLayout.finishRefreshing()
-                            toast("刷新完成")
-                        })
-            }
-
-            override fun onLoadMore(refreshLayout: TwinklingRefreshLayout) {
-                composite.add(Observable.timer(3, TimeUnit.SECONDS)
-                        .doOnSubscribe {
-                            toast("开始加载更多")
-                        }
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe {
-                            val s = data.size
-                            for (i in 0.until(20)) {
-                                data.add("<< item ${s + i}")
-                            }
-                            recyclerView.adapter.notifyDataSetChanged()
-                            refreshLayout.finishLoadmore()
-                            toast("加载完成")
-                        })
-            }
-        })
-
-        smartRefreshLayout.setOnRefreshListener {
-            composite.add(Observable.timer(3, TimeUnit.SECONDS)
                     .doOnSubscribe {
                         toast("开始刷新")
                     }
@@ -113,38 +78,74 @@ class TestRvActivity : BaseActivity() {
                     .subscribe {
                         val tmp = ArrayList<String>(20)
                         for (i in 1.until(20)) {
-                            tmp.add("<< item $i")
+                            tmp.add("new item $i")
                         }
-                        data2.addAll(0, tmp)
-                        recyclerView2.adapter.notifyDataSetChanged()
+                        data.addAll(0, tmp)
+                        recyclerView.adapter.notifyDataSetChanged()
+                        refreshLayout.finishRefreshing()
                         toast("刷新完成")
-                        smartRefreshLayout.finishRefresh()
                     })
-        }
+            }
 
-        smartRefreshLayout.setOnLoadMoreListener {
-            composite.add(Observable.timer(5, TimeUnit.SECONDS)
+            override fun onLoadMore(refreshLayout: TwinklingRefreshLayout) {
+                composite.add(Observable.timer(3, TimeUnit.SECONDS)
                     .doOnSubscribe {
                         toast("开始加载更多")
                     }
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe {
-                        val s = data2.size
+                        val s = data.size
                         for (i in 0.until(20)) {
-                            data2.add("item ${s + i}")
+                            data.add("<< item ${s + i}")
                         }
-                        recyclerView2.adapter.notifyDataSetChanged()
+                        recyclerView.adapter.notifyDataSetChanged()
+                        refreshLayout.finishLoadmore()
                         toast("加载完成")
-                        smartRefreshLayout.finishLoadMore()
                     })
+            }
+        })
+
+        smartRefreshLayout.setOnRefreshListener {
+            composite.add(Observable.timer(3, TimeUnit.SECONDS)
+                .doOnSubscribe {
+                    toast("开始刷新")
+                }
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe {
+                    val tmp = ArrayList<String>(20)
+                    for (i in 1.until(20)) {
+                        tmp.add("<< item $i")
+                    }
+                    data2.addAll(0, tmp)
+                    recyclerView2.adapter.notifyDataSetChanged()
+                    toast("刷新完成")
+                    smartRefreshLayout.finishRefresh()
+                })
+        }
+
+        smartRefreshLayout.setOnLoadMoreListener {
+            composite.add(Observable.timer(5, TimeUnit.SECONDS)
+                .doOnSubscribe {
+                    toast("开始加载更多")
+                }
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe {
+                    val s = data2.size
+                    for (i in 0.until(20)) {
+                        data2.add("item ${s + i}")
+                    }
+                    recyclerView2.adapter.notifyDataSetChanged()
+                    toast("加载完成")
+                    smartRefreshLayout.finishLoadMore()
+                })
         }
     }
 
     override fun addListener() {
     }
 
-    class DynamicAdapter(data: ArrayList<String>, id: Int = android.R.layout.simple_list_item_1)
-        : BaseQuickAdapter<String, BaseViewHolder>(id, data) {
+    class DynamicAdapter(data: ArrayList<String>, id: Int = android.R.layout.simple_list_item_1) :
+        BaseQuickAdapter<String, BaseViewHolder>(id, data) {
         override fun convert(helper: BaseViewHolder, item: String) {
             helper.getView<TextView>(android.R.id.text1).text = item
         }

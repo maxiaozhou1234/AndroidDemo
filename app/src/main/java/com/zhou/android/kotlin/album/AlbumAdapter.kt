@@ -21,7 +21,7 @@ class AlbumAdapter : RecyclerView.Adapter<AlbumAdapter.ViewHolder> {
         this@AlbumAdapter.data = data
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int): ViewHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         return ViewHolder(LayoutInflater.from(context).inflate(R.layout.layout_picture, parent, false))
     }
 
@@ -29,7 +29,7 @@ class AlbumAdapter : RecyclerView.Adapter<AlbumAdapter.ViewHolder> {
         return data.size
     }
 
-    override fun onBindViewHolder(holder: ViewHolder?, position: Int) {
+    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         Picasso.with(context)
                 .load(data[position])
                 .error(R.drawable.ic_place)

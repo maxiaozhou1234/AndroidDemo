@@ -28,7 +28,7 @@ class TextFragment : Fragment() {
         return text
     }
 
-    override fun onViewCreated(view: View?, savedInstanceState: Bundle?) {
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         text?.text = str
         text?.setBackgroundColor(color)

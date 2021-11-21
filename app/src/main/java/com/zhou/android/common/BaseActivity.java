@@ -9,7 +9,6 @@ import android.view.MenuItem;
 /**
  * Created by ZhOu on 2017/2/9.
  */
-
 public abstract class BaseActivity extends AppCompatActivity {
 
     @Override

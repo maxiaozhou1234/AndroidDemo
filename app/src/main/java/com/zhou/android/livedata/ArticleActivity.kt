@@ -101,8 +101,8 @@ class ArticleActivity : BaseActivity() {
 //        return super.onCreateOptionsMenu(menu)
     }
 
-    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
-        if (item?.itemId == R.id.menu_status) {
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        if (item.itemId == R.id.menu_status) {
             startActivity(Intent(this, LDBusActivity::class.java))
             return true
         }

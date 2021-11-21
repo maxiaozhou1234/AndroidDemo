@@ -26,7 +26,7 @@ class AlbumPagerAdapter : PagerAdapter {
         }
     }
 
-    override fun isViewFromObject(view: View?, `object`: Any?): Boolean {
+    override fun isViewFromObject(view: View, `object`: Any): Boolean {
         return view == `object`
     }
 
@@ -34,7 +34,7 @@ class AlbumPagerAdapter : PagerAdapter {
         return data.size
     }
 
-    override fun getItemPosition(`object`: Any?): Int {
+    override fun getItemPosition(`object`: Any): Int {
         if (needFreshCount > 0) {
             needFreshCount--
             return POSITION_NONE
@@ -43,14 +43,14 @@ class AlbumPagerAdapter : PagerAdapter {
         }
     }
 
-    override fun instantiateItem(container: ViewGroup?, position: Int): Any {
+    override fun instantiateItem(container: ViewGroup, position: Int): Any {
         val imageView = images[position]
         container?.addView(imageView)
         return imageView
     }
 
-    override fun destroyItem(container: ViewGroup?, position: Int, `object`: Any?) {
-        container?.removeView(images[position])
+    override fun destroyItem(container: ViewGroup, position: Int, `object`: Any) {
+        container.removeView(images[position])
 //        images.removeAt(position)
 //        (container as ViewPager).removeView(`object` as View)
     }

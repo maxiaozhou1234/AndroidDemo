@@ -30,7 +30,7 @@ class LiveEvent<T> {
             Log.d("liveBus", "get version $version")
         } catch (e: NoSuchFieldException) {
             e.printStackTrace()
-            Log.e("liveBus", e.message)
+            Log.e("liveBus", "error:${e.message}")
         }
         return version
     }

@@ -24,8 +24,8 @@ class SimpleListKotlinActivity : AppCompatActivity() {
         listView.adapter = adapter
     }
 
-    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
-        if (android.R.id.home == item?.itemId) {
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        if (android.R.id.home == item.itemId) {
             finish()
             return true
         } else

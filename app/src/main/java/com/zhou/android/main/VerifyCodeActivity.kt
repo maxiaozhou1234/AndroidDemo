@@ -37,7 +37,7 @@ class VerifyCodeActivity : BaseActivity() {
     private val pop: PopupWindow by lazy {
         PopupWindow(this).apply {
             val layout = LayoutInflater.from(this@VerifyCodeActivity)
-                    .inflate(R.layout.layout_shared, null)
+                .inflate(R.layout.layout_shared, null)
 
             layout.findViewById<Button>(R.id.btnFriend).setOnClickListener {
 
@@ -74,8 +74,15 @@ class VerifyCodeActivity : BaseActivity() {
 
             }
             layout.findViewById<Button>(R.id.btnLink).setOnClickListener {
-                val clipboard = this@VerifyCodeActivity.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-                clipboard.primaryClip = ClipData("link", arrayOf("text/plain"), ClipData.Item("https:www.baidu.com"))
+                val clipboard =
+                    this@VerifyCodeActivity.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+                clipboard.setPrimaryClip(
+                    ClipData(
+                        "link",
+                        arrayOf("text/plain"),
+                        ClipData.Item("https:www.baidu.com")
+                    )
+                )
                 toast("复制成功")
             }
 

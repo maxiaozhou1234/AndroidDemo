@@ -55,7 +55,7 @@ class SkinExternalResActivity : AppCompatActivity() {
 
             try {
                 val packageInfo = context.packageManager.getPackageArchiveInfo(skinPath, PackageManager.GET_ACTIVITIES)
-                packageName = packageInfo.packageName //解析并存储包名，加载资源需要用到
+                packageName = packageInfo!!.packageName //解析并存储包名，加载资源需要用到
 
                 //构建 AssetManager，反射指定资源路径
                 val am = AssetManager::class.java.newInstance()

@@ -337,7 +337,7 @@ object StorageUtil {
         val data = mutableListOf<AppDetail>()
         var count = 0
 
-        override fun onGetStatsCompleted(pStats: PackageStats?, succeeded: Boolean) {
+        override fun onGetStatsCompleted(pStats: PackageStats, succeeded: Boolean) {
             pStats?.also {
                 val app = map[it.packageName]
                 app?.apply {

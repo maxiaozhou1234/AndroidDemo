@@ -71,7 +71,7 @@ class RoundViewActivity : BaseActivity() {
 
     class SimpleAdapter(val context: Context, val data: ArrayList<String>, val itemClick: ((position: Int) -> Unit)) : RecyclerView.Adapter<VH>() {
 
-        override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int): VH = VH(LayoutInflater.from(context).inflate(R.layout.layout_small_text, parent, false))
+        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): VH = VH(LayoutInflater.from(context).inflate(R.layout.layout_small_text, parent, false))
 
         override fun getItemCount(): Int = data.size
 

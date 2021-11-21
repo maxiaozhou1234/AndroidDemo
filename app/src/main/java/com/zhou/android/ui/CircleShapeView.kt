@@ -38,7 +38,7 @@ class CircleShapeView : View {
             canvas.clipPath(circlePath, Region.Op.INTERSECT)
             //将位图放到中间
             m.postTranslate(width / 2 - innerRadius, height / 2 - innerRadius)
-            canvas.drawBitmap(faceBitmap, m, headPaint)
+            canvas.drawBitmap(faceBitmap!!, m, headPaint)
         } else if (innerRadius > 0) {
             canvas.clipRect(0F, 0F, width.toFloat(), height.toFloat())
             canvas.clipPath(circlePath, Region.Op.XOR)

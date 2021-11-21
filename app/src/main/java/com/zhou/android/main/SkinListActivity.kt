@@ -70,11 +70,11 @@ class SkinListActivity : AppCompatActivity() {
         return true
     }
 
-    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
-        if (item?.itemId == android.R.id.home) {
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        if (item.itemId == android.R.id.home) {
             finish()
             return true
-        } else if (item?.itemId == R.id.menu_switch) {
+        } else if (item.itemId == R.id.menu_switch) {
             SkinManager.switchMode()
             return true
         }
